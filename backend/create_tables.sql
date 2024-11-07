@@ -483,7 +483,7 @@ CREATE TABLE LIG_BOX_SCORE(
     fouls_received INT,
     valuation INT,
     plus_minus INT,
-
+    
 
 );
 
@@ -536,7 +536,7 @@ CREATE TABLE CUP_PLAYERS(
     fouls_received_per_game FLOAT,
     valuation_per_game FLOAT,
 
-    FOREIGN KEY (season_team_id) REFERENCES  CUP_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (season_team_id) REFERENCES  CUP_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE LIG_PLAYERS(
@@ -587,5 +587,5 @@ CREATE TABLE LIG_PLAYERS(
     fouls_received_per_game FLOAT,
     valuation_per_game FLOAT,
 
-    FOREIGN KEY (season_team_id) REFERENCES  LIG_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (season_team_id) REFERENCES  LIG_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
