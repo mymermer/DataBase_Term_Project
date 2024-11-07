@@ -360,60 +360,56 @@ CREATE TABLE LIG_HEADER(
 );
 
 CREATE TABLE CUP_PLAY_BY_PLAY(
+   
     game_play_id VARCHAR(50) PRIMARY KEY,
+    game_player_id VARCHAR(50),
+    game_point_id VARCHAR(50),
     game_id VARCHAR(50),
     game VARCHAR(50),
     round INT,
     phase VARCHAR(50),
-    season_code VARCHAR(50),
+    season_player_id VARCHAR(50),
+    season_team_id  VARCHAR(50),
     quarter VARCHAR(10),
     type INT,
-    number_of_play INT,
-    team_id VARCHAR(50),
-    player_id VARCHAR(50),
     play_type VARCHAR(10),
     player VARCHAR(100),
     team VARCHAR(50),
     dorsal INT,
     minute INT,
-    marker_time VARCHAR(10),
     points_a INT,
     points_b INT,
-    comment TEXT,
     play_info VARCHAR(100),
 
-    FOREIGN KEY (game_id) REFERENCES  CUP_COMPARISON(game_id) ON DELETE CASCADE ON UPDATE CASCADE
-
-
+    FOREIGN KEY (game_player_id) REFERENCES  CUP_COMPARISON(game_player_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (game_player_id) REFERENCES  CUP_POINTS(game_player_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 CREATE TABLE LIG_PLAY_BY_PLAY(
+    
     game_play_id VARCHAR(50) PRIMARY KEY,
+    game_player_id VARCHAR(50),
+    game_point_id VARCHAR(50),
     game_id VARCHAR(50),
     game VARCHAR(50),
     round INT,
     phase VARCHAR(50),
-    season_code VARCHAR(50),
+    season_player_id VARCHAR(50),
+    season_team_id  VARCHAR(50),
     quarter VARCHAR(10),
     type INT,
-    number_of_play INT,
-    team_id VARCHAR(50),
-    player_id VARCHAR(50),
     play_type VARCHAR(10),
     player VARCHAR(100),
     team VARCHAR(50),
     dorsal INT,
     minute INT,
-    marker_time VARCHAR(10),
     points_a INT,
     points_b INT,
-    comment TEXT,
     play_info VARCHAR(100),
 
-    FOREIGN KEY (game_id) REFERENCES  CUP_COMPARISON(game_id) ON DELETE CASCADE ON UPDATE CASCADE
-
-
+    FOREIGN KEY (game_player_id) REFERENCES  LIG_COMPARISON(game_player_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (game_player_id) REFERENCES  LIG_POINTS(game_player_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -457,9 +453,6 @@ CREATE TABLE CUP_BOX_SCORE(
     FOREIGN KEY (game_play_id) REFERENCES  CUP_PLAY_BY_PLAY(game_play_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (season_player_id) REFERENCES  CUP_PLAYERS(season_player_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (season_team_id) REFERENCES  CUP_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE
-
-
-
 );
 
 
