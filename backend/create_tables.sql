@@ -382,6 +382,9 @@ CREATE TABLE CUP_PLAY_BY_PLAY(
     comment TEXT,
     play_info VARCHAR(100),
 
+    FOREIGN KEY (game_id) REFERENCES  CUP_COMPARISON(game_id) ON DELETE CASCADE ON UPDATE CASCADE
+
+
 );
 
 
@@ -408,16 +411,21 @@ CREATE TABLE LIG_PLAY_BY_PLAY(
     comment TEXT,
     play_info VARCHAR(100),
 
+    FOREIGN KEY (game_id) REFERENCES  CUP_COMPARISON(game_id) ON DELETE CASCADE ON UPDATE CASCADE
+
+
 );
 
 
 CREATE TABLE CUP_BOX_SCORE(
     game_player_id VARCHAR(50) PRIMARY KEY,
+    game_play_id VARCHAR(50),
     game_id VARCHAR(50),
     game VARCHAR(50),
     round INT,
     phase VARCHAR(50),
-    season_code VARCHAR(50),
+    season_player_id VARCHAR(50),
+    season_team_id  VARCHAR(50),
     player_id VARCHAR(50),
     is_starter BOOLEAN,
     is_playing BOOLEAN,
@@ -444,6 +452,12 @@ CREATE TABLE CUP_BOX_SCORE(
     fouls_received INT,
     valuation INT,
     plus_minus INT,
+
+    FOREIGN KEY (game_id) REFERENCES  CUP_COMPARISON(game_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (game_play_id) REFERENCES  CUP_PLAY_BY_PLAY(game_play_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (season_player_id) REFERENCES  CUP_PLAYERS(season_player_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (season_team_id) REFERENCES  CUP_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE
+
 
 
 );
@@ -483,7 +497,12 @@ CREATE TABLE LIG_BOX_SCORE(
     fouls_received INT,
     valuation INT,
     plus_minus INT,
-    
+
+    FOREIGN KEY (game_id) REFERENCES  CUP_COMPARISON(game_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (game_play_id) REFERENCES  CUP_PLAY_BY_PLAY(game_play_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (season_player_id) REFERENCES  CUP_PLAYERS(season_player_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (season_team_id) REFERENCES  CUP_TEAMS(season_team_id) ON DELETE CASCADE ON UPDATE CASCADE
+
 
 );
 
