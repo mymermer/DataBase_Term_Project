@@ -1,4 +1,5 @@
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' INTO TABLE CUP_POINTS FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' INTO TABLE CUP_POINTS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' 
+ LINES TERMINATED BY '\n' IGNORE 1 ROWS  (
     game_point_id,
     game_player_id,
     game_play_id,
@@ -18,13 +19,14 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' 
     minute,
     points_a,
     points_b,
-    @timestamp
+    @date_time_stp
 );
-SET time_stamp = STR_TO_DATE(@timestamp, '%m/%d/%Y %H:%i');
+UPDATE CUP_POINTS
+SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
 
 -- End of load table for CUP_POINTS
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_POINTS.csv' INTO TABLE LIG_POINTS FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_POINTS.csv' INTO TABLE LIG_POINTS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_point_id,
     game_player_id,
     game_play_id,
@@ -44,13 +46,14 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_POINTS.csv' 
     minute,
     points_a,
     points_b,
-    @timestamp
+    @date_time_stp
 );
-SET time_stamp = STR_TO_DATE(@timestamp, '%m/%d/%Y %H:%i');
+UPDATE CUP_POINTS
+SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
 
 -- End of load table for LIG_POINTS
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_TEAMS.csv' INTO TABLE CUP_TEAMS FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_TEAMS.csv' INTO TABLE CUP_TEAMS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     season_team_id,
     games_played,
     minutes_played,
@@ -98,7 +101,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_TEAMS.csv' I
 
 -- End of load table for CUP_TEAMS
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_TEAMS.csv' INTO TABLE LIG_TEAMS FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_TEAMS.csv' INTO TABLE LIG_TEAMS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     season_team_id,
     games_played,
     minutes_played,
@@ -146,7 +149,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_TEAMS.csv' I
 
 -- End of load table for LIG_TEAMS
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_COMPARISON.csv' INTO TABLE CUP_COMPARISON FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_COMPARISON.csv' INTO TABLE CUP_COMPARISON FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_id,
     game,
     round_of_game,
@@ -189,7 +192,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_COMPARISON.c
 
 -- End of load table for CUP_COMPARISON
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_COMPARISON.csv' INTO TABLE LIG_COMPARISON FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_COMPARISON.csv' INTO TABLE LIG_COMPARISON FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_id,
     game,
     round_of_game,
@@ -232,10 +235,10 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_COMPARISON.c
 
 -- End of load table for LIG_COMPARISON
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' INTO TABLE CUP_HEADER FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' INTO TABLE CUP_HEADER FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_id,
     game,
-    date_of_game,
+    @date_of_game,
     time_of_game,
     round_of_game,
     phase,
@@ -265,23 +268,37 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' 
     score_quarter_2_b,
     score_quarter_3_b,
     score_quarter_4_b,
-    score_extra_time_1_a,
-    score_extra_time_2_a,
-    score_extra_time_3_a,
-    score_extra_time_4_a,
-    score_extra_time_1_b,
-    score_extra_time_2_b,
-    score_extra_time_3_b,
-    score_extra_time_4_b,
+    @score_extra_time_1_a,
+    @score_extra_time_2_a,
+    @score_extra_time_3_a,
+    @score_extra_time_4_a,
+    @score_extra_time_1_b,
+    @score_extra_time_2_b,
+    @score_extra_time_3_b,
+    @score_extra_time_4_b,
     winner
+    
 );
+
+UPDATE CUP_HEADER
+SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
+
+
+    score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
+    score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
+    score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
+    score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
+    score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
+    score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
+    score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
+    score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
 
 -- End of load table for CUP_HEADER
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' INTO TABLE LIG_HEADER FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' INTO TABLE LIG_HEADER FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_id,
     game,
-    date_of_game,
+    @date_of_game,
     time_of_game,
     round_of_game,
     phase,
@@ -311,20 +328,33 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' 
     score_quarter_2_b,
     score_quarter_3_b,
     score_quarter_4_b,
-    score_extra_time_1_a,
-    score_extra_time_2_a,
-    score_extra_time_3_a,
-    score_extra_time_4_a,
-    score_extra_time_1_b,
-    score_extra_time_2_b,
-    score_extra_time_3_b,
-    score_extra_time_4_b,
+    @score_extra_time_1_a,
+    @score_extra_time_2_a,
+    @score_extra_time_3_a,
+    @score_extra_time_4_a,
+    @score_extra_time_1_b,
+    @score_extra_time_2_b,
+    @score_extra_time_3_b,
+    @score_extra_time_4_b,
     winner
 );
 
+UPDATE LIG_HEADER
+SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
+
+
+    score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
+    score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
+    score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
+    score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
+    score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
+    score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
+    score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
+    score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
+
 -- End of load table for LIG_HEADER
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAY_BY_PLAY.csv' INTO TABLE CUP_PLAY_BY_PLAY FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAY_BY_PLAY.csv' INTO TABLE CUP_PLAY_BY_PLAY FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_play_id,
     game_player_id,
     game_point_id,
@@ -338,16 +368,21 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAY_BY_PLAY
     play_type,
     player,
     team,
-    dorsal,
+    @dorsal,
     minute,
-    points_a,
-    points_b,
+    @points_a,
+    @points_b,
     play_info
 );
+
+UPDATE CUP_PLAY_BY_PLAY
+SET points_a = NULLIF(@points_a, ''),
+    points_b = NULLIF(@points_b, ''),
+    dorsal = NULLIF(@dorsal, '');
 
 -- End of load table for CUP_PLAY_BY_PLAY
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAY_BY_PLAY.csv' INTO TABLE LIG_PLAY_BY_PLAY FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAY_BY_PLAY.csv' INTO TABLE LIG_PLAY_BY_PLAY FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_play_id,
     game_player_id,
     game_point_id,
@@ -361,16 +396,22 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAY_BY_PLAY
     play_type,
     player,
     team,
-    dorsal,
+    @dorsal,
     minute,
-    points_a,
-    points_b,
+    @points_a,
+    @points_b,
     play_info
 );
 
+UPDATE LIG_PLAY_BY_PLAY
+SET points_a = NULLIF(@points_a, ''),
+    points_b = NULLIF(@points_b, ''),
+    dorsal = NULLIF(@dorsal, '');
+
+
 -- End of load table for LIG_PLAY_BY_PLAY
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_BOX_SCORE.csv' INTO TABLE CUP_BOX_SCORE FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_BOX_SCORE.csv' INTO TABLE CUP_BOX_SCORE FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_player_id,
     game_id,
     game,
@@ -380,7 +421,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_BOX_SCORE.cs
     season_team_id,
     is_starter,
     is_playing,
-    dorsal,
+    @dorsal,
     player,
     points,
     two_points_made,
@@ -401,10 +442,13 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_BOX_SCORE.cs
     fouls_received,
     valuation
 );
+
+UPDATE CUP_BOX_SCORE
+    SET dorsal = NULLIF(@dorsal, '');
 
 -- End of load table for CUP_BOX_SCORE
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_BOX_SCORE.csv' INTO TABLE LIG_BOX_SCORE FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_BOX_SCORE.csv' INTO TABLE LIG_BOX_SCORE FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_player_id,
     game_id,
     game,
@@ -414,7 +458,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_BOX_SCORE.cs
     season_team_id,
     is_starter,
     is_playing,
-    dorsal,
+    @dorsal,
     player,
     points,
     two_points_made,
@@ -436,9 +480,12 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_BOX_SCORE.cs
     valuation
 );
 
+UPDATE LIG_BOX_SCORE
+    SET dorsal = NULLIF(@dorsal, '');
+
 -- End of load table for LIG_BOX_SCORE
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAYERS.csv' INTO TABLE CUP_PLAYERS FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAYERS.csv' INTO TABLE CUP_PLAYERS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     season_player_id,
     season_team_id,
     player,
@@ -464,7 +511,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAYERS.csv'
     fouls_received,
     valuation,
     minutes_per_game,
-    points_per_game,
+    @points_per_game,
     two_points_made_per_game,
     two_points_attempted_per_game,
     two_points_percentage,
@@ -489,7 +536,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_PLAYERS.csv'
 
 -- End of load table for CUP_PLAYERS
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAYERS.csv' INTO TABLE LIG_PLAYERS FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAYERS.csv' INTO TABLE LIG_PLAYERS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     season_player_id,
     season_team_id,
     player,
@@ -515,9 +562,9 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAYERS.csv'
     fouls_received,
     valuation,
     minutes_per_game,
-    points_per_game,
-    two_points_made_per_game,
-    two_points_attempted_per_game,
+    @points_per_game,
+    @two_points_made_per_game,
+    @two_points_attempted_per_game,
     two_points_percentage,
     three_points_made_per_game,
     three_points_attempted_per_game,
@@ -535,8 +582,14 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAYERS.csv'
     blocks_against_per_game,
     fouls_committed_per_game,
     fouls_received_per_game,
-    valuation_per_game
+    @valuation_per_game
 );
+UPDATE LIG_PLAYERS 
+    SET     points_per_game = NULLIF(@points_per_game, 'inf'),
+            two_points_made_per_game =  NULLIF(@two_points_made_per_game, 'inf'),
+            two_points_attempted_per_game =  NULLIF(@two_points_attempted_per_game, 'inf'),
+            valuation_per_game =  NULLIF(@valuation_per_game, 'inf');
+
 
 -- End of load table for LIG_PLAYERS
 
