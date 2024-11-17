@@ -2,8 +2,6 @@ from dataclasses import dataclass
 from db.db import db
 import mysql.connector
 
-
-# Define the data structure for the table
 @dataclass
 class CupBoxscore:
     cup_box_score_id: str
