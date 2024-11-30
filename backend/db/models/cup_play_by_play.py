@@ -24,7 +24,7 @@ class CupPlayByPlay:
     points_a: int
     points_b: int
     comment: str
-    play_info: str
+    play_info: str 
 
 
 class CupPlayByPlayDAO:
