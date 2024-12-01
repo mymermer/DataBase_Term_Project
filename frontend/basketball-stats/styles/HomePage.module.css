@@ -1,0 +1,61 @@
+.container {
+  min-height: 200vh;
+  background-color: white;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.topSection {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-image: url('/basketball-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.topSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 100, 0.6);
+  z-index: 1;
+}
+
+.titleSection {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.titleSection h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.leagueSection {
+  width: 100%;
+  max-width: 1200px;
+  position: relative;
+  z-index: 2;
+}
+
+.statsSection {
+  width: 100%;
+  padding: 4rem 2rem;
+  background-color: white;
+}
+

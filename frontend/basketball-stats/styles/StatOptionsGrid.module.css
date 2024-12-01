@@ -1,0 +1,72 @@
+.statOptionsContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+.optionCard {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.optionCard.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.optionCard:nth-child(7) {
+  grid-column: 2;
+}
+
+.icon {
+  font-size: 2rem;
+  min-width: 2.5rem;
+  transition: transform 0.3s ease;
+}
+
+.label {
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: left;
+  flex-grow: 1;
+  transition: transform 0.3s ease;
+}
+
+.optionCard:hover:not(.disabled) {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background-color: #f8f8f8;
+}
+
+.optionCard:hover:not(.disabled) .icon,
+.optionCard:hover:not(.disabled) .label {
+  transform: scale(1.05);
+}
+
+.optionCard:active:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
