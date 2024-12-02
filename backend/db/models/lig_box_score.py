@@ -1,23 +1,21 @@
 from dataclasses import dataclass
+from datetime import datetime
 from db.db import db
 import mysql.connector
 
-
 @dataclass
-class LigBoxscore:
-    lig_box_score_id: str
+class LigBoxScore:
+    game_player_id: str
     game_id: str
     game: str
-    round: str
+    round_of_game: int
     phase: str
-    season_code: str
-    player_id: str
+    season_player_id: str
+    season_team_id: str
     is_starter: bool
     is_playing: bool
-    team_id: str
     dorsal: int
     player: str
-    minutes: float
     points: int
     two_points_made: int
     two_points_attempted: int
@@ -36,41 +34,38 @@ class LigBoxscore:
     fouls_committed: int
     fouls_received: int
     valuation: int
-    plus_minus: float
 
-
-class LigBoxscoresDAO:
+class LigBoxScoreDAO:
     @staticmethod
-    def create_lig_box_score(db: db, lig_box_score: LigBoxscore) -> None:
+    def create_lig_box_score(db: db, boxscore: LigBoxScore) -> None:
         try:
             connection = db.get_connection()
             cursor = connection.cursor()
             query = """
-                INSERT INTO lig_box_score (
-                    lig_box_score_id, game_id, game, round, phase, season_code,
-                    player_id, is_starter, is_playing, team_id, dorsal, player,
-                    minutes, points, two_points_made, two_points_attempted,
-                    three_points_made, three_points_attempted, free_throws_made,
-                    free_throws_attempted, offensive_rebounds, defensive_rebounds,
-                    total_rebounds, assists, steals, turnovers, blocks_favour,
-                    blocks_against, fouls_committed, fouls_received, valuation,
-                    plus_minus
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO LIG_BOX_SCORE (
+                    game_player_id, game_id, game, round_of_game, phase, season_player_id, season_team_id,
+                    is_starter, is_playing, dorsal, player, points, two_points_made, two_points_attempted,
+                    three_points_made, three_points_attempted, free_throws_made, free_throws_attempted,
+                    offensive_rebounds, defensive_rebounds, total_rebounds, assists, steals, turnovers,
+                    blocks_favour, blocks_against, fouls_committed, fouls_received, valuation
+                ) VALUES (
+                    %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s, %s, %s
+                )
             """
             cursor.execute(query, (
-                lig_box_score.lig_box_score_id, lig_box_score.game_id, lig_box_score.game,
-                lig_box_score.round, lig_box_score.phase, lig_box_score.season_code,
-                lig_box_score.player_id, lig_box_score.is_starter, lig_box_score.is_playing,
-                lig_box_score.team_id, lig_box_score.dorsal, lig_box_score.player,
-                lig_box_score.minutes, lig_box_score.points, lig_box_score.two_points_made,
-                lig_box_score.two_points_attempted, lig_box_score.three_points_made,
-                lig_box_score.three_points_attempted, lig_box_score.free_throws_made,
-                lig_box_score.free_throws_attempted, lig_box_score.offensive_rebounds,
-                lig_box_score.defensive_rebounds, lig_box_score.total_rebounds,
-                lig_box_score.assists, lig_box_score.steals, lig_box_score.turnovers,
-                lig_box_score.blocks_favour, lig_box_score.blocks_against,
-                lig_box_score.fouls_committed, lig_box_score.fouls_received,
-                lig_box_score.valuation, lig_box_score.plus_minus
+                boxscore.game_player_id, boxscore.game_id, boxscore.game, boxscore.round_of_game,
+                boxscore.phase, boxscore.season_player_id, boxscore.season_team_id,
+                boxscore.is_starter, boxscore.is_playing, boxscore.dorsal, boxscore.player,
+                boxscore.points, boxscore.two_points_made, boxscore.two_points_attempted,
+                boxscore.three_points_made, boxscore.three_points_attempted,
+                boxscore.free_throws_made, boxscore.free_throws_attempted,
+                boxscore.offensive_rebounds, boxscore.defensive_rebounds, boxscore.total_rebounds,
+                boxscore.assists, boxscore.steals, boxscore.turnovers,
+                boxscore.blocks_favour, boxscore.blocks_against,
+                boxscore.fouls_committed, boxscore.fouls_received, boxscore.valuation
             ))
             connection.commit()
         except mysql.connector.Error as err:
@@ -81,74 +76,69 @@ class LigBoxscoresDAO:
             connection.close()
 
     @staticmethod
-    def get_lig_box_score(db: db, lig_box_score_id: str) -> LigBoxscore:
+    def get_lig_box_score(db: db, game_player_id: str) -> LigBoxScore:
         try:
             connection = db.get_connection()
             query = """
-                SELECT * FROM lig_box_score WHERE lig_box_score_id = %s
+            SELECT * FROM LIG_BOX_SCORE WHERE game_player_id = %s 
             """
             cursor = connection.cursor()
-            cursor.execute(query, (lig_box_score_id,))
+            cursor.execute(query, (game_player_id,))
             result = cursor.fetchone()
             if result is None:
                 return None
-            return LigBoxscore(*result)
+            return LigBoxScore(*result)
         except mysql.connector.Error as err:
             print(f"Error: {err}")
+            connection.rollback()
         finally:
             cursor.close()
             connection.close()
 
     @staticmethod
-    def get_all_lig_box_scores(db: db) -> list:
-        try:
-            connection = db.get_connection()
-            query = "SELECT * FROM lig_box_score"
-            cursor = connection.cursor()
-            cursor.execute(query)
-            box_scores = cursor.fetchall()
-            return [LigBoxscore(*box_score) for box_score in box_scores]
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-        finally:
-            cursor.close()
-            connection.close()
-
-    @staticmethod
-    def update_lig_box_score(db: db, lig_box_score: LigBoxscore) -> None:
+    def get_all_lig_box_score(db: db) -> list[LigBoxScore]:
         try:
             connection = db.get_connection()
             query = """
-                UPDATE lig_box_score SET
-                    game_id = %s, game = %s, round = %s, phase = %s,
-                    season_code = %s, player_id = %s, is_starter = %s,
-                    is_playing = %s, team_id = %s, dorsal = %s, player = %s,
-                    minutes = %s, points = %s, two_points_made = %s,
-                    two_points_attempted = %s, three_points_made = %s,
-                    three_points_attempted = %s, free_throws_made = %s,
-                    free_throws_attempted = %s, offensive_rebounds = %s,
-                    defensive_rebounds = %s, total_rebounds = %s, assists = %s,
-                    steals = %s, turnovers = %s, blocks_favour = %s,
-                    blocks_against = %s, fouls_committed = %s,
-                    fouls_received = %s, valuation = %s, plus_minus = %s
-                WHERE lig_box_score_id = %s
+            SELECT * FROM LIG_BOX_SCORE
             """
             cursor = connection.cursor()
+            cursor.execute(query)
+            results = cursor.fetchall()
+            return [LigBoxScore(*row) for row in results]
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+        finally:
+            cursor.close()
+            connection.close()
+
+    @staticmethod
+    def update_lig_box_score(db: db, boxscore: LigBoxScore) -> None:
+        try:
+            connection = db.get_connection()
+            query = """
+                UPDATE LIG_BOX_SCORE SET
+                    game_id = %s, game = %s, round_of_game = %s, phase = %s, season_player_id = %s,
+                    season_team_id = %s, is_starter = %s, is_playing = %s, dorsal = %s, player = %s,
+                    points = %s, two_points_made = %s, two_points_attempted = %s,
+                    three_points_made = %s, three_points_attempted = %s,
+                    free_throws_made = %s, free_throws_attempted = %s,
+                    offensive_rebounds = %s, defensive_rebounds = %s, total_rebounds = %s,
+                    assists = %s, steals = %s, turnovers = %s, blocks_favour = %s,
+                    blocks_against = %s, fouls_committed = %s, fouls_received = %s, valuation = %s
+                WHERE game_player_id = %s
+            """
             cursor.execute(query, (
-                lig_box_score.game_id, lig_box_score.game, lig_box_score.round,
-                lig_box_score.phase, lig_box_score.season_code, lig_box_score.player_id,
-                lig_box_score.is_starter, lig_box_score.is_playing, lig_box_score.team_id,
-                lig_box_score.dorsal, lig_box_score.player, lig_box_score.minutes,
-                lig_box_score.points, lig_box_score.two_points_made,
-                lig_box_score.two_points_attempted, lig_box_score.three_points_made,
-                lig_box_score.three_points_attempted, lig_box_score.free_throws_made,
-                lig_box_score.free_throws_attempted, lig_box_score.offensive_rebounds,
-                lig_box_score.defensive_rebounds, lig_box_score.total_rebounds,
-                lig_box_score.assists, lig_box_score.steals, lig_box_score.turnovers,
-                lig_box_score.blocks_favour, lig_box_score.blocks_against,
-                lig_box_score.fouls_committed, lig_box_score.fouls_received,
-                lig_box_score.valuation, lig_box_score.plus_minus,
-                lig_box_score.lig_box_score_id
+                boxscore.game_id, boxscore.game, boxscore.round_of_game, boxscore.phase,
+                boxscore.season_player_id, boxscore.season_team_id, boxscore.is_starter,
+                boxscore.is_playing, boxscore.dorsal, boxscore.player, boxscore.points,
+                boxscore.two_points_made, boxscore.two_points_attempted, boxscore.three_points_made,
+                boxscore.three_points_attempted, boxscore.free_throws_made, boxscore.free_throws_attempted,
+                boxscore.offensive_rebounds, boxscore.defensive_rebounds, boxscore.total_rebounds,
+                boxscore.assists, boxscore.steals, boxscore.turnovers, boxscore.blocks_favour,
+                boxscore.blocks_against, boxscore.fouls_committed, boxscore.fouls_received,
+                boxscore.valuation, boxscore.game_player_id
             ))
             connection.commit()
         except mysql.connector.Error as err:
@@ -159,12 +149,14 @@ class LigBoxscoresDAO:
             connection.close()
 
     @staticmethod
-    def delete_lig_box_score(db: db, lig_box_score_id: str) -> None:
+    def delete_lig_box_score(db: db, game_player_id: str) -> None:
         try:
             connection = db.get_connection()
-            query = "DELETE FROM lig_box_score WHERE lig_box_score_id = %s"
+            query = """
+            DELETE FROM LIG_BOX_SCORE WHERE game_player_id = %s
+            """
             cursor = connection.cursor()
-            cursor.execute(query, (lig_box_score_id,))
+            cursor.execute(query, (game_player_id,))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
