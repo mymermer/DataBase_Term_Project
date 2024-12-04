@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional
 
 # game_point_id VARCHAR(50) PRIMARY KEY,
 # game_player_id VARCHAR(50),
@@ -26,90 +27,70 @@ import mysql.connector
 
 @dataclass
 class Cup_Points:
-    game_point_id: str
-    game_player_id: str
-    game_play_id: str
-    game_id: str
-    game: str
-    round_of_game: int
-    phase: str
-    season_player_id: str
-    season_team_id: str
-    player: str
-    action_id: str
-    action_of_play: str
-    points: int
-    coord_x: int
-    coord_y: int
-    zone_of_play: str
-    minute: int
-    points_a: int
-    points_b: int
-    date_time_stp: datetime
+    game_point_id: Optional[str] = None
+    game_player_id: Optional[str] = None
+    game_play_id: Optional[str] = None
+    game_id: Optional[str] = None
+    game: Optional[str] = None
+    round_of_game: Optional[int] = None
+    phase: Optional[str] = None
+    season_player_id: Optional[str] = None
+    season_team_id: Optional[str] = None
+    player: Optional[str] = None
+    action_id: Optional[str] = None
+    action_of_play: Optional[str] = None
+    points: Optional[int] = None
+    coord_x: Optional[int] = None
+    coord_y: Optional[int] = None
+    zone_of_play: Optional[str] = None
+    minute: Optional[int] = None
+    points_a: Optional[int] = None
+    points_b: Optional[int] = None
+    date_time_stp: Optional[datetime] = None
 
-class Cup_PointsDAO():
+class Cup_PointsDAO:
     @staticmethod
-    def create_cup_points(db: db, point: Cup_Points) -> None:
-        try:
-            connection  = db.get_connection()
-            cursor = db.connection.cursor()
-            query = """
-                INSERT INTO CUP_POINTS (
-                game_point_id,
-                game_player_id,
-                game_play_id,
-                game_id,
-                game,
-                round_of_game,
-                phase,
-                season_player_id,
-                season_team_id,
-                player,
-                action_id,
-                action_of_play,
-                points,
-                coord_x,
-                coord_y,
-                zone_of_play,
-                minute,
-                points_a,
-                points_b,
-                date_time_stp
-                ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-                )
-                """
+    def create_cup_points(db, point):
+        """
+        Insert a new CUP_POINTS record with only provided columns.
 
-            cursor.execute(query, (
-                point.game_point_id,
-                point.game_player_id,
-                point.game_play_id,
-                point.game_id,
-                point.game,
-                point.round_of_game,
-                point.phase,
-                point.season_player_id,
-                point.season_team_id,
-                point.player,
-                point.action_id,
-                point.action_of_play,
-                point.points,
-                point.coord_x,
-                point.coord_y,
-                point.zone_of_play,
-                point.minute,
-                point.points_a,
-                point.points_b,
-                point.date_time_stp
-            ))
+        Args:
+            db: Database connection.
+            point: A `Cup_Points` object or dictionary containing column-value pairs for the record.
+        """
+        try:
+            connection = db.get_connection()
+            cursor = connection.cursor()
+
+            # Convert Cup_Points object to dictionary if necessary
+            if isinstance(point, Cup_Points):
+                point = point.__dict__
+
+            # Dynamically construct query based on provided keys
+            columns = ", ".join(point.keys())
+            placeholders = ", ".join(["%s"] * len(point))
+            query = f"INSERT INTO CUP_POINTS ({columns}) VALUES ({placeholders})"
+
+            # Execute query with provided values
+            cursor.execute(query, list(point.values()))
             connection.commit()
+
+            print(f"Successfully created CUP_POINTS with provided data.")
+
         except mysql.connector.Error as err:
-            print(f"Error: {err}")
+            print(f"Database Error: {err}")
             connection.rollback()
+            raise
+        except Exception as e:
+            print(f"General Error: {e}")
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
+
+
     
     @staticmethod
     def get_cup_points(db: db, game_point_id: str) -> Cup_Points:
