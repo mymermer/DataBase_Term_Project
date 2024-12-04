@@ -11,6 +11,6 @@ dowload postman app and open new request for whatever operation you wanna do.
 
 for update and create you need to fill body in json format
 
-TODO: create route files and from your models files, update "update", "create" functions and allow varabiles to take NULL values (look my code)
+TODO: create route files and from your models files, update "update", "create" functions and allow varabiles to take NULL values (look my code). __init__.py add the register_blueprint
 
 We may further .gitignore "load_tables.sql" file to not push different directories in the future 
