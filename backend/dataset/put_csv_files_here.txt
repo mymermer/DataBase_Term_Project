@@ -1,3 +1,0 @@
-put csv files here.
-.gitignore will prevent them from being pushed (unless you do it explicitly or force)
-Only you can see the chanages you made to .csv's. Notfiy and share with others if necessary.
