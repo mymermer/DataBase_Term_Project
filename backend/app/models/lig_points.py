@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional
 
 # game_point_id VARCHAR(50) PRIMARY KEY,
 # game_player_id VARCHAR(50),
@@ -26,90 +27,68 @@ import mysql.connector
 
 @dataclass
 class Lig_Points:
-    game_point_id: str
-    game_player_id: str
-    game_play_id: str
-    game_id: str
-    game: str
-    round_of_game: int
-    phase: str
-    season_player_id: str
-    season_team_id: str
-    player: str
-    action_id: str
-    action_of_play: str
-    points: int
-    coord_x: int
-    coord_y: int
-    zone_of_play: str
-    minute: int
-    points_a: int
-    points_b: int
-    date_time_stp: datetime
+    game_point_id: Optional[str] = None
+    game_player_id: Optional[str] = None
+    game_play_id: Optional[str] = None
+    game_id: Optional[str] = None
+    game: Optional[str] = None
+    round_of_game: Optional[int] = None
+    phase: Optional[str] = None
+    season_player_id: Optional[str] = None
+    season_team_id: Optional[str] = None
+    player: Optional[str] = None
+    action_id: Optional[str] = None
+    action_of_play: Optional[str] = None
+    points: Optional[int] = None
+    coord_x: Optional[int] = None
+    coord_y: Optional[int] = None
+    zone_of_play: Optional[str] = None
+    minute: Optional[int] = None
+    points_a: Optional[int] = None
+    points_b: Optional[int] = None
+    date_time_stp: Optional[datetime] = None
 
 class Lig_PointsDAO():
     @staticmethod
     def create_lig_points(db: db, point: Lig_Points) -> None:
-        try:
-            connection  = db.get_connection()
-            cursor = db.connection.cursor()
-            query = """
-                INSERT INTO LIG_POINTS (
-                game_point_id,
-                game_player_id,
-                game_play_id,
-                game_id,
-                game,
-                round_of_game,
-                phase,
-                season_player_id,
-                season_team_id,
-                player,
-                action_id,
-                action_of_play,
-                points,
-                coord_x,
-                coord_y,
-                zone_of_play,
-                minute,
-                points_a,
-                points_b,
-                date_time_stp
-                ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-                )
-                """
+        """
+        Insert a new Lig_POINTS record with only provided columns.
 
-            cursor.execute(query, (
-                point.game_point_id,
-                point.game_player_id,
-                point.game_play_id,
-                point.game_id,
-                point.game,
-                point.round_of_game,
-                point.phase,
-                point.season_player_id,
-                point.season_team_id,
-                point.player,
-                point.action_id,
-                point.action_of_play,
-                point.points,
-                point.coord_x,
-                point.coord_y,
-                point.zone_of_play,
-                point.minute,
-                point.points_a,
-                point.points_b,
-                point.date_time_stp
-            ))
+        Args:
+            db: Database connection.
+            point: A `Lig_Points` object or dictionary containing column-value pairs for the record.
+        """
+        try:
+            connection = db.get_connection()
+            cursor = connection.cursor()
+
+            # Convert Lig_Points object to dictionary if necessary
+            if isinstance(point, Lig_Points):
+                point = point.__dict__
+
+            # Dynamically construct query based on provided keys
+            columns = ", ".join(point.keys())
+            placeholders = ", ".join(["%s"] * len(point))
+            query = f"INSERT INTO LIG_POINTS ({columns}) VALUES ({placeholders})"
+
+            # Execute query with provided values
+            cursor.execute(query, list(point.values()))
             connection.commit()
+
+            print(f"Successfully created LIG_POINTS with provided data.")
+
         except mysql.connector.Error as err:
-            print(f"Error: {err}")
+            print(f"Database Error: {err}")
             connection.rollback()
+            raise
+        except Exception as e:
+            print(f"General Error: {e}")
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
     
     @staticmethod
     def get_lig_points(db: db, game_point_id: str) -> Lig_Points:
@@ -157,54 +136,66 @@ class Lig_PointsDAO():
     def update_lig_points(db: db, point: Lig_Points) -> None:
         try:
             connection = db.get_connection()
-            query = """
-            UPDATE LIG_POINTS SET
-            game_player_id = %s,
-            game_play_id = %s,
-            game_id = %s,
-            game = %s,
-            round_of_game = %s,
-            phase = %s,
-            season_player_id = %s,
-            season_team_id = %s,
-            player = %s,
-            action_id = %s,
-            action_of_play = %s,
-            points = %s,
-            coord_x = %s,
-            coord_y = %s,
-            zone_of_play = %s,
-            minute = %s,
-            points_a = %s,
-            points_b = %s,
-            date_time_stp = %s
+            cursor = connection.cursor()
+            
+            # Extract fields from the `point` object
+            fields_to_update = {}
+            if point.game_player_id is not None:
+                fields_to_update['game_player_id'] = point.game_player_id
+            if point.game_play_id is not None:
+                fields_to_update['game_play_id'] = point.game_play_id
+            if point.game_id is not None:
+                fields_to_update['game_id'] = point.game_id
+            if point.game is not None:
+                fields_to_update['game'] = point.game
+            if point.round_of_game is not None:
+                fields_to_update['round_of_game'] = point.round_of_game
+            if point.phase is not None:
+                fields_to_update['phase'] = point.phase
+            if point.season_player_id is not None:
+                fields_to_update['season_player_id'] = point.season_player_id
+            if point.season_team_id is not None:
+                fields_to_update['season_team_id'] = point.season_team_id
+            if point.player is not None:
+                fields_to_update['player'] = point.player
+            if point.action_id is not None:
+                fields_to_update['action_id'] = point.action_id
+            if point.action_of_play is not None:
+                fields_to_update['action_of_play'] = point.action_of_play
+            if point.points is not None:
+                fields_to_update['points'] = point.points
+            if point.coord_x is not None:
+                fields_to_update['coord_x'] = point.coord_x
+            if point.coord_y is not None:
+                fields_to_update['coord_y'] = point.coord_y
+            if point.zone_of_play is not None:
+                fields_to_update['zone_of_play'] = point.zone_of_play
+            if point.minute is not None:
+                fields_to_update['minute'] = point.minute
+            if point.points_a is not None:
+                fields_to_update['points_a'] = point.points_a
+            if point.points_b is not None:
+                fields_to_update['points_b'] = point.points_b
+            if point.date_time_stp is not None:
+                fields_to_update['date_time_stp'] = point.date_time_stp
+            
+            # Construct dynamic SQL query
+            if not fields_to_update:
+                raise ValueError("No fields to update were provided.")
+            
+            set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+            query = f"""
+            UPDATE LIG_POINTS
+            SET {set_clause}
             WHERE game_point_id = %s
             """
+            
+            # Prepare values for the query
+            values = list(fields_to_update.values())
+            values.append(point.game_point_id)  # Add identifier for WHERE clause
 
-            cursor = connection.cursor()
-            cursor.execute(query, (
-                point.game_player_id,
-                point.game_play_id,
-                point.game_id,
-                point.game,
-                point.round_of_game,
-                point.phase,
-                point.season_player_id,
-                point.season_team_id,
-                point.player,
-                point.action_id,
-                point.action_of_play,
-                point.points,
-                point.coord_x,
-                point.coord_y,
-                point.zone_of_play,
-                point.minute,
-                point.points_a,
-                point.points_b,
-                point.date_time_stp,
-                point.game_point_id  # Identifier for WHERE clause
-            ))
-
+            # Execute query
+            cursor.execute(query, tuple(values))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -212,6 +203,7 @@ class Lig_PointsDAO():
         finally:
             cursor.close()
             connection.close()
+
 
     @staticmethod
     def delete_lig_points(db: db, game_point_id: str) -> None:

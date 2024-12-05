@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from app.db.db import db
 import mysql.connector
-from typing import Optional
+from typing import Optional, Any, Dict
 
 # game_point_id VARCHAR(50) PRIMARY KEY,
 # game_player_id VARCHAR(50),
@@ -138,54 +138,66 @@ class Cup_PointsDAO:
     def update_cup_points(db: db, point: Cup_Points) -> None:
         try:
             connection = db.get_connection()
-            query = """
-            UPDATE CUP_POINTS SET
-            game_player_id = %s,
-            game_play_id = %s,
-            game_id = %s,
-            game = %s,
-            round_of_game = %s,
-            phase = %s,
-            season_player_id = %s,
-            season_team_id = %s,
-            player = %s,
-            action_id = %s,
-            action_of_play = %s,
-            points = %s,
-            coord_x = %s,
-            coord_y = %s,
-            zone_of_play = %s,
-            minute = %s,
-            points_a = %s,
-            points_b = %s,
-            date_time_stp = %s
+            cursor = connection.cursor()
+            
+            # Extract fields from the `point` object
+            fields_to_update = {}
+            if point.game_player_id is not None:
+                fields_to_update['game_player_id'] = point.game_player_id
+            if point.game_play_id is not None:
+                fields_to_update['game_play_id'] = point.game_play_id
+            if point.game_id is not None:
+                fields_to_update['game_id'] = point.game_id
+            if point.game is not None:
+                fields_to_update['game'] = point.game
+            if point.round_of_game is not None:
+                fields_to_update['round_of_game'] = point.round_of_game
+            if point.phase is not None:
+                fields_to_update['phase'] = point.phase
+            if point.season_player_id is not None:
+                fields_to_update['season_player_id'] = point.season_player_id
+            if point.season_team_id is not None:
+                fields_to_update['season_team_id'] = point.season_team_id
+            if point.player is not None:
+                fields_to_update['player'] = point.player
+            if point.action_id is not None:
+                fields_to_update['action_id'] = point.action_id
+            if point.action_of_play is not None:
+                fields_to_update['action_of_play'] = point.action_of_play
+            if point.points is not None:
+                fields_to_update['points'] = point.points
+            if point.coord_x is not None:
+                fields_to_update['coord_x'] = point.coord_x
+            if point.coord_y is not None:
+                fields_to_update['coord_y'] = point.coord_y
+            if point.zone_of_play is not None:
+                fields_to_update['zone_of_play'] = point.zone_of_play
+            if point.minute is not None:
+                fields_to_update['minute'] = point.minute
+            if point.points_a is not None:
+                fields_to_update['points_a'] = point.points_a
+            if point.points_b is not None:
+                fields_to_update['points_b'] = point.points_b
+            if point.date_time_stp is not None:
+                fields_to_update['date_time_stp'] = point.date_time_stp
+            
+            # Construct dynamic SQL query
+            if not fields_to_update:
+                raise ValueError("No fields to update were provided.")
+            
+            set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+            query = f"""
+            UPDATE CUP_POINTS
+            SET {set_clause}
             WHERE game_point_id = %s
             """
+            
+            # Prepare values for the query
+            values = list(fields_to_update.values())
+            values.append(point.game_point_id)  # Add identifier for WHERE clause
 
-            cursor = connection.cursor()
-            cursor.execute(query, (
-                point.game_player_id,
-                point.game_play_id,
-                point.game_id,
-                point.game,
-                point.round_of_game,
-                point.phase,
-                point.season_player_id,
-                point.season_team_id,
-                point.player,
-                point.action_id,
-                point.action_of_play,
-                point.points,
-                point.coord_x,
-                point.coord_y,
-                point.zone_of_play,
-                point.minute,
-                point.points_a,
-                point.points_b,
-                point.date_time_stp,
-                point.game_point_id  # Identifier for WHERE clause
-            ))
-
+            # Execute query
+            cursor.execute(query, tuple(values))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -193,6 +205,7 @@ class Cup_PointsDAO:
         finally:
             cursor.close()
             connection.close()
+
 
     @staticmethod
     def delete_cup_points(db: db, game_point_id: str) -> None:
