@@ -140,12 +140,9 @@ const DataTable = ({ initialData, initialColumns }) => {
   );
 
   const fullWidthStyle = {
-    width: '100vw',
-    position: 'relative',
-    left: '50%',
-    right: '50%',
-    marginLeft: '-50vw',
-    marginRight: '-50vw',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'flex-start',
   };
 
   const handleModeChange = (mode) => {
@@ -232,7 +229,7 @@ const DataTable = ({ initialData, initialColumns }) => {
                   }} 
                   className={styles.controlButton}
                 >
-                  <Columns size={16} style={{ marginRight: '4px' }} />
+                  <span className={styles.buttonIcon}><Columns size={16} /></span>
                   More Columns
                 </button>
                 {showColumnSelector && (
@@ -272,7 +269,7 @@ const DataTable = ({ initialData, initialColumns }) => {
                   }} 
                   className={styles.controlButton}
                 >
-                  <Filter size={16} style={{ marginRight: '4px' }} />
+                  <span className={styles.buttonIcon}><Filter size={16} /></span>
                   Add Filter
                 </button>
                 {showFilterSelector && (

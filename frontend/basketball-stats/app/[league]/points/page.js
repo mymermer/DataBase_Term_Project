@@ -50,7 +50,9 @@ export default function PointsPage({ params }) {
     <StatPageTemplate league={league} stat="Points">
       <div className={styles.pointsPageContent}>
         <h2>{league.charAt(0).toUpperCase() + league.slice(1)} Points Statistics</h2>
-        <DataTable initialData={data} initialColumns={columns} />
+        <div className={styles.tableContainer}>
+          <DataTable initialData={data} initialColumns={columns} />
+        </div>
       </div>
     </StatPageTemplate>
   );

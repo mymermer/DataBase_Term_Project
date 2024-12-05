@@ -1,8 +1,7 @@
 .dataTable {
   font-family: Arial, sans-serif;
-  margin: 20px 165px;
-  width: 95%;
-  max-width: 1600px;
+  width: 100%;
+  max-width: none;
   position: relative;
   font-size: 14px;
   display: flex;
@@ -10,7 +9,12 @@
   align-items: stretch;
 }
 
-
+.fullWidthWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0;
+}
 
 .tableWrapper {
   width: 100%;
@@ -25,6 +29,7 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  padding: 0 1rem;
 }
 
 .topButtons {
@@ -60,6 +65,9 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .controlButton:hover {
@@ -214,16 +222,14 @@
   min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: 2px solid #000080;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
   margin-bottom: 0;
 }
 
 .table th, .table td {
   padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .table th {
@@ -236,15 +242,13 @@
   border-bottom: 2px solid #000066;
   cursor: pointer;
   user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .table th:hover {
   background-color: #000066;
-}
-
-.table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 .table tr:nth-child(even) {
@@ -269,6 +273,7 @@
   gap: 10px;
   margin-top: 20px;
   width: 100%;
+  padding: 0 1rem;
 }
 
 .paginationControls {
@@ -343,5 +348,39 @@
 @keyframes fadeInOut {
   0%, 100% { opacity: 0; }
   10%, 90% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .dataTable {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .topButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .leftButtons {
+    flex-direction: column;
+  }
+
+  .crudButtons {
+    flex-direction: column;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bottomButtons {
+    justify-content: space-between;
+  }
+}
+
+.buttonIcon {
+  display: inline-flex;
+  align-items: center;
 }
 
