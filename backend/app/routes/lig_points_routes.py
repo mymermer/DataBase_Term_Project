@@ -14,15 +14,43 @@ def get_lig_points(game_point_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# @lig_points_bp.route('/lig_points', methods=['GET'])
+# def get_all_lig_points():
+#     try:
+#         lig_points = Lig_PointsDAO.get_all_lig_points(db)
+#         if not lig_points:
+#             return jsonify({"message": "No lig points found"}), 404
+#         return jsonify([point for point in lig_points]), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
 @lig_points_bp.route('/lig_points', methods=['GET'])
-def get_all_lig_points():
+def get_paginated_points():
     try:
-        lig_points = Lig_PointsDAO.get_all_lig_points(db)
-        if not lig_points:
-            return jsonify({"message": "No lig points found"}), 404
-        return jsonify([point for point in lig_points]), 200
+        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
+        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
+        
+        lig_points = Lig_PointsDAO.get_paginated_lig_points(db, offset=offset, limit=limit)
+        if lig_points is None:
+            return jsonify([]), 200
+        return jsonify([point.__dict__ for point in lig_points]), 200
+    except ValueError:
+        return jsonify({'error': 'Invalid offset or limit'}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+    
+@lig_points_bp.route('/api/v1/lig_points/count', methods=['GET'])
+def get_total_points_count():
+    try:
+        total_count = Lig_PointsDAO.get_total_lig_points(db)
+        return jsonify({'total': total_count}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
 
 @lig_points_bp.route('/lig_points', methods=['POST'])
 def create_lig_points():
@@ -51,3 +79,5 @@ def delete_lig_points(game_point_id):
         return jsonify({"message": "Lig point deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+

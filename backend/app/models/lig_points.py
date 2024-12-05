@@ -221,3 +221,56 @@ class Lig_PointsDAO():
         finally:
             cursor.close()
             connection.close()
+
+    @staticmethod
+    def get_paginated_lig_points(db: db, offset: int = 0, limit: int = 25) -> list:
+        """
+        Fetch paginated data from the LIG_POINTS table.
+        
+        Args:
+            db: Database connection.
+            offset: Starting row index.
+            limit: Number of rows to fetch.
+
+        Returns:
+            A list of Lig_Points objects.
+        """
+        try:
+            connection = db.get_connection()
+            query = """
+                SELECT * FROM LIG_POINTS
+                LIMIT %s OFFSET %s
+            """
+            cursor = connection.cursor()
+            cursor.execute(query, (limit, offset))
+            points = cursor.fetchall()
+            if points is None:
+                return None
+            return [Lig_Points(*point) for point in points]
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
+    @staticmethod
+    def get_total_lig_points(db: db) -> int:
+        """
+        Fetch total number of rows in the LIG_POINTS table.
+        """
+        try:
+            connection = db.get_connection()
+            query = "SELECT COUNT(*) FROM LIG_POINTS"
+            cursor = connection.cursor()
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result[0]
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
