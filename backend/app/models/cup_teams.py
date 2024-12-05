@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional
 
 # season_team_id VARCHAR(50) PRIMARY KEY,
 # games_played INT,
@@ -49,162 +50,85 @@ import mysql.connector
 
 @dataclass
 class Cup_Teams:
-    season_team_id: str
-    games_played: int
-    minutes_played: float
-    points: int
-    two_points_made: int
-    two_points_attempted: int
-    three_points_made: int
-    three_points_attempted: int
-    free_throws_made: int
-    free_throws_attempted: int
-    offensive_rebounds: int
-    defensive_rebounds: int
-    total_rebounds: int
-    assists: int
-    steals: int
-    turnovers: int
-    blocks_favour: int
-    blocks_against: int
-    fouls_committed: int
-    fouls_received: int
-    valuation: int
-    minutes_per_game: float
-    points_per_game: float
-    two_points_made_per_game: float
-    two_points_attempted_per_game: float
-    two_points_percentage: float
-    three_points_made_per_game: float
-    three_points_attempted_per_game: float
-    three_points_percentage: float
-    free_throws_made_per_game: float
-    free_throws_attempted_per_game: float
-    free_throws_percentage: float
-    offensive_rebounds_per_game: float
-    defensive_rebounds_per_game: float
-    total_rebounds_per_game: float
-    assists_per_game: float
-    steals_per_game: float
-    turnovers_per_game: float
-    blocks_favour_per_game: float
-    blocks_against_per_game: float
-    fouls_committed_per_game: float
-    fouls_received_per_game: float
-    valuation_per_game: float
+    season_team_id: Optional[str] = None
+    games_played: Optional[int] = None
+    minutes_played: Optional[float] = None
+    points: Optional[int] = None
+    two_points_made: Optional[int] = None
+    two_points_attempted: Optional[int] = None
+    three_points_made: Optional[int] = None
+    three_points_attempted: Optional[int] = None
+    free_throws_made: Optional[int] = None
+    free_throws_attempted: Optional[int] = None
+    offensive_rebounds: Optional[int] = None
+    defensive_rebounds: Optional[int] = None
+    total_rebounds: Optional[int] = None
+    assists: Optional[int] = None
+    steals: Optional[int] = None
+    turnovers: Optional[int] = None
+    blocks_favour: Optional[int] = None
+    blocks_against: Optional[int] = None
+    fouls_committed: Optional[int] = None
+    fouls_received: Optional[int] = None
+    valuation: Optional[int] = None
+    minutes_per_game: Optional[float] = None
+    points_per_game: Optional[float] = None
+    two_points_made_per_game: Optional[float] = None
+    two_points_attempted_per_game: Optional[float] = None
+    two_points_percentage: Optional[float] = None
+    three_points_made_per_game: Optional[float] = None
+    three_points_attempted_per_game: Optional[float] = None
+    three_points_percentage: Optional[float] = None
+    free_throws_made_per_game: Optional[float] = None
+    free_throws_attempted_per_game: Optional[float] = None
+    free_throws_percentage: Optional[float] = None
+    offensive_rebounds_per_game: Optional[float] = None
+    defensive_rebounds_per_game: Optional[float] = None
+    total_rebounds_per_game: Optional[float] = None
+    assists_per_game: Optional[float] = None
+    steals_per_game: Optional[float] = None
+    turnovers_per_game: Optional[float] = None
+    blocks_favour_per_game: Optional[float] = None
+    blocks_against_per_game: Optional[float] = None
+    fouls_committed_per_game: Optional[float] = None
+    fouls_received_per_game: Optional[float] = None
+    valuation_per_game: Optional[float] = None
 
 class Cup_TeamsDAO():
     @staticmethod
-    def create_cup_teams(db: db, team: Cup_Teams) -> None:
+    def create_cup_teams(db, team):
         try:
-            connection  = db.get_connection()
-            cursor = db.connection.cursor()
-            query = """
-                INSERT INTO CUP_TEAMS (
-                season_team_id,
-                games_played,
-                minutes_played,
-                points,
-                two_points_made,
-                two_points_attempted,
-                three_points_made,
-                three_points_attempted,
-                free_throws_made,
-                free_throws_attempted,
-                offensive_rebounds,
-                defensive_rebounds,
-                total_rebounds,
-                assists,
-                steals,
-                turnovers,
-                blocks_favour,
-                blocks_against,
-                fouls_committed,
-                fouls_received,
-                valuation,
-                minutes_per_game,
-                points_per_game,
-                two_points_made_per_game,
-                two_points_attempted_per_game,
-                two_points_percentage,
-                three_points_made_per_game,
-                three_points_attempted_per_game,
-                three_points_percentage,
-                free_throws_made_per_game,
-                free_throws_attempted_per_game,
-                free_throws_percentage,
-                offensive_rebounds_per_game,
-                defensive_rebounds_per_game,
-                total_rebounds_per_game,
-                assists_per_game,
-                steals_per_game,
-                turnovers_per_game,
-                blocks_favour_per_game,
-                blocks_against_per_game,
-                fouls_committed_per_game,
-                fouls_received_per_game,
-                valuation_per_game
-                ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s
-                )
-                """
+            connection = db.get_connection()
+            cursor = connection.cursor()
 
-            cursor.execute(query, (
-                team.season_team_id,
-                team.games_played,
-                team.minutes_played,
-                team.points,
-                team.two_points_made,
-                team.two_points_attempted,
-                team.three_points_made,
-                team.three_points_attempted,
-                team.free_throws_made,
-                team.free_throws_attempted,
-                team.offensive_rebounds,
-                team.defensive_rebounds,
-                team.total_rebounds,
-                team.assists,
-                team.steals,
-                team.turnovers,
-                team.blocks_favour,
-                team.blocks_against,
-                team.fouls_committed,
-                team.fouls_received,
-                team.valuation,
-                team.minutes_per_game,
-                team.points_per_game,
-                team.two_points_made_per_game,
-                team.two_points_attempted_per_game,
-                team.two_points_percentage,
-                team.three_points_made_per_game,
-                team.three_points_attempted_per_game,
-                team.three_points_percentage,
-                team.free_throws_made_per_game,
-                team.free_throws_attempted_per_game,
-                team.free_throws_percentage,
-                team.offensive_rebounds_per_game,
-                team.defensive_rebounds_per_game,
-                team.total_rebounds_per_game,
-                team.assists_per_game,
-                team.steals_per_game,
-                team.turnovers_per_game,
-                team.blocks_favour_per_game,
-                team.blocks_against_per_game,
-                team.fouls_committed_per_game,
-                team.fouls_received_per_game,
-                team.valuation_per_game
-            ))
+            # Convert Cup_Teams object to dictionary if necessary
+            if isinstance(team, Cup_Teams):
+                team = team.__dict__
+
+            # Dynamically construct query based on provided keys
+            columns = ", ".join(team.keys())
+            placeholders = ", ".join(["%s"] * len(team))
+            query = f"INSERT INTO CUP_TEAMS ({columns}) VALUES ({placeholders})"
+
+            # Execute query with provided values
+            cursor.execute(query, list(team.values()))
             connection.commit()
+
+            print(f"Successfully created CUP_TEAMS with provided data.")
+
         except mysql.connector.Error as err:
-            print(f"Error: {err}")
+            print(f"Database Error: {err}")
             connection.rollback()
+            raise
+        except Exception as e:
+            print(f"General Error: {e}")
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
+
     
     @staticmethod
     def get_cup_teams(db: db, season_team_id: str) -> Cup_Teams:
@@ -252,101 +176,116 @@ class Cup_TeamsDAO():
     def update_cup_teams(db: db, team: Cup_Teams) -> None:
         try:
             connection = db.get_connection()
-            query = """
-            UPDATE CUP_TEAMS SET
-            season_team_id = %s,
-            games_played = %s,
-            minutes_played = %s,
-            points = %s,
-            two_points_made = %s,
-            two_points_attempted = %s,
-            three_points_made = %s,
-            three_points_attempted = %s,
-            free_throws_made = %s,
-            free_throws_attempted = %s,
-            offensive_rebounds = %s,
-            defensive_rebounds = %s,
-            total_rebounds = %s,
-            assists = %s,
-            steals = %s,
-            turnovers = %s,
-            blocks_favour = %s,
-            blocks_against = %s,
-            fouls_committed = %s,
-            fouls_received = %s,
-            valuation = %s,
-            minutes_per_game = %s,
-            points_per_game = %s,
-            two_points_made_per_game = %s,
-            two_points_attempted_per_game = %s,
-            two_points_percentage = %s,
-            three_points_made_per_game = %s,
-            three_points_attempted_per_game = %s,
-            three_points_percentage = %s,
-            free_throws_made_per_game = %s,
-            free_throws_attempted_per_game = %s,
-            free_throws_percentage = %s,
-            offensive_rebounds_per_game = %s,
-            defensive_rebounds_per_game = %s,
-            total_rebounds_per_game = %s,
-            assists_per_game = %s,
-            steals_per_game = %s,
-            turnovers_per_game = %s,
-            blocks_favour_per_game = %s,
-            blocks_against_per_game = %s,
-            fouls_committed_per_game = %s,
-            fouls_received_per_game = %s,
-            valuation_per_game = %s
+            cursor = connection.cursor()
+            
+            # Extract fields from the `team` object
+            fields_to_update = {}
+            if team.season_team_id is not None:
+                fields_to_update['season_team_id'] = team.season_team_id
+            if team.games_played is not None:    
+                fields_to_update['games_played'] = team.games_played
+            if team.minutes_played is not None:
+                fields_to_update['minutes_played'] = team.minutes_played
+            if team.points is not None:
+                fields_to_update['points'] = team.points
+            if team.two_points_made is not None:
+                fields_to_update['two_points_made'] = team.two_points_made
+            if team.two_points_attempted is not None:
+                fields_to_update['two_points_attempted'] = team.two_points_attempted
+            if team.three_points_made is not None:
+                fields_to_update['three_points_made'] = team.three_points_made
+            if team.three_points_attempted is not None:
+                fields_to_update['three_points_attempted'] = team.three_points_attempted
+            if team.free_throws_made is not None:
+                fields_to_update['free_throws_made'] = team.free_throws_made
+            if team.free_throws_attempted is not None:
+                fields_to_update['free_throws_attempted'] = team.free_throws_attempted
+            if team.offensive_rebounds is not None:
+                fields_to_update['offensive_rebounds'] = team.offensive_rebounds
+            if team.defensive_rebounds is not None:
+                fields_to_update['defensive_rebounds'] = team.defensive_rebounds
+            if team.total_rebounds is not None:
+                fields_to_update['total_rebounds'] = team.total_rebounds
+            if team.assists is not None:
+                fields_to_update['assists'] = team.assists
+            if team.steals is not None:
+                fields_to_update['steals'] = team.steals
+            if team.turnovers is not None:
+                fields_to_update['turnovers'] = team.turnovers
+            if team.blocks_favour is not None:
+                fields_to_update['blocks_favour'] = team.blocks_favour
+            if team.blocks_against is not None:
+                fields_to_update['blocks_against'] = team.blocks_against
+            if team.fouls_committed is not None:
+                fields_to_update['fouls_committed'] = team.fouls_committed
+            if team.fouls_received is not None:
+                fields_to_update['fouls_received'] = team.fouls_received
+            if team.valuation is not None:
+                fields_to_update['valuation'] = team.valuation
+            if team.minutes_per_game is not None:
+                fields_to_update['minutes_per_game'] = team.minutes_per_game
+            if team.points_per_game is not None:
+                fields_to_update['points_per_game'] = team.points_per_game
+            if team.two_points_made_per_game is not None:
+                fields_to_update['two_points_made_per_game'] = team.two_points_made_per_game
+            if team.two_points_attempted_per_game is not None:
+                fields_to_update['two_points_attempted_per_game'] = team.two_points_attempted_per_game
+            if team.two_points_percentage is not None:
+                fields_to_update['two_points_percentage'] = team.two_points_percentage
+            if team.three_points_made_per_game is not None:
+                fields_to_update['three_points_made_per_game'] = team.three_points_made_per_game
+            if team.three_points_attempted_per_game is not None:
+                fields_to_update['three_points_attempted_per_game'] = team.three_points_attempted_per_game
+            if team.three_points_percentage is not None:
+                fields_to_update['three_points_percentage'] = team.three_points_percentage
+            if team.free_throws_made_per_game is not None:
+                fields_to_update['free_throws_made_per_game'] = team.free_throws_made_per_game
+            if team.free_throws_attempted_per_game is not None:
+                fields_to_update['free_throws_attempted_per_game'] = team.free_throws_attempted_per_game
+            if team.free_throws_percentage is not None:
+                fields_to_update['free_throws_percentage'] = team.free_throws_percentage
+            if team.offensive_rebounds_per_game is not None:
+                fields_to_update['offensive_rebounds_per_game'] = team.offensive_rebounds_per_game
+            if team.defensive_rebounds_per_game is not None:
+                fields_to_update['defensive_rebounds_per_game'] = team.defensive_rebounds_per_game
+            if team.total_rebounds_per_game is not None:
+                fields_to_update['total_rebounds_per_game'] = team.total_rebounds_per_game
+            if team.assists_per_game is not None:
+                fields_to_update['assists_per_game'] = team.assists_per_game
+            if team.steals_per_game is not None:
+                fields_to_update['steals_per_game'] = team.steals_per_game
+            if team.turnovers_per_game is not None:
+                fields_to_update['turnovers_per_game'] = team.turnovers_per_game
+            if team.blocks_favour_per_game is not None:
+                fields_to_update['blocks_favour_per_game'] = team.blocks_favour_per_game
+            if team.blocks_against_per_game is not None:
+                fields_to_update['blocks_against_per_game'] = team.blocks_against_per_game
+            if team.fouls_committed_per_game is not None:
+                fields_to_update['fouls_committed_per_game'] = team.fouls_committed_per_game
+            if team.fouls_received_per_game is not None:
+                fields_to_update['fouls_received_per_game'] = team.fouls_received_per_game
+            if team.valuation_per_game is not None:
+                fields_to_update['valuation_per_game'] = team.valuation_per_game
+            
+
+ 
+            # Construct dynamic SQL query
+            if not fields_to_update:
+                raise ValueError("No fields to update were provided.")
+            
+            set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+            query = f"""
+            UPDATE CUP_TEAMS
+            SET {set_clause}
             WHERE season_team_id = %s
             """
+            
+            # Prepare values for the query
+            values = list(fields_to_update.values())
+            values.append(team.season_team_id)  # Add identifier for WHERE clause
 
-            cursor = connection.cursor()
-            cursor.execute(query, (
-            team.season_team_id,
-            team.games_played,
-            team.minutes_played,
-            team.points,
-            team.two_points_made,
-            team.two_points_attempted,
-            team.three_points_made,
-            team.three_points_attempted,
-            team.free_throws_made,
-            team.free_throws_attempted,
-            team.offensive_rebounds,
-            team.defensive_rebounds,
-            team.total_rebounds,
-            team.assists,
-            team.steals,
-            team.turnovers,
-            team.blocks_favour,
-            team.blocks_against,
-            team.fouls_committed,
-            team.fouls_received,
-            team.valuation,
-            team.minutes_per_game,
-            team.points_per_game,
-            team.two_points_made_per_game,
-            team.two_points_attempted_per_game,
-            team.two_points_percentage,
-            team.three_points_made_per_game,
-            team.three_points_attempted_per_game,
-            team.three_points_percentage,
-            team.free_throws_made_per_game,
-            team.free_throws_attempted_per_game,
-            team.free_throws_percentage,
-            team.offensive_rebounds_per_game,
-            team.defensive_rebounds_per_game,
-            team.total_rebounds_per_game,
-            team.assists_per_game,
-            team.steals_per_game,
-            team.turnovers_per_game,
-            team.blocks_favour_per_game,
-            team.blocks_against_per_game,
-            team.fouls_committed_per_game,
-            team.fouls_received_per_game,
-            team.valuation_per_game,
-            team.season_team_id  # The identifier in the WHERE clause
-            ))
+            # Execute query
+            cursor.execute(query, tuple(values))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -355,6 +294,7 @@ class Cup_TeamsDAO():
             cursor.close()
             connection.close()
 
+            
     @staticmethod
     def delete_cup_teams(db: db, season_team_id: str) -> None:
         try:

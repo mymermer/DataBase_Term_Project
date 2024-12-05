@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from app.db.db import db
 import mysql.connector
-from typing import Optional, Any, Dict
+from typing import Optional
 
 # game_point_id VARCHAR(50) PRIMARY KEY,
 # game_player_id VARCHAR(50),

@@ -15,6 +15,8 @@ def create_app():
     app.register_blueprint(cup_points_bp, url_prefix='/api/v1')
     from app.routes.lig_points_routes import lig_points_bp
     app.register_blueprint(lig_points_bp, url_prefix='/api/v1')
+    from app.routes.cup_teams_routes import cup_teams_bp
+    app.register_blueprint(cup_teams_bp, url_prefix='/api/v1')
 
     # Teardown logic to close DB connections
     @app.teardown_appcontext
