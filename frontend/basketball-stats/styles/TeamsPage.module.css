@@ -1,0 +1,19 @@
+.teamsPageContent {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.teamsPageContent h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+  padding: 0 1rem;
+}
+
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+}
+
