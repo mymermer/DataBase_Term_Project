@@ -14,15 +14,48 @@ def get_cup_teams(season_team_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# @cup_teams_bp.route('/cup_teams', methods=['GET'])
+# def get_all_cup_teams():
+#     try:
+#         cup_teams = Cup_TeamsDAO.get_all_cup_teams(db)
+#         if not cup_teams:
+#             return jsonify({"message": "No cup teams found"}), 404
+#         return jsonify([team for team in cup_teams]), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
+
 @cup_teams_bp.route('/cup_teams', methods=['GET'])
-def get_all_cup_teams():
+def get_paginated_teams():
     try:
-        cup_teams = Cup_TeamsDAO.get_all_cup_teams(db)
-        if not cup_teams:
-            return jsonify({"message": "No cup teams found"}), 404
-        return jsonify([team for team in cup_teams]), 200
+        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
+        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
+        columns = request.args.get('columns', None)  # Optional column list
+        
+        # Parse columns if provided
+        if columns:
+            columns = columns.split(",")
+        
+        cup_teams = Cup_TeamsDAO.get_paginated_cup_teams(db, offset=offset, limit=limit, columns=columns)
+        if cup_teams is None:
+            return jsonify([]), 200
+        return jsonify(cup_teams), 200  # Already a list of dicts if columns are specified
+    except ValueError:
+        return jsonify({'error': 'Invalid offset, limit, or columns'}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+
+
+
+@cup_teams_bp.route('/cup_teams/count', methods=['GET'])
+def get_total_teams_count():
+    try:
+        total_count = Cup_TeamsDAO.get_total_cup_teams(db)
+        return jsonify({'total': total_count}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @cup_teams_bp.route('/cup_teams', methods=['POST'])
 def create_cup_teams():

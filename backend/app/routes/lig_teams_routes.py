@@ -14,15 +14,47 @@ def get_lig_teams(season_team_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# @lig_teams_bp.route('/lig_teams', methods=['GET'])
+# def get_all_lig_teams():
+#     try:
+#         lig_teams = Lig_TeamsDAO.get_all_lig_teams(db)
+#         if not lig_teams:
+#             return jsonify({"message": "No lig teams found"}), 404
+#         return jsonify([team for team in lig_teams]), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
 @lig_teams_bp.route('/lig_teams', methods=['GET'])
-def get_all_lig_teams():
+def get_paginated_teams():
     try:
-        lig_teams = Lig_TeamsDAO.get_all_lig_teams(db)
-        if not lig_teams:
-            return jsonify({"message": "No lig teams found"}), 404
-        return jsonify([team for team in lig_teams]), 200
+        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
+        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
+        columns = request.args.get('columns', None)  # Optional column list
+        
+        # Parse columns if provided
+        if columns:
+            columns = columns.split(",")
+        
+        lig_teams = Lig_TeamsDAO.get_paginated_lig_teams(db, offset=offset, limit=limit, columns=columns)
+        if lig_teams is None:
+            return jsonify([]), 200
+        return jsonify(lig_teams), 200  # Already a list of dicts if columns are specified
+    except ValueError:
+        return jsonify({'error': 'Invalid offset, limit, or columns'}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+
+
+
+@lig_teams_bp.route('/lig_teams/count', methods=['GET'])
+def get_total_teams_count():
+    try:
+        total_count = Lig_TeamsDAO.get_total_lig_teams(db)
+        return jsonify({'total': total_count}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @lig_teams_bp.route('/lig_teams', methods=['POST'])
 def create_lig_teams():

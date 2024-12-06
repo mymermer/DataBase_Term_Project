@@ -311,3 +311,78 @@ class Cup_TeamsDAO():
         finally:
             cursor.close()
             connection.close()
+
+
+
+    @staticmethod
+    def get_paginated_cup_teams(db: db, offset: int = 0, limit: int = 25, columns: list = None) -> list:
+        """
+        Fetch paginated data from the CUP_TEAMS table with specified columns.
+        
+        Args:
+            db: Database connection.
+            offset: Starting row index.
+            limit: Number of rows to fetch.
+            columns: List of columns to select (default: all columns).
+
+        Returns:
+            A list of Cup_Teams objects.
+        """
+        try:
+            connection = db.get_connection()
+            
+            # Build the SELECT query with the specified columns
+            selected_columns = ", ".join(columns) if columns else "*"
+            query = f"""
+                SELECT {selected_columns} FROM CUP_TEAMS
+                LIMIT %s OFFSET %s
+            """
+            
+            cursor = connection.cursor()
+            cursor.execute(query, (limit, offset))
+            teams = cursor.fetchall()
+
+            if teams is None:
+                return None
+
+            # Map fetched rows to Cup_Teams objects
+            if columns:  # Use only the specified columns
+                return [dict(zip(columns, team)) for team in teams]
+            else:  # Use all columns
+                return [Cup_Teams(*team) for team in teams]
+        
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
+
+    @staticmethod
+    def get_total_cup_teams(db: db) -> int:
+        """
+        Fetch total number of rows in the CUP_TEAMS table.
+        """
+        try:
+            connection = db.get_connection()
+            query = "SELECT COUNT(*) FROM CUP_TEAMS"
+            cursor = connection.cursor()
+            cursor.execute(query)
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                raise ValueError("Query returned no results.")
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
