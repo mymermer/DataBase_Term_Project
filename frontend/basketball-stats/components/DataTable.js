@@ -4,12 +4,19 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
 import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit } from 'lucide-react';
 
-const DataTable = ({ initialData, initialColumns }) => {
+const DataTable = ({ 
+  initialData, 
+  initialColumns, 
+  allColumns,
+  currentPage, 
+  rowsPerPage, 
+  totalRows, 
+  onPageChange, 
+  onRowsPerPageChange,
+  onColumnChange
+}) => {
   const [data, setData] = useState(initialData);
-  const [columns, setColumns] = useState(initialColumns);
-  const [visibleColumns, setVisibleColumns] = useState(initialColumns.slice(0, 10));
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [visibleColumns, setVisibleColumns] = useState(initialColumns);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [filters, setFilters] = useState({});
   const [showColumnSelector, setShowColumnSelector] = useState(false);
@@ -17,16 +24,18 @@ const DataTable = ({ initialData, initialColumns }) => {
   const [currentFilterColumn, setCurrentFilterColumn] = useState(null);
   const [tempVisibleColumns, setTempVisibleColumns] = useState(visibleColumns);
   const [bubbleWidth, setBubbleWidth] = useState(200);
-  const [activeMode, setActiveMode] = useState(null);
-  const [newRow, setNewRow] = useState({});
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [validationErrors, setValidationErrors] = useState([]);
-  const [editingCell, setEditingCell] = useState(null);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const columnSelectorRef = useRef(null);
   const filterSelectorRef = useRef(null);
   const columnButtonRef = useRef(null);
   const filterButtonRef = useRef(null);
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
+    setVisibleColumns(initialColumns);
+  }, [initialColumns]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,7 +55,7 @@ const DataTable = ({ initialData, initialColumns }) => {
   }, []);
 
   useEffect(() => {
-    const longestColumnName = columns.reduce((longest, current) => 
+    const longestColumnName = allColumns.reduce((longest, current) => 
       current.length > longest.length ? current : longest
     );
     const tempElement = document.createElement('span');
@@ -58,7 +67,7 @@ const DataTable = ({ initialData, initialColumns }) => {
     const width = Math.max(200, tempElement.offsetWidth + 50);
     document.body.removeChild(tempElement);
     setBubbleWidth(width);
-  }, [columns]);
+  }, [allColumns]);
 
   const toggleColumn = (columnName) => {
     setTempVisibleColumns(prev => 
@@ -70,6 +79,7 @@ const DataTable = ({ initialData, initialColumns }) => {
 
   const applyColumnSelection = () => {
     setVisibleColumns(tempVisibleColumns);
+    onColumnChange(tempVisibleColumns);
     setShowColumnSelector(false);
   };
 
@@ -134,16 +144,7 @@ const DataTable = ({ initialData, initialColumns }) => {
     return processedData;
   }, [data, sortConfig, filters]);
 
-  const paginatedData = filteredAndSortedData.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
-
-  const fullWidthStyle = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'flex-start',
-  };
+  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
 
   const handleModeChange = (mode) => {
     if (activeMode === mode) {
@@ -208,9 +209,15 @@ const DataTable = ({ initialData, initialColumns }) => {
       setEditingCell({ rowIndex, column });
     }
   };
+  const [activeMode, setActiveMode] = useState(null);
+  const [newRow, setNewRow] = useState({});
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [editingCell, setEditingCell] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   return (
-    <div className={styles.fullWidthWrapper} style={fullWidthStyle}>
+    <div className={styles.fullWidthWrapper}>
       <div className={styles.dataTable}>
         {showSuccessMessage && (
           <div className={styles.successMessage}>
@@ -236,7 +243,7 @@ const DataTable = ({ initialData, initialColumns }) => {
                   <div ref={columnSelectorRef} className={styles.selectorBubble} style={{ width: bubbleWidth }}>
                     <h3>Select Columns</h3>
                     <div className={styles.columnList}>
-                      {columns.map(column => (
+                      {allColumns.map(column => (
                         <label key={column} className={styles.columnOption}>
                           <span>{column}</span>
                           {tempVisibleColumns.includes(column) && (
@@ -278,7 +285,7 @@ const DataTable = ({ initialData, initialColumns }) => {
                       <>
                         <h3>Select Column to Filter</h3>
                         <div className={styles.columnList}>
-                          {columns.map(column => (
+                          {visibleColumns.map(column => (
                             <button 
                               key={column} 
                               onClick={() => setCurrentFilterColumn(column)}
@@ -353,7 +360,6 @@ const DataTable = ({ initialData, initialColumns }) => {
           <table className={styles.table}>
             <thead>
               <tr>
-                {activeMode === 'delete' && <th></th>}
                 {visibleColumns.map(column => (
                   <th key={column} onClick={() => requestSort(column)}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -369,46 +375,10 @@ const DataTable = ({ initialData, initialColumns }) => {
               </tr>
             </thead>
             <tbody>
-              {activeMode === 'add' && (
-                <tr>
-                  {visibleColumns.map(column => (
-                    <td key={column}>
-                      <input
-                        type="text"
-                        value={newRow[column] || ''}
-                        onChange={(e) => handleNewRowChange(column, e.target.value)}
-                        placeholder={column}
-                        className={`${styles.newRowInput} ${validationErrors.includes(column) ? styles.errorInput : ''}`}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              )}
-              {paginatedData.map((row, rowIndex) => (
+              {filteredAndSortedData.map((row, rowIndex) => (
                 <tr key={rowIndex}>
-                  {activeMode === 'delete' && (
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(rowIndex)}
-                        onChange={() => handleRowSelection(rowIndex)}
-                      />
-                    </td>
-                  )}
                   {visibleColumns.map(column => (
-                    <td key={column} onClick={() => handleCellClick(rowIndex, column)}>
-                      {activeMode === 'update' && editingCell?.rowIndex === rowIndex && editingCell?.column === column ? (
-                        <input
-                          type="text"
-                          value={row[column] || ''}
-                          onChange={(e) => handleCellEdit(rowIndex, column, e.target.value)}
-                          className={styles.updateInput}
-                          autoFocus
-                        />
-                      ) : (
-                        row[column]
-                      )}
-                    </td>
+                    <td key={column}>{row[column]}</td>
                   ))}
                 </tr>
               ))}
@@ -418,23 +388,23 @@ const DataTable = ({ initialData, initialColumns }) => {
         <div className={styles.pagination}>
           <div className={styles.bottomButtons}>
             <button 
-              onClick={() => setPage(prev => Math.max(prev - 1, 1))}
-              disabled={page === 1}
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 0}
             >
               Previous
             </button>
             <button 
-              onClick={() => setPage(prev => Math.min(prev + 1, Math.ceil(filteredAndSortedData.length / rowsPerPage)))}
-              disabled={page === Math.ceil(filteredAndSortedData.length / rowsPerPage)}
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages - 1}
             >
               Next
             </button>
           </div>
           <div className={styles.paginationControls}>
-            <span>Page {page} of {Math.ceil(filteredAndSortedData.length / rowsPerPage)}</span>
+            <span>Page {currentPage + 1} of {totalPages}</span>
             <select 
               value={rowsPerPage} 
-              onChange={(e) => setRowsPerPage(Number(e.target.value))}
+              onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
             >
               <option value={25}>25 rows</option>
               <option value={50}>50 rows</option>

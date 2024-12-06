@@ -30,17 +30,23 @@ def get_paginated_points():
     try:
         offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
+        columns = request.args.get('columns', None)  # Optional column list
         
-        lig_points = Lig_PointsDAO.get_paginated_lig_points(db, offset=offset, limit=limit)
+        # Parse columns if provided
+        if columns:
+            columns = columns.split(",")
+        
+        lig_points = Lig_PointsDAO.get_paginated_lig_points(db, offset=offset, limit=limit, columns=columns)
         if lig_points is None:
             return jsonify([]), 200
-        return jsonify([point.__dict__ for point in lig_points]), 200
+        return jsonify(lig_points), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset or limit'}), 400
+        return jsonify({'error': 'Invalid offset, limit, or columns'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
     
-@lig_points_bp.route('/api/v1/lig_points/count', methods=['GET'])
+@lig_points_bp.route('/lig_points/count', methods=['GET'])
 def get_total_points_count():
     try:
         total_count = Lig_PointsDAO.get_total_lig_points(db)

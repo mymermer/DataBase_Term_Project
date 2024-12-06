@@ -223,30 +223,42 @@ class Lig_PointsDAO():
             connection.close()
 
     @staticmethod
-    def get_paginated_lig_points(db: db, offset: int = 0, limit: int = 25) -> list:
+    def get_paginated_lig_points(db: db, offset: int = 0, limit: int = 25, columns: list = None) -> list:
         """
-        Fetch paginated data from the LIG_POINTS table.
+        Fetch paginated data from the LIG_POINTS table with specified columns.
         
         Args:
             db: Database connection.
             offset: Starting row index.
             limit: Number of rows to fetch.
+            columns: List of columns to select (default: all columns).
 
         Returns:
             A list of Lig_Points objects.
         """
         try:
             connection = db.get_connection()
-            query = """
-                SELECT * FROM LIG_POINTS
+            
+            # Build the SELECT query with the specified columns
+            selected_columns = ", ".join(columns) if columns else "*"
+            query = f"""
+                SELECT {selected_columns} FROM LIG_POINTS
                 LIMIT %s OFFSET %s
             """
+            
             cursor = connection.cursor()
             cursor.execute(query, (limit, offset))
             points = cursor.fetchall()
+
             if points is None:
                 return None
-            return [Lig_Points(*point) for point in points]
+
+            # Map fetched rows to Lig_Points objects
+            if columns:  # Use only the specified columns
+                return [dict(zip(columns, point)) for point in points]
+            else:  # Use all columns
+                return [Lig_Points(*point) for point in points]
+        
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             connection.rollback()
@@ -254,6 +266,7 @@ class Lig_PointsDAO():
         finally:
             cursor.close()
             connection.close()
+
 
     @staticmethod
     def get_total_lig_points(db: db) -> int:
@@ -266,11 +279,19 @@ class Lig_PointsDAO():
             cursor = connection.cursor()
             cursor.execute(query)
             result = cursor.fetchone()
-            return result[0]
+            if result:
+                return result[0]
+            else:
+                raise ValueError("Query returned no results.")
         except mysql.connector.Error as err:
-            print(f"Error: {err}")
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
             raise
         finally:
-            cursor.close()
-            connection.close()
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
