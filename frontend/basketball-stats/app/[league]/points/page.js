@@ -9,7 +9,7 @@ const allColumns = [
   'game_point_id', 'game_player_id', 'game_play_id', 'game_id', 'game',
   'round_of_game', 'phase', 'season_player_id', 'season_team_id', 'player',
   'action_id', 'action_of_play', 'points', 'coord_x', 'coord_y',
-  'zone_of_play', 'minute', 'points_a', 'points_b', 'time_stamp'
+  'zone_of_play', 'minute', 'points_a', 'points_b', 'date_time_stp'
 ];
 
 export default function PointsPage({ params }) {
@@ -77,7 +77,6 @@ export default function PointsPage({ params }) {
     setSelectedColumns(newColumns);
   };
 
-  if (loading) return <p>Loading data...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
@@ -95,6 +94,7 @@ export default function PointsPage({ params }) {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             onColumnChange={handleColumnChange}
+            isLoading={loading}
           />
         </div>
       </div>

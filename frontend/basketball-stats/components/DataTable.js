@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
 import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit } from 'lucide-react';
+import LoadingOverlay from './LoadingOverlay';
 
 const DataTable = ({ 
   initialData, 
@@ -13,7 +14,8 @@ const DataTable = ({
   totalRows, 
   onPageChange, 
   onRowsPerPageChange,
-  onColumnChange
+  onColumnChange,
+  isLoading
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
@@ -28,6 +30,7 @@ const DataTable = ({
   const filterSelectorRef = useRef(null);
   const columnButtonRef = useRef(null);
   const filterButtonRef = useRef(null);
+  const tableWrapperRef = useRef(null);
 
   useEffect(() => {
     setData(initialData);
@@ -219,6 +222,7 @@ const DataTable = ({
   return (
     <div className={styles.fullWidthWrapper}>
       <div className={styles.dataTable}>
+        <LoadingOverlay isLoading={isLoading} tableWrapperRef={tableWrapperRef} />
         {showSuccessMessage && (
           <div className={styles.successMessage}>
             Save successful
@@ -356,7 +360,7 @@ const DataTable = ({
             ))}
           </div>
         </div>
-        <div className={styles.tableWrapper}>
+        <div className={`${styles.tableWrapper} ${isLoading ? styles.loading : ''}`} ref={tableWrapperRef}>
           <table className={styles.table}>
             <thead>
               <tr>
