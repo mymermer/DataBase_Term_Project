@@ -100,11 +100,9 @@ export default function TeamsPage({ params }) {
           countResponse.json()
         ]);
 
-        console.log('Count result:', countResult);
-        console.log('Total rows:', countResult.count);
 
         setData(result);
-        setTotalRows(countResult.count);
+        setTotalRows(countResult.total);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);

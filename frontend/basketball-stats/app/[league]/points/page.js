@@ -32,7 +32,8 @@ export default function PointsPage({ params }) {
       const offset = currentPage * rowsPerPage;
       const columnsParam = selectedColumns.join(',');
       let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
-    
+      let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points/count`;
+
       // Add filters to the URL
       if (Object.keys(filters).length > 0) {
         const filterParams = Object.entries(filters)
@@ -40,9 +41,9 @@ export default function PointsPage({ params }) {
           .flat()
           .join(',');
         dataUrl += `&filters=${filterParams}`;
+        countUrl += `&filters=${filterParams}`;
       }
     
-      const countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points/count`;
     
       try {
         const [dataResponse, countResponse] = await Promise.all([
@@ -59,11 +60,9 @@ export default function PointsPage({ params }) {
           countResponse.json()
         ]);
 
-        console.log('Count result:', countResult);
-        console.log('Total rows:', countResult.count);
 
         setData(result);
-        setTotalRows(countResult.count);
+        setTotalRows(countResult.total);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);

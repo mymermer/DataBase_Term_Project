@@ -1,13 +1,13 @@
 import styles from '../styles/StatOptions.module.css';
 
 const statOptions = [
-  { id: 'POINTS', icon: '📊' },
-  { id: 'TEAMS', icon: '👥' },
-  { id: 'COMPARISON', icon: '⚖️' },
-  { id: 'HEADER', icon: '📋' },
-  { id: 'PLAY_BY_PLAY', icon: '▶️' },
-  { id: 'BOX_SCORE', icon: '📦' },
-  { id: 'PLAYERS', icon: '🏃' }
+  { id: 'POINTS' },
+  { id: 'TEAMS' },
+  { id: 'COMPARISON' },
+  { id: 'HEADER' },
+  { id: 'PLAY_BY_PLAY' },
+  { id: 'BOX_SCORE' },
+  { id: 'PLAYERS'}
 ];
 
 export default function StatOptions({ league }) {

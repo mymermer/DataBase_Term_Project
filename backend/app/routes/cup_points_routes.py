@@ -55,7 +55,16 @@ def get_paginated_points():
 @cup_points_bp.route('/cup_points/count', methods=['GET'])
 def get_total_points_count():
     try:
-        total_count = Cup_PointsDAO.get_total_cup_points(db)
+        filters_raw = request.args.get('filters', None)  # Optional filters
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            
+
+
+        total_count = Cup_PointsDAO.get_total_cup_points(db,filters=filters)
         return jsonify({'total': total_count}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

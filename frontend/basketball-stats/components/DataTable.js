@@ -147,6 +147,7 @@ const DataTable = ({
     return processedData;
   }, [data, sortConfig, filters]);
 
+
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
 
   const handleModeChange = (mode) => {

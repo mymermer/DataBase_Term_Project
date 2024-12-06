@@ -273,10 +273,24 @@ class Cup_PointsDAO():
 
 
     @staticmethod
-    def get_total_cup_points(db: db) -> int:
+    def get_total_cup_points(db: db, filters: dict = None) -> int:
         try:
             connection = db.get_connection()
-            query = "SELECT COUNT(*) FROM CUP_POINTS"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                        SELECT COUNT(*) FROM CUP_POINTS
+                        {where_clause}
+            """
             cursor = connection.cursor()
             cursor.execute(query)
             result = cursor.fetchone()
