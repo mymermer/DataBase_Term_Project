@@ -223,40 +223,44 @@ class Cup_PointsDAO():
             connection.close()
 
     @staticmethod
-    def get_paginated_cup_points(db: db, offset: int = 0, limit: int = 25, columns: list = None) -> list:
-        """
-        Fetch paginated data from the CUP_POINTS table with specified columns.
-        
-        Args:
-            db: Database connection.
-            offset: Starting row index.
-            limit: Number of rows to fetch.
-            columns: List of columns to select (default: all columns).
-
-        Returns:
-            A list of Cup_Points objects.
-        """
+    def get_paginated_cup_points(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None) -> list:
         try:
             connection = db.get_connection()
             
-            # Build the SELECT query with the specified columns
+            # Build the SELECT part of the query
             selected_columns = ", ".join(columns) if columns else "*"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT {selected_columns} FROM CUP_POINTS
+                {where_clause}
                 LIMIT %s OFFSET %s
             """
             
+            # Append limit and offset to the params
+            params.extend([limit, offset])
+            
             cursor = connection.cursor()
-            cursor.execute(query, (limit, offset))
+            cursor.execute(query, params)
             points = cursor.fetchall()
 
             if points is None:
                 return None
 
-            # Map fetched rows to Cup_Points objects
-            if columns:  # Use only the specified columns
+            # Map fetched rows to Cup_Points objects or dicts
+            if columns:
                 return [dict(zip(columns, point)) for point in points]
-            else:  # Use all columns
+            else:
                 return [Cup_Points(*point) for point in points]
         
         except mysql.connector.Error as err:
@@ -270,9 +274,6 @@ class Cup_PointsDAO():
 
     @staticmethod
     def get_total_cup_points(db: db) -> int:
-        """
-        Fetch total number of rows in the CUP_POINTS table.
-        """
         try:
             connection = db.get_connection()
             query = "SELECT COUNT(*) FROM CUP_POINTS"

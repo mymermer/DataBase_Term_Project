@@ -22,6 +22,7 @@ export default function PointsPage({ params }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
   const [selectedColumns, setSelectedColumns] = useState(allColumns.slice(0, 10));
+  const [filters, setFilters] = useState({});
   
   const tournament = league === "euroleague" ? "lig" : "cup";
 
@@ -30,9 +31,19 @@ export default function PointsPage({ params }) {
       setLoading(true);
       const offset = currentPage * rowsPerPage;
       const columnsParam = selectedColumns.join(',');
-      const dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
+      let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
+    
+      // Add filters to the URL
+      if (Object.keys(filters).length > 0) {
+        const filterParams = Object.entries(filters)
+          .map(([column, values]) => values.map(value => `${column}:${value}`))
+          .flat()
+          .join(',');
+        dataUrl += `&filters=${filterParams}`;
+      }
+    
       const countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points/count`;
-      
+    
       try {
         const [dataResponse, countResponse] = await Promise.all([
           fetch(dataUrl),
@@ -62,7 +73,7 @@ export default function PointsPage({ params }) {
     };
 
     fetchData();
-  }, [currentPage, rowsPerPage, tournament, selectedColumns]);
+  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -75,6 +86,11 @@ export default function PointsPage({ params }) {
 
   const handleColumnChange = (newColumns) => {
     setSelectedColumns(newColumns);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(0); // Reset to first page when filters change
   };
 
   if (error) return <p>Error: {error}</p>;
@@ -94,6 +110,7 @@ export default function PointsPage({ params }) {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             onColumnChange={handleColumnChange}
+            onFilterChange={handleFilterChange}
             isLoading={loading}
           />
         </div>

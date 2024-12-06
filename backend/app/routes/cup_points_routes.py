@@ -31,20 +31,26 @@ def get_paginated_points():
         offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
+        filters_raw = request.args.get('filters', None)  # Optional filters
         
         # Parse columns if provided
         if columns:
             columns = columns.split(",")
-        
-        cup_points = Cup_PointsDAO.get_paginated_cup_points(db, offset=offset, limit=limit, columns=columns)
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+
+        cup_points = Cup_PointsDAO.get_paginated_cup_points(db, offset=offset, limit=limit, columns=columns, filters=filters)
         if cup_points is None:
             return jsonify([]), 200
         return jsonify(cup_points), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset, limit, or columns'}), 400
+        return jsonify({'error': 'Invalid offset, limit, columns, or filters'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
     
 @cup_points_bp.route('/cup_points/count', methods=['GET'])
 def get_total_points_count():

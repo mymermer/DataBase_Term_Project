@@ -31,17 +31,23 @@ def get_paginated_points():
         offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
+        filters_raw = request.args.get('filters', None)  # Optional filters
         
         # Parse columns if provided
         if columns:
             columns = columns.split(",")
-        
-        lig_points = Lig_PointsDAO.get_paginated_lig_points(db, offset=offset, limit=limit, columns=columns)
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+
+        lig_points = Lig_PointsDAO.get_paginated_lig_points(db, offset=offset, limit=limit, columns=columns, filters=filters)
         if lig_points is None:
             return jsonify([]), 200
         return jsonify(lig_points), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset, limit, or columns'}), 400
+        return jsonify({'error': 'Invalid offset, limit, columns, or filters'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
