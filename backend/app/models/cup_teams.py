@@ -315,40 +315,44 @@ class Cup_TeamsDAO():
 
 
     @staticmethod
-    def get_paginated_cup_teams(db: db, offset: int = 0, limit: int = 25, columns: list = None) -> list:
-        """
-        Fetch paginated data from the CUP_TEAMS table with specified columns.
-        
-        Args:
-            db: Database connection.
-            offset: Starting row index.
-            limit: Number of rows to fetch.
-            columns: List of columns to select (default: all columns).
-
-        Returns:
-            A list of Cup_Teams objects.
-        """
+    def get_paginated_cup_teams(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None) -> list:
         try:
             connection = db.get_connection()
             
-            # Build the SELECT query with the specified columns
+            # Build the SELECT part of the query
             selected_columns = ", ".join(columns) if columns else "*"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT {selected_columns} FROM CUP_TEAMS
+                {where_clause}
                 LIMIT %s OFFSET %s
             """
             
+            # Append limit and offset to the params
+            params.extend([limit, offset])
+            
             cursor = connection.cursor()
-            cursor.execute(query, (limit, offset))
+            cursor.execute(query, params)
             teams = cursor.fetchall()
 
             if teams is None:
                 return None
 
-            # Map fetched rows to Cup_Teams objects
-            if columns:  # Use only the specified columns
+            # Map fetched rows to Cup_Points objects or dicts
+            if columns:
                 return [dict(zip(columns, team)) for team in teams]
-            else:  # Use all columns
+            else:
                 return [Cup_Teams(*team) for team in teams]
         
         except mysql.connector.Error as err:
