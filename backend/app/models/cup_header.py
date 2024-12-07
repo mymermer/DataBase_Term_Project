@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional
 
 # game_id VARCHAR(50) PRIMARY KEY,
 # game VARCHAR(50),
@@ -47,155 +48,89 @@ import mysql.connector
 
 @dataclass
 class Cup_Header:
-    game_id: str
-    game: str
-    date_of_game: datetime
-    time_of_game: datetime
-    round_of_game: int
-    phase: str
-    season_team_id_a: str
-    season_team_id_b: str
-    score_a: int
-    score_b: int
-    team_a: str
-    team_b: str
-    coach_a: str
-    coach_b: str
-    game_time: datetime
-    referee_1: str
-    referee_2: str
-    referee_3: str
-    stadium: str
-    capacity: int
-    fouls_a: int
-    fouls_b: int
-    timeouts_a: int
-    timeouts_b: int
-    score_quarter_1_a: int
-    score_quarter_2_a: int
-    score_quarter_3_a: int
-    score_quarter_4_a: int
-    score_quarter_1_b: int
-    score_quarter_2_b: int
-    score_quarter_3_b: int
-    score_quarter_4_b: int
-    score_extra_time_1_a: int
-    score_extra_time_2_a: int
-    score_extra_time_3_a: int
-    score_extra_time_4_a: int
-    score_extra_time_1_b: int
-    score_extra_time_2_b: int
-    score_extra_time_3_b: int
-    score_extra_time_4_b: int
-    winner: str
+    game_id: Optional[str] = None
+    game: Optional[str] = None
+    date_of_game: Optional[datetime] = None
+    time_of_game: Optional[datetime] = None
+    round_of_game: Optional[int] = None
+    phase: Optional[str] = None
+    season_team_id_a: Optional[str] = None
+    season_team_id_b: Optional[str] = None
+    score_a: Optional[int] = None
+    score_b: Optional[int] = None
+    team_a: Optional[str] = None
+    team_b: Optional[str] = None
+    coach_a: Optional[str] = None
+    coach_b: Optional[str] = None
+    game_time: Optional[datetime] = None
+    referee_1: Optional[str] = None
+    referee_2: Optional[str] = None
+    referee_3: Optional[str] = None
+    stadium: Optional[str] = None
+    capacity: Optional[int] = None
+    fouls_a: Optional[int] = None
+    fouls_b: Optional[int] = None
+    timeouts_a: Optional[int] = None
+    timeouts_b: Optional[int] = None
+    score_quarter_1_a: Optional[int] = None
+    score_quarter_2_a: Optional[int] = None
+    score_quarter_3_a: Optional[int] = None
+    score_quarter_4_a: Optional[int] = None
+    score_quarter_1_b: Optional[int] = None
+    score_quarter_2_b: Optional[int] = None
+    score_quarter_3_b: Optional[int] = None
+    score_quarter_4_b: Optional[int] = None
+    score_extra_time_1_a: Optional[int] = None
+    score_extra_time_2_a: Optional[int] = None
+    score_extra_time_3_a: Optional[int] = None
+    score_extra_time_4_a: Optional[int] = None
+    score_extra_time_1_b: Optional[int] = None
+    score_extra_time_2_b: Optional[int] = None
+    score_extra_time_3_b: Optional[int] = None
+    score_extra_time_4_b: Optional[int] = None
+    winner: Optional[str] = None
 
 class Cup_HeaderDAO():
     @staticmethod
     def create_cup_header(db: db, header: Cup_Header) -> None:
+        """
+        Insert a new CUP_HEADER record with only provided columns.
+
+        Args:
+            db: Database connection.
+            header: A `Cup_Header` object or dictionary containing column-value pairs for the record.
+        """
         try:
             connection  = db.get_connection()
             cursor = db.connection.cursor()
-            query = """
-                INSERT INTO CUP_HEADER (
-                game_id,
-                game,
-                date_of_game,
-                time_of_game,
-                round_of_game,
-                phase,
-                season_team_id_a,
-                season_team_id_b,
-                score_a,
-                score_b,
-                team_a,
-                team_b,
-                coach_a,
-                coach_b,
-                game_time,
-                referee_1,
-                referee_2,
-                referee_3,
-                stadium,
-                capacity,
-                fouls_a,
-                fouls_b,
-                timeouts_a,
-                timeouts_b,
-                score_quarter_1_a,
-                score_quarter_2_a,
-                score_quarter_3_a,
-                score_quarter_4_a,
-                score_quarter_1_b,
-                score_quarter_2_b,
-                score_quarter_3_b,
-                score_quarter_4_b,
-                score_extra_time_1_a,
-                score_extra_time_2_a,
-                score_extra_time_3_a,
-                score_extra_time_4_a,
-                score_extra_time_1_b,
-                score_extra_time_2_b,
-                score_extra_time_3_b,
-                score_extra_time_4_b,
-                winner
-                ) VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-                )
-                """
 
-            cursor.execute(query, (
-                header.game_id,
-                header.game,
-                header.date_of_game,
-                header.time_of_game,
-                header.round_of_game,
-                header.phase,
-                header.season_team_id_a,
-                header.season_team_id_b,
-                header.score_a,
-                header.score_b,
-                header.team_a,
-                header.team_b,
-                header.coach_a,
-                header.coach_b,
-                header.game_time,
-                header.referee_1,
-                header.referee_2,
-                header.referee_3,
-                header.stadium,
-                header.capacity,
-                header.fouls_a,
-                header.fouls_b,
-                header.timeouts_a,
-                header.timeouts_b,
-                header.score_quarter_1_a,
-                header.score_quarter_2_a,
-                header.score_quarter_3_a,
-                header.score_quarter_4_a,
-                header.score_quarter_1_b,
-                header.score_quarter_2_b,
-                header.score_quarter_3_b,
-                header.score_quarter_4_b,
-                header.score_extra_time_1_a,
-                header.score_extra_time_2_a,
-                header.score_extra_time_3_a,
-                header.score_extra_time_4_a,
-                header.score_extra_time_1_b,
-                header.score_extra_time_2_b,
-                header.score_extra_time_3_b,
-                header.score_extra_time_4_b,
-                header.winner
-            ))
+            # Convert Cup_Header object to dictionary if necessary
+            if isinstance(header, Cup_Header):
+                header = header.__dict__
+
+            # Dynamically construct query based on provided keys
+            columns = ", ".join(header.keys())
+            placeholders = ", ".join(["%s"] * len(header))
+            query = f"INSERT INTO CUP_HEADER ({columns}) VALUES ({placeholders})"
+
+            # Execute query with provided values
+            cursor.execute(query, list(header.values()))
             connection.commit()
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
+
+            print(f"Successfully created CUP_HEADER with provided data.")
+
+        except mysql.connector.Error as error:
+            print(f"Database Error: {error}")
             connection.rollback()
+            raise
+        except Exception as e:
+            print(f"General Error: {e}")
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
     
     @staticmethod
     def get_cup_header(db: db, game_id: str) -> Cup_Header:
@@ -243,95 +178,109 @@ class Cup_HeaderDAO():
     def update_cup_header(db: db, header: Cup_Header) -> None:
         try:
             connection = db.get_connection()
-            query = """
-            UPDATE CUP_HEADER SET
-            game = %s,
-            date_of_game = %s,
-            time_of_game = %s,
-            round_of_game = %s,
-            phase = %s,
-            season_team_id_a = %s,
-            season_team_id_b = %s,
-            score_a = %s,
-            score_b = %s,
-            team_a = %s,
-            team_b = %s,
-            coach_a = %s,
-            coach_b = %s,
-            game_time = %s,
-            referee_1 = %s,
-            referee_2 = %s,
-            referee_3 = %s,
-            stadium = %s,
-            capacity = %s,
-            fouls_a = %s,
-            fouls_b = %s,
-            timeouts_a = %s,
-            timeouts_b = %s,
-            score_quarter_1_a = %s,
-            score_quarter_2_a = %s,
-            score_quarter_3_a = %s,
-            score_quarter_4_a = %s,
-            score_quarter_1_b = %s,
-            score_quarter_2_b = %s,
-            score_quarter_3_b = %s,
-            score_quarter_4_b = %s,
-            score_extra_time_1_a = %s,
-            score_extra_time_2_a = %s,
-            score_extra_time_3_a = %s,
-            score_extra_time_4_a = %s,
-            score_extra_time_1_b = %s,
-            score_extra_time_2_b = %s,
-            score_extra_time_3_b = %s,
-            score_extra_time_4_b = %s,
-            winner = %s
+            cursor = connection.cursor()
+
+            # Extract fields from the "header" object
+            fields_to_update = {}
+            if header.game_id is not None:
+                fields_to_update['game_id'] = header.game_id
+            if header.game is not None:
+                fields_to_update['game'] = header.game
+            if header.date_of_game is not None:
+                fields_to_update['date_of_game'] = header.date_of_game
+            if header.time_of_game is not None:
+                fields_to_update['time_of_game'] = header.time_of_game
+            if header.round_of_game is not None:
+                fields_to_update['round_of_game'] = header.round_of_game
+            if header.phase is not None:
+                fields_to_update['phase'] = header.phase
+            if header.season_team_id_a is not None:
+                fields_to_update['season_team_id_a'] = header.season_team_id_a
+            if header.season_team_id_b is not None:
+                fields_to_update['season_team_id_b'] = header.season_team_id_b
+            if header.score_a is not None:
+                fields_to_update['score_a'] = header.score_a
+            if header.score_b is not None:
+                fields_to_update['score_b'] = header.score_b
+            if header.team_a is not None:
+                fields_to_update['team_a'] = header.team_a
+            if header.team_b is not None:
+                fields_to_update['team_b'] = header.team_b
+            if header.coach_a is not None:
+                fields_to_update['coach_a'] = header.coach_a
+            if header.coach_b is not None:
+                fields_to_update['coach_b'] = header.coach_b
+            if header.game_time is not None:
+                fields_to_update['game_time'] = header.game_time
+            if header.referee_1 is not None:
+                fields_to_update['referee_1'] = header.referee_1
+            if header.referee_2 is not None:
+                fields_to_update['referee_2'] = header.referee_2
+            if header.referee_3 is not None:
+                fields_to_update['referee_3'] = header.referee_3
+            if header.stadium is not None:
+                fields_to_update['stadium'] = header.stadium
+            if header.capacity is not None:
+                fields_to_update['capacity'] = header.capacity
+            if header.fouls_a is not None:
+                fields_to_update['fouls_a'] = header.fouls_a
+            if header.fouls_b is not None:
+                fields_to_update['fouls_b'] = header.fouls_b
+            if header.timeouts_a is not None:
+                fields_to_update['timeouts_a'] = header.timeouts_a
+            if header.timeouts_b is not None:
+                fields_to_update['timeouts_b'] = header.timeouts_b
+            if header.score_quarter_1_a is not None:
+                fields_to_update['score_quarter_1_a'] = header.score_quarter_1_a
+            if header.score_quarter_2_a is not None:
+                fields_to_update['score_quarter_2_a'] = header.score_quarter_2_a
+            if header.score_quarter_3_a is not None:
+                fields_to_update['score_quarter_3_a'] = header.score_quarter_3_a
+            if header.score_quarter_4_a is not None:
+                fields_to_update['score_quarter_4_a'] = header.score_quarter_4_a
+            if header.score_quarter_1_b is not None:
+                fields_to_update['score_quarter_1_b'] = header.score_quarter_1_b
+            if header.score_quarter_2_b is not None:
+                fields_to_update['score_quarter_2_b'] = header.score_quarter_2_b
+            if header.score_quarter_3_b is not None:
+                fields_to_update['score_quarter_3_b'] = header.score_quarter_3_b
+            if header.score_quarter_4_b is not None:
+                fields_to_update['score_quarter_4_b'] = header.score_quarter_4_b
+            if header.score_extra_time_1_a is not None:
+                fields_to_update['score_extra_time_1_a'] = header.score_extra_time_1_a
+            if header.score_extra_time_2_a is not None:
+                fields_to_update['score_extra_time_2_a'] = header.score_extra_time_2_a
+            if header.score_extra_time_3_a is not None:
+                fields_to_update['score_extra_time_3_a'] = header.score_extra_time_3_a
+            if header.score_extra_time_4_a is not None:
+                fields_to_update['score_extra_time_4_a'] = header.score_extra_time_4_a
+            if header.score_extra_time_1_b is not None:
+                fields_to_update['score_extra_time_1_b'] = header.score_extra_time_1_b
+            if header.score_extra_time_2_b is not None:
+                fields_to_update['score_extra_time_2_b'] = header.score_extra_time_2_b
+            if header.score_extra_time_3_b is not None:
+                fields_to_update['score_extra_time_3_b'] = header.score_extra_time_3_b
+            if header.score_extra_time_4_b is not None:
+                fields_to_update['score_extra_time_4_b'] = header.score_extra_time_4_b
+            if header.winner is not None:
+                fields_to_update['winner'] = header.winner
+
+            # Construct dynamic SQL query
+            if not fields_to_update:
+                raise ValueError("No fields to update were provided.")
+            
+            set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+            query = f"""
+            UPDATE CUP_HEADER
+            SET {set_clause}
             WHERE game_id = %s
             """
+            # Prepare values for the query
+            values = list(fields_to_update.values())
+            values.append(header.game_id)  # Add identifier for WHERE clause
 
-            cursor = connection.cursor()
-            cursor.execute(query, (
-            header.game,
-            header.date_of_game,
-            header.time_of_game,
-            header.round_of_game,
-            header.phase,
-            header.season_team_id_a,
-            header.season_team_id_b,
-            header.score_a,
-            header.score_b,
-            header.team_a,
-            header.team_b,
-            header.coach_a,
-            header.coach_b,
-            header.game_time,
-            header.referee_1,
-            header.referee_2,
-            header.referee_3,
-            header.stadium,
-            header.capacity,
-            header.fouls_a,
-            header.fouls_b,
-            header.timeouts_a,
-            header.timeouts_b,
-            header.score_quarter_1_a,
-            header.score_quarter_2_a,
-            header.score_quarter_3_a,
-            header.score_quarter_4_a,
-            header.score_quarter_1_b,
-            header.score_quarter_2_b,
-            header.score_quarter_3_b,
-            header.score_quarter_4_b,
-            header.score_extra_time_1_a,
-            header.score_extra_time_2_a,
-            header.score_extra_time_3_a,
-            header.score_extra_time_4_a,
-            header.score_extra_time_1_b,
-            header.score_extra_time_2_b,
-            header.score_extra_time_3_b,
-            header.score_extra_time_4_b,
-            header.winner,
-            header.game_id  # The identifier in the WHERE clause
-            ))
+            # Execute query
+            cursor.execute(query, tuple(values))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -356,3 +305,99 @@ class Cup_HeaderDAO():
         finally:
             cursor.close()
             connection.close()
+
+    @staticmethod
+    def get_paginated_cup_header(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
+        try:
+            connection = db.get_connection()
+            
+            # Build the SELECT part of the query
+            selected_columns = ", ".join(columns) if columns else "*"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
+            # Final query with LIMIT and OFFSET
+            query = f"""
+                SELECT {selected_columns} FROM CUP_HEADER
+                {where_clause}
+                {order_clause}
+                LIMIT %s OFFSET %s
+            """
+            
+            # Append limit and offset to the params
+            params.extend([limit, offset])
+            
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            headers = cursor.fetchall()
+
+            if headers is None:
+                return None
+
+            # Map fetched rows to Cup_Header objects or dicts
+            if columns:
+                return [dict(zip(columns, header)) for header in headers]
+            else:
+                return [Cup_Header(*header) for header in headers]
+        
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
+
+    @staticmethod
+    def get_total_cup_header(db: db, filters: dict = None) -> int:
+        try:
+            connection = db.get_connection()
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")  # Use %s as a placeholder
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                SELECT COUNT(*) FROM CUP_HEADER
+                {where_clause}
+            """
+            cursor = connection.cursor()
+            cursor.execute(query, params)  # Pass params for the placeholders
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                raise ValueError("Query returned no results.")
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()       
