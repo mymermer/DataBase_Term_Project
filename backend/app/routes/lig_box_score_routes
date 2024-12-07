@@ -64,8 +64,8 @@ def get_total_box_score_count():
 def create_lig_box_score():
     try:
         data = request.get_json()
-        box_score = ligBoxScore(**data)
-        ligBoxScoreDAO.create_lig_box_score(db, box_score)
+        boxscore = ligBoxScore(**data)
+        ligBoxScoreDAO.create_lig_box_score(db, boxscore)
         return jsonify({"message": "Lig Box Score created successfully"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -74,8 +74,8 @@ def create_lig_box_score():
 def update_lig_box_score(game_player_id):
     try:
         data = request.get_json()
-        box_score = ligBoxScore(game_player_id=game_player_id, **data)
-        ligBoxScoreDAO.update_lig_box_score(db, box_score)
+        boxscore = ligBoxScore(game_player_id=game_player_id, **data)
+        ligBoxScoreDAO.update_lig_box_score(db, boxscore)
         return jsonify({"message": "lig Box Score updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
