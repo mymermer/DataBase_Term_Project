@@ -93,13 +93,13 @@ class Cup_ComparisonDAO():
 
         Args:
             db: Database connection.
-            point: A `Cup_Points` object or dictionary containing column-value pairs for the record.
+            comparison: A `Cup_Comparison` object or dictionary containing column-value pairs for the record.
         """
         try:
             connection  = db.get_connection()
             cursor = db.connection.cursor()
 
-            # Convert Cup_Points object to dictionary if necessary
+            # Convert Cup_Comparison object to dictionary if necessary
             if isinstance(comparison, Cup_Comparison):
                 comparison = comparison.__dict__
 
