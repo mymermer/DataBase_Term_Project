@@ -14,13 +14,13 @@ def get_cup_comparison(game_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @cup_points_bp.route('/cup_points', methods=['GET'])
-# def get_all_cup_points():
+# @cup_comparison_bp.route('/cup_comparison', methods=['GET'])
+# def get_all_cup_comparison():
 #     try:
-#         cup_points = Cup_PointsDAO.get_all_cup_points(db)
-#         if not cup_points:
-#             return jsonify({"message": "No cup points found"}), 404
-#         return jsonify([point for point in cup_points]), 200
+#         cup_comparison = Cup_ComparisonDAO.get_all_cup_comparison(db)
+#         if not cup_comparison:
+#             return jsonify({"message": "No cup comparisons found"}), 404
+#         return jsonify([comparison for comparison in cup_comparison]), 200
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
 
@@ -69,7 +69,7 @@ def get_total_comparison_count():
 def create_cup_comparison():
     try:
         data = request.get_json()
-        point = Cup_Comparison(**data)
+        comparison = Cup_Comparison(**data)
         Cup_ComparisonDAO.create_cup_comparison(db, comparison)
         return jsonify({"message": "Cup comparison created successfully"}), 201
     except Exception as e:
@@ -79,7 +79,7 @@ def create_cup_comparison():
 def update_cup_comparison(game_id):
     try:
         data = request.get_json()
-        point = Cup_Comparison(game_id=game_id, **data)
+        comparison = Cup_Comparison(game_id=game_id, **data)
         Cup_ComparisonDAO.update_cup_comparison(db, comparison)
         return jsonify({"message": "Cup comparison updated successfully"}), 200
     except Exception as e:
