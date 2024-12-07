@@ -64,8 +64,8 @@ def get_total_box_score_count():
 def create_cup_box_score():
     try:
         data = request.get_json()
-        box_score = CupBoxScore(**data)
-        CupBoxScoreDAO.create_cup_box_score(db, box_score)
+        boxscore = CupBoxScore(**data)
+        CupBoxScoreDAO.create_cup_box_score(db, boxscore)
         return jsonify({"message": "Cup box score created successfully"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -74,8 +74,8 @@ def create_cup_box_score():
 def update_cup_box_score(game_player_id):
     try:
         data = request.get_json()
-        box_score = CupBoxScore(game_player_id=game_player_id, **data)
-        CupBoxScoreDAO.update_cup_box_score(db, box_score)
+        boxscore = CupBoxScore(game_player_id=game_player_id, **data)
+        CupBoxScoreDAO.update_cup_box_score(db, boxscore)
         return jsonify({"message": "Cup Box Score updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
