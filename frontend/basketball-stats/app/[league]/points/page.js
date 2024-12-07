@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import StatPageTemplate from '../../../components/StatPageTemplate';
 import DataTable from '../../../components/DataTable';
 import styles from '../../../styles/PointsPage.module.css';
+import PointsUserView from '../../../components/PointsUserView';
 
 const allColumns = [
   'game_point_id', 'game_player_id', 'game_play_id', 'game_id', 'game',
@@ -171,7 +172,7 @@ export default function PointsPage({ params }) {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <StatPageTemplate league={league} stat="Points">
+    <StatPageTemplate league={league} stat="Points" UserView={PointsUserView}>
       <div className={styles.pointsPageContent}>
         <h2>{league.charAt(0).toUpperCase() + league.slice(1)} Points Statistics</h2>
         <div className={styles.tableContainer}>

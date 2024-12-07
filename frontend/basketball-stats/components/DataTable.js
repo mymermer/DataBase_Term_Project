@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
-import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingOverlay from './LoadingOverlay';
 
 const DataTable = ({ 
@@ -295,13 +295,13 @@ const DataTable = ({
               </div>
             </div>
             <div className={styles.crudButtons}>
-              <button onClick={() => handlePopupOpen('add')} className={styles.crudButton}>
+              <button onClick={() => handlePopupOpen('add')} className={`${styles.crudButton} ${styles.addButton}`}>
                 <Plus size={16} /> Add
               </button>
-              <button onClick={() => handlePopupOpen('delete')} className={styles.crudButton}>
+              <button onClick={() => handlePopupOpen('delete')} className={`${styles.crudButton} ${styles.deleteButton}`}>
                 <Trash size={16} /> Delete
               </button>
-              <button onClick={() => handlePopupOpen('update')} className={styles.crudButton}>
+              <button onClick={() => handlePopupOpen('update')} className={`${styles.crudButton} ${styles.updateButton}`}>
                 <Edit size={16} /> Update
               </button>
             </div>
@@ -351,14 +351,16 @@ const DataTable = ({
             <button 
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 0}
+              className={styles.paginationButton}
             >
-              Previous
+              <ChevronLeft size={20} />
             </button>
             <button 
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages - 1}
+              className={styles.paginationButton}
             >
-              Next
+              <ChevronRight size={20} />
             </button>
           </div>
           <div className={styles.paginationControls}>

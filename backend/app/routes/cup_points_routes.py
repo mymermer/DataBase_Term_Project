@@ -186,7 +186,7 @@ def get_distinct_games_with_like():
             like_pattern=like_pattern,
             columns=columns
         )
-
+        print("lol", distinct_games)
         if distinct_games is None:
             return jsonify([]), 200
         return jsonify(distinct_games), 200  # Return the distinct values

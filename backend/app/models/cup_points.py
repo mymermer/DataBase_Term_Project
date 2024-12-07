@@ -331,11 +331,12 @@ class Cup_PointsDAO():
         sort_by: str = None,
         order: str = 'asc'
     ) -> list:
-        """
-        Retrieve paginated rows from CUP_POINTS with a compulsory 'LIKE' filter on game_point_id.
-        """
+        
         try:
             connection = db.get_connection()
+
+            # Add `%` wildcard to the LIKE pattern
+            like_pattern = f"{like_pattern}%"
 
             # Build the SELECT part of the query
             selected_columns = ", ".join(columns) if columns else "*"
@@ -399,11 +400,12 @@ class Cup_PointsDAO():
         like_pattern: str,
         columns: list = None
     ) -> list:
-        """
-        Retrieve distinct values from the 'game' column with a compulsory 'LIKE' filter on game_point_id.
-        """
+
         try:
             connection = db.get_connection()
+
+            # Add `%` wildcard to the LIKE pattern
+            like_pattern = f"{like_pattern}%"
 
             # Default columns to return
             selected_columns = ", ".join(columns) if columns else "game"
