@@ -23,6 +23,8 @@ export default function PointsPage({ params }) {
   const [totalRows, setTotalRows] = useState(0);
   const [selectedColumns, setSelectedColumns] = useState(allColumns.slice(0, 10));
   const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
   
   const tournament = league === "euroleague" ? "lig" : "cup";
 
@@ -32,6 +34,9 @@ export default function PointsPage({ params }) {
       const offset = currentPage * rowsPerPage;
       const columnsParam = selectedColumns.join(',');
       let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
+      if (sortBy) {
+        dataUrl += `&sortBy=${sortBy}&order=${sortOrder}`;
+      }
       let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points/count`;
 
       // Add filters to the URL
@@ -70,7 +75,7 @@ export default function PointsPage({ params }) {
     };
 
     fetchData();
-  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters]);
+  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters, sortBy, sortOrder]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -82,12 +87,21 @@ export default function PointsPage({ params }) {
   };
 
   const handleColumnChange = (newColumns) => {
-    setSelectedColumns(newColumns);newColumns;
+    setSelectedColumns(newColumns);
   };
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     setCurrentPage(0); // Reset to first page when filters change
+  };
+
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
   };
 
   if (error) return <p>Error: {error}</p>;
@@ -109,6 +123,7 @@ export default function PointsPage({ params }) {
             onColumnChange={handleColumnChange}
             onFilterChange={handleFilterChange}
             isLoading={loading}
+            onSort={handleSort}
           />
         </div>
       </div>

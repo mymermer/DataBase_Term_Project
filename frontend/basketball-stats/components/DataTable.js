@@ -16,11 +16,11 @@ const DataTable = ({
   onRowsPerPageChange,
   onColumnChange,
   onFilterChange,
-  isLoading
+  isLoading,
+  onSort
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [filters, setFilters] = useState({});
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilterSelector, setShowFilterSelector] = useState(false);
@@ -88,11 +88,7 @@ const DataTable = ({
   };
 
   const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
+    onSort(key);
   };
 
   const applyFilter = () => {
@@ -248,11 +244,7 @@ const DataTable = ({
                   <th key={column} onClick={() => requestSort(column)}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{column}</span>
-                      {sortConfig.key === column ? (
-                        sortConfig.direction === 'ascending' ? <ChevronUp className={styles.sortIcon} /> : <ChevronDown className={styles.sortIcon} />
-                      ) : (
-                        <ArrowUpDown className={styles.sortIcon} />
-                      )}
+                      <ArrowUpDown className={styles.sortIcon} />
                     </div>
                   </th>
                 ))}
