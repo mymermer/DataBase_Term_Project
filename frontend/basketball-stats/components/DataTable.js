@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
 import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit } from 'lucide-react';
 import LoadingOverlay from './LoadingOverlay';
@@ -15,6 +15,7 @@ const DataTable = ({
   onPageChange, 
   onRowsPerPageChange,
   onColumnChange,
+  onFilterChange,
   isLoading
 }) => {
   const [data, setData] = useState(initialData);
@@ -97,138 +98,36 @@ const DataTable = ({
   const applyFilter = () => {
     const filterValue = document.querySelector(`.${styles.filterInput}`).value;
     if (filterValue.trim() !== '') {
-      setFilters(prev => {
-        const newFilters = { ...prev };
-        if (!newFilters[currentFilterColumn]) {
-          newFilters[currentFilterColumn] = [];
-        }
-        if (!newFilters[currentFilterColumn].includes(filterValue)) {
-          newFilters[currentFilterColumn].push(filterValue);
-        }
-        return newFilters;
-      });
+      const newFilters = { ...filters };
+      if (!newFilters[currentFilterColumn]) {
+        newFilters[currentFilterColumn] = [];
+      }
+      if (!newFilters[currentFilterColumn].includes(filterValue)) {
+        newFilters[currentFilterColumn].push(filterValue);
+      }
+      setFilters(newFilters);
+      onFilterChange(newFilters);
     }
     setShowFilterSelector(false);
     setCurrentFilterColumn(null);
   };
 
   const removeFilter = (column, value) => {
-    setFilters(prev => {
-      const newFilters = { ...prev };
-      newFilters[column] = newFilters[column].filter(v => v !== value);
-      if (newFilters[column].length === 0) {
-        delete newFilters[column];
-      }
-      return newFilters;
-    });
-  };
-
-  const filteredAndSortedData = useMemo(() => {
-    let processedData = [...data];
-
-    Object.entries(filters).forEach(([column, values]) => {
-      processedData = processedData.filter(item => 
-        values.some(value => String(item[column]).toLowerCase().includes(value.toLowerCase()))
-      );
-    });
-
-    if (sortConfig.key) {
-      processedData.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
+    const newFilters = { ...filters };
+    newFilters[column] = newFilters[column].filter(v => v !== value);
+    if (newFilters[column].length === 0) {
+      delete newFilters[column];
     }
-
-    return processedData;
-  }, [data, sortConfig, filters]);
-
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
 
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-
-  const handleModeChange = (mode) => {
-    if (activeMode === mode) {
-      handleApply();
-    } else {
-      setActiveMode(mode);
-      setNewRow({});
-      setSelectedRows([]);
-      setValidationErrors([]);
-      setEditingCell(null);
-    }
-  };
-
-  const handleApply = () => {
-    switch (activeMode) {
-      case 'add':
-        const compulsoryFields = ['Player', 'Team'];
-        const missingFields = compulsoryFields.filter(field => !newRow[field]);
-        if (missingFields.length > 0) {
-          setValidationErrors(missingFields);
-          return;
-        }
-        setData(prevData => [...prevData, newRow]);
-        setNewRow({});
-        setValidationErrors([]);
-        break;
-      case 'delete':
-        if (selectedRows.length > 0) {
-          setData(prevData => prevData.filter((_, index) => !selectedRows.includes(index)));
-          setSelectedRows([]);
-        }
-        break;
-      case 'update':
-        // No need to do anything here as updates are applied in real-time
-        break;
-    }
-    setActiveMode(null);
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
-  };
-
-  const handleNewRowChange = (column, value) => {
-    setNewRow(prev => ({ ...prev, [column]: value }));
-  };
-
-  const handleRowSelection = (index) => {
-    setSelectedRows(prev => 
-      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
-    );
-  };
-
-  const handleCellEdit = (rowIndex, column, value) => {
-    setData(prevData => {
-      const newData = [...prevData];
-      newData[rowIndex] = { ...newData[rowIndex], [column]: value };
-      return newData;
-    });
-  };
-
-  const handleCellClick = (rowIndex, column) => {
-    if (activeMode === 'update') {
-      setEditingCell({ rowIndex, column });
-    }
-  };
-  const [activeMode, setActiveMode] = useState(null);
-  const [newRow, setNewRow] = useState({});
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [validationErrors, setValidationErrors] = useState([]);
-  const [editingCell, setEditingCell] = useState(null);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   return (
     <div className={styles.fullWidthWrapper}>
       <div className={styles.dataTable}>
         <LoadingOverlay isLoading={isLoading} tableWrapperRef={tableWrapperRef} />
-        {showSuccessMessage && (
-          <div className={styles.successMessage}>
-            Save successful
-          </div>
-        )}
         <div className={styles.tableControls}>
           <div className={styles.topButtons}>
             <div className={styles.leftButtons}>
@@ -329,26 +228,6 @@ const DataTable = ({
                 )}
               </div>
             </div>
-            <div className={styles.crudButtons}>
-              <button
-                onClick={() => handleModeChange('add')}
-                className={`${styles.crudButton} ${activeMode === 'add' ? styles.active : ''}`}
-              >
-                {activeMode === 'add' ? 'Apply' : <><Plus size={16} /> Add</>}
-              </button>
-              <button
-                onClick={() => handleModeChange('delete')}
-                className={`${styles.crudButton} ${activeMode === 'delete' ? styles.active : ''}`}
-              >
-                {activeMode === 'delete' ? 'Apply' : <><Trash size={16} /> Delete</>}
-              </button>
-              <button
-                onClick={() => handleModeChange('update')}
-                className={`${styles.crudButton} ${activeMode === 'update' ? styles.active : ''}`}
-              >
-                {activeMode === 'update' ? 'Apply' : <><Edit size={16} /> Update</>}
-              </button>
-            </div>
           </div>
           <div className={styles.filterTags}>
             {Object.entries(filters).map(([column, values]) => (
@@ -380,7 +259,7 @@ const DataTable = ({
               </tr>
             </thead>
             <tbody>
-              {filteredAndSortedData.map((row, rowIndex) => (
+              {data.map((row, rowIndex) => (
                 <tr key={rowIndex}>
                   {visibleColumns.map(column => (
                     <td key={column}>{row[column]}</td>

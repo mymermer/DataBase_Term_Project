@@ -41,9 +41,8 @@ export default function PointsPage({ params }) {
           .flat()
           .join(',');
         dataUrl += `&filters=${filterParams}`;
-        countUrl += `&filters=${filterParams}`;
+        countUrl += `?filters=${filterParams}`;
       }
-    
     
       try {
         const [dataResponse, countResponse] = await Promise.all([
@@ -59,7 +58,6 @@ export default function PointsPage({ params }) {
           dataResponse.json(),
           countResponse.json()
         ]);
-
 
         setData(result);
         setTotalRows(countResult.total);
@@ -84,7 +82,7 @@ export default function PointsPage({ params }) {
   };
 
   const handleColumnChange = (newColumns) => {
-    setSelectedColumns(newColumns);
+    setSelectedColumns(newColumns);newColumns;
   };
 
   const handleFilterChange = (newFilters) => {

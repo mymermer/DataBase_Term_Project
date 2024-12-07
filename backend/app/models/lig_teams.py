@@ -364,12 +364,26 @@ class Lig_TeamsDAO():
 
 
     @staticmethod
-    def get_total_lig_teams(db: db) -> int:
+    def get_total_lig_teams(db: db, filters: dict = None) -> int:
         try:
             connection = db.get_connection()
-            query = "SELECT COUNT(*) FROM LIG_TEAMS"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")  # Use %s as a placeholder
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                SELECT COUNT(*) FROM LIG_TEAMS
+                {where_clause}
+            """
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.execute(query, params)  # Pass params for the placeholders
             result = cursor.fetchone()
             if result:
                 return result[0]

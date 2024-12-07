@@ -57,11 +57,19 @@ def get_paginated_teams():
 @lig_teams_bp.route('/lig_teams/count', methods=['GET'])
 def get_total_teams_count():
     try:
-        total_count = Lig_TeamsDAO.get_total_lig_teams(db)
+        filters_raw = request.args.get('filters', None)  # Optional filters
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            
+
+
+        total_count = Lig_TeamsDAO.get_total_lig_teams(db,filters=filters)
         return jsonify({'total': total_count}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @lig_teams_bp.route('/lig_teams', methods=['POST'])
 def create_lig_teams():

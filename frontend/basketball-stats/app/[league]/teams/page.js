@@ -73,7 +73,8 @@ export default function TeamsPage({ params }) {
       const offset = currentPage * rowsPerPage;
       const columnsParam = selectedColumns.join(',');
       let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
-    
+      let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams/count`;
+
       // Add filters to the URL
       if (Object.keys(filters).length > 0) {
         const filterParams = Object.entries(filters)
@@ -81,9 +82,8 @@ export default function TeamsPage({ params }) {
           .flat()
           .join(',');
         dataUrl += `&filters=${filterParams}`;
+        countUrl += `?filters=${filterParams}`;
       }
-    
-      const countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams/count`;
     
       try {
         const [dataResponse, countResponse] = await Promise.all([
@@ -99,7 +99,6 @@ export default function TeamsPage({ params }) {
           dataResponse.json(),
           countResponse.json()
         ]);
-
 
         setData(result);
         setTotalRows(countResult.total);
@@ -124,7 +123,7 @@ export default function TeamsPage({ params }) {
   };
 
   const handleColumnChange = (newColumns) => {
-    setSelectedColumns(newColumns);
+    setSelectedColumns(newColumns);newColumns;
   };
 
   const handleFilterChange = (newFilters) => {
