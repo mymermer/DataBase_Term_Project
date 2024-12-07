@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
-import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X } from 'lucide-react';
 import LoadingOverlay from './LoadingOverlay';
 
 const DataTable = ({ 
@@ -17,7 +17,12 @@ const DataTable = ({
   onColumnChange,
   onFilterChange,
   isLoading,
-  onSort
+  onSort,
+  sortBy,
+  sortOrder,
+  onAdd,
+  onDelete,
+  onUpdate
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
@@ -27,6 +32,15 @@ const DataTable = ({
   const [currentFilterColumn, setCurrentFilterColumn] = useState(null);
   const [tempVisibleColumns, setTempVisibleColumns] = useState(visibleColumns);
   const [bubbleWidth, setBubbleWidth] = useState(200);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupType, setPopupType] = useState(null);
+  const [newRowData, setNewRowData] = useState({});
+  const [deleteId, setDeleteId] = useState('');
+  const [updateId, setUpdateId] = useState('');
+  const [updateColumn, setUpdateColumn] = useState('');
+  const [updateValue, setUpdateValue] = useState('');
+  const [message, setMessage] = useState(null);
+
   const columnSelectorRef = useRef(null);
   const filterSelectorRef = useRef(null);
   const columnButtonRef = useRef(null);
@@ -120,10 +134,52 @@ const DataTable = ({
 
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
 
+  const handlePopupOpen = (type) => {
+    setPopupType(type);
+    setShowPopup(true);
+  };
+
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    setPopupType(null);
+    setNewRowData({});
+    setDeleteId('');
+    setUpdateId('');
+    setUpdateColumn('');
+    setUpdateValue('');
+  };
+
+  const handleApply = async () => {
+    try {
+      let result;
+      switch (popupType) {
+        case 'add':
+          result = await onAdd(newRowData);
+          break;
+        case 'delete':
+          result = await onDelete(deleteId);
+          break;
+        case 'update':
+          result = await onUpdate(updateId, updateColumn, updateValue);
+          break;
+      }
+      setMessage({ type: 'success', text: 'Operation successful' });
+      handlePopupClose();
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    }
+    setTimeout(() => setMessage(null), 3000);
+  };
+
   return (
     <div className={styles.fullWidthWrapper}>
       <div className={styles.dataTable}>
         <LoadingOverlay isLoading={isLoading} tableWrapperRef={tableWrapperRef} />
+        {message && (
+          <div className={`${styles.message} ${styles[message.type]}`}>
+            {message.text}
+          </div>
+        )}
         <div className={styles.tableControls}>
           <div className={styles.topButtons}>
             <div className={styles.leftButtons}>
@@ -224,6 +280,17 @@ const DataTable = ({
                 )}
               </div>
             </div>
+            <div className={styles.crudButtons}>
+              <button onClick={() => handlePopupOpen('add')} className={styles.crudButton}>
+                <Plus size={16} /> Add
+              </button>
+              <button onClick={() => handlePopupOpen('delete')} className={styles.crudButton}>
+                <Trash size={16} /> Delete
+              </button>
+              <button onClick={() => handlePopupOpen('update')} className={styles.crudButton}>
+                <Edit size={16} /> Update
+              </button>
+            </div>
           </div>
           <div className={styles.filterTags}>
             {Object.entries(filters).map(([column, values]) => (
@@ -244,7 +311,11 @@ const DataTable = ({
                   <th key={column} onClick={() => requestSort(column)}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{column}</span>
-                      <ArrowUpDown className={styles.sortIcon} />
+                      {sortBy === column ? (
+                        sortOrder === 'asc' ? <ChevronUp className={styles.sortIcon} /> : <ChevronDown className={styles.sortIcon} />
+                      ) : (
+                        <ArrowUpDown className={styles.sortIcon} />
+                      )}
                     </div>
                   </th>
                 ))}
@@ -289,6 +360,83 @@ const DataTable = ({
           </div>
         </div>
       </div>
+      {showPopup && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popup}>
+            <button className={styles.closeButton} onClick={handlePopupClose}>
+              <X size={24} />
+            </button>
+            <h2>{popupType.charAt(0).toUpperCase() + popupType.slice(1)}</h2>
+            {popupType === 'add' && (
+              <div className={styles.addForm}>
+                {allColumns.map(column => (
+                  <div key={column} className={styles.formGroup}>
+                    <label htmlFor={column}>{column}</label>
+                    <input
+                      type="text"
+                      id={column}
+                      value={newRowData[column] || ''}
+                      onChange={(e) => setNewRowData({...newRowData, [column]: e.target.value})}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            {popupType === 'delete' && (
+              <div className={styles.deleteForm}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="deleteId">game_point_id</label>
+                  <input
+                    type="text"
+                    id="deleteId"
+                    value={deleteId}
+                    onChange={(e) => setDeleteId(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+            {popupType === 'update' && (
+              <div className={styles.updateForm}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="updateId">game_point_id</label>
+                  <input
+                    type="text"
+                    id="updateId"
+                    value={updateId}
+                    onChange={(e) => setUpdateId(e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="updateColumn">Column to Update</label>
+                  <select
+                    id="updateColumn"
+                    value={updateColumn}
+                    onChange={(e) => setUpdateColumn(e.target.value)}
+                  >
+                    <option value="">Select a column</option>
+                    {allColumns.map(column => (
+                      <option key={column} value={column}>{column}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="updateValue">New Value</label>
+                  <input
+                    type="text"
+                    id="updateValue"
+                    value={updateValue}
+                    onChange={(e) => setUpdateValue(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+            <div className={styles.popupButtons}>
+              <button onClick={handlePopupClose} className={styles.cancelButton}>Cancel</button>
+              <button onClick={handleApply} className={styles.applyButton}>Apply</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

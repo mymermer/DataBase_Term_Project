@@ -29,53 +29,53 @@ export default function PointsPage({ params }) {
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const offset = currentPage * rowsPerPage;
-      const columnsParam = selectedColumns.join(',');
-      let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
-      if (sortBy) {
-        dataUrl += `&sortBy=${sortBy}&order=${sortOrder}`;
-      }
-      let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points/count`;
-
-      // Add filters to the URL
-      if (Object.keys(filters).length > 0) {
-        const filterParams = Object.entries(filters)
-          .map(([column, values]) => values.map(value => `${column}:${value}`))
-          .flat()
-          .join(',');
-        dataUrl += `&filters=${filterParams}`;
-        countUrl += `?filters=${filterParams}`;
-      }
-    
-      try {
-        const [dataResponse, countResponse] = await Promise.all([
-          fetch(dataUrl),
-          fetch(countUrl)
-        ]);
-
-        if (!dataResponse.ok || !countResponse.ok) {
-          throw new Error(`HTTP error! status: ${dataResponse.status} or ${countResponse.status}`);
-        }
-
-        const [result, countResult] = await Promise.all([
-          dataResponse.json(),
-          countResponse.json()
-        ]);
-
-        setData(result);
-        setTotalRows(countResult.total);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [currentPage, rowsPerPage, tournament, selectedColumns, filters, sortBy, sortOrder]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const offset = currentPage * rowsPerPage;
+    const columnsParam = selectedColumns.join(',');
+    let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
+    if (sortBy) {
+      dataUrl += `&sortBy=${sortBy}&order=${sortOrder}`;
+    }
+    let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points/count`;
+
+    // Add filters to the URL
+    if (Object.keys(filters).length > 0) {
+      const filterParams = Object.entries(filters)
+        .map(([column, values]) => values.map(value => `${column}:${value}`))
+        .flat()
+        .join(',');
+      dataUrl += `&filters=${filterParams}`;
+      countUrl += `?filters=${filterParams}`;
+    }
+  
+    try {
+      const [dataResponse, countResponse] = await Promise.all([
+        fetch(dataUrl),
+        fetch(countUrl)
+      ]);
+
+      if (!dataResponse.ok || !countResponse.ok) {
+        throw new Error(`HTTP error! status: ${dataResponse.status} or ${countResponse.status}`);
+      }
+
+      const [result, countResult] = await Promise.all([
+        dataResponse.json(),
+        countResponse.json()
+      ]);
+
+      setData(result);
+      setTotalRows(countResult.total);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -104,6 +104,68 @@ export default function PointsPage({ params }) {
     }
   };
 
+  const handleAdd = async (newRowData) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newRowData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchData(); // Refresh data after successful add
+      return true;
+    } catch (error) {
+      console.error('Error adding new row:', error);
+      throw error;
+    }
+  };
+
+  const handleDelete = async (gamePointId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchData(); // Refresh data after successful delete
+      return true;
+    } catch (error) {
+      console.error('Error deleting row:', error);
+      throw error;
+    }
+  };
+
+  const handleUpdate = async (gamePointId, column, value) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [column]: value }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchData(); // Refresh data after successful update
+      return true;
+    } catch (error) {
+      console.error('Error updating row:', error);
+      throw error;
+    }
+  };
+
   if (error) return <p>Error: {error}</p>;
 
   return (
@@ -124,6 +186,11 @@ export default function PointsPage({ params }) {
             onFilterChange={handleFilterChange}
             isLoading={loading}
             onSort={handleSort}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onAdd={handleAdd}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
           />
         </div>
       </div>
