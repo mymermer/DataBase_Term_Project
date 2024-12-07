@@ -32,7 +32,9 @@ def get_paginated_points():
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
         filters_raw = request.args.get('filters', None)  # Optional filters
-        
+        sort_by = request.args.get('sortBy', None)  # Optional sort column
+        order = request.args.get('order', 'asc')  # Default to ascending order
+
         # Parse columns if provided
         if columns:
             columns = columns.split(",")
@@ -42,12 +44,21 @@ def get_paginated_points():
         if filters_raw:
             filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
-        cup_points = Cup_PointsDAO.get_paginated_cup_points(db, offset=offset, limit=limit, columns=columns, filters=filters)
+        # Call the DAO method with the sort_by and order parameters
+        cup_points = Cup_PointsDAO.get_paginated_cup_points(
+            db, 
+            offset=offset, 
+            limit=limit, 
+            columns=columns, 
+            filters=filters, 
+            sort_by=sort_by, 
+            order=order
+        )
         if cup_points is None:
             return jsonify([]), 200
         return jsonify(cup_points), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset, limit, columns, or filters'}), 400
+        return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     

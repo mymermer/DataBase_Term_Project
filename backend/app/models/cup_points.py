@@ -223,7 +223,7 @@ class Cup_PointsDAO():
             connection.close()
 
     @staticmethod
-    def get_paginated_cup_points(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None) -> list:
+    def get_paginated_cup_points(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
         try:
             connection = db.get_connection()
             
@@ -239,11 +239,19 @@ class Cup_PointsDAO():
                     params.append(value)
 
             where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
-            
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
             # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT {selected_columns} FROM CUP_POINTS
                 {where_clause}
+                {order_clause}
                 LIMIT %s OFFSET %s
             """
             
