@@ -32,10 +32,12 @@ export default function StatPageTemplate({ league, stat, children, UserView }) {
           <h1>{league.charAt(0).toUpperCase() + league.slice(1)} - {stat}</h1>
           <ViewToggle isAdminView={isAdminView} onToggle={toggleView} />
         </div>
-        {isAdminView ? children : <UserView league={league} />}
+        {isAdminView 
+          ? children 
+          : (UserView ? <UserView league={league} /> : <p>User view is not available.</p>)
+        }
       </main>
       <Footer onLogoClick={onLogoClick} />
     </div>
   );
 }
-
