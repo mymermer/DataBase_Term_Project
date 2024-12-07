@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional
 
 # game_id VARCHAR(50),
 # game VARCHAR(50),
