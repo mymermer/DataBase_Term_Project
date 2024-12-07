@@ -22,7 +22,8 @@ const DataTable = ({
   sortOrder,
   onAdd,
   onDelete,
-  onUpdate
+  onUpdate,
+  foreignKeyColumns
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
@@ -170,6 +171,19 @@ const DataTable = ({
     }
     setTimeout(() => setMessage(null), 3000);
   };
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        handlePopupClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
 
   return (
     <div className={styles.fullWidthWrapper}>
@@ -361,76 +375,81 @@ const DataTable = ({
         </div>
       </div>
       {showPopup && (
-        <div className={styles.popupOverlay}>
-          <div className={styles.popup}>
+        <div className={styles.popupOverlay} onClick={handlePopupClose}>
+          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
             <button className={styles.closeButton} onClick={handlePopupClose}>
               <X size={24} />
             </button>
-            <h2>{popupType.charAt(0).toUpperCase() + popupType.slice(1)}</h2>
-            {popupType === 'add' && (
-              <div className={styles.addForm}>
-                {allColumns.map(column => (
-                  <div key={column} className={styles.formGroup}>
-                    <label htmlFor={column}>{column}</label>
+            <h2 className={styles.popupTitle}>{popupType.charAt(0).toUpperCase() + popupType.slice(1)}</h2>
+            <div className={styles.warningMessage}>
+              WARNING: This method will have impact on other tables due to foreign key columns: {foreignKeyColumns.join(', ')}.
+            </div>
+            <div className={styles.popupContent}>
+              {popupType === 'add' && (
+                <div className={styles.addForm}>
+                  {allColumns.map(column => (
+                    <div key={column} className={styles.formGroup}>
+                      <label htmlFor={column}>{column}</label>
+                      <input
+                        type="text"
+                        id={column}
+                        value={newRowData[column] || ''}
+                        onChange={(e) => setNewRowData({...newRowData, [column]: e.target.value})}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {popupType === 'delete' && (
+                <div className={styles.deleteForm}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="deleteId">game_point_id</label>
                     <input
                       type="text"
-                      id={column}
-                      value={newRowData[column] || ''}
-                      onChange={(e) => setNewRowData({...newRowData, [column]: e.target.value})}
+                      id="deleteId"
+                      value={deleteId}
+                      onChange={(e) => setDeleteId(e.target.value)}
                     />
                   </div>
-                ))}
-              </div>
-            )}
-            {popupType === 'delete' && (
-              <div className={styles.deleteForm}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="deleteId">game_point_id</label>
-                  <input
-                    type="text"
-                    id="deleteId"
-                    value={deleteId}
-                    onChange={(e) => setDeleteId(e.target.value)}
-                  />
                 </div>
-              </div>
-            )}
-            {popupType === 'update' && (
-              <div className={styles.updateForm}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="updateId">game_point_id</label>
-                  <input
-                    type="text"
-                    id="updateId"
-                    value={updateId}
-                    onChange={(e) => setUpdateId(e.target.value)}
-                  />
+              )}
+              {popupType === 'update' && (
+                <div className={styles.updateForm}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="updateId">game_point_id</label>
+                    <input
+                      type="text"
+                      id="updateId"
+                      value={updateId}
+                      onChange={(e) => setUpdateId(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="updateColumn">Column to Update</label>
+                    <select
+                      id="updateColumn"
+                      value={updateColumn}
+                      onChange={(e) => setUpdateColumn(e.target.value)}
+                    >
+                      <option value="">Select a column</option>
+                      {allColumns.map(column => (
+                        <option key={column} value={column}>{column}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="updateValue">New Value</label>
+                    <input
+                      type="text"
+                      id="updateValue"
+                      value={updateValue}
+                      onChange={(e) => setUpdateValue(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className={styles.formGroup}>
-                  <label htmlFor="updateColumn">Column to Update</label>
-                  <select
-                    id="updateColumn"
-                    value={updateColumn}
-                    onChange={(e) => setUpdateColumn(e.target.value)}
-                  >
-                    <option value="">Select a column</option>
-                    {allColumns.map(column => (
-                      <option key={column} value={column}>{column}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className={styles.formGroup}>
-                  <label htmlFor="updateValue">New Value</label>
-                  <input
-                    type="text"
-                    id="updateValue"
-                    value={updateValue}
-                    onChange={(e) => setUpdateValue(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-            <div className={styles.popupButtons}>
+              )}
+            </div>
+            <div className={styles.popupFooter}>
               <button onClick={handlePopupClose} className={styles.cancelButton}>Cancel</button>
               <button onClick={handleApply} className={styles.applyButton}>Apply</button>
             </div>

@@ -53,6 +53,8 @@ const allColumns = [
 
 ];
 
+const foreignKeyColumns = [];
+
 export default function TeamsPage({ params }) {
   const { league } = React.use(params);
 
@@ -64,54 +66,59 @@ export default function TeamsPage({ params }) {
   const [totalRows, setTotalRows] = useState(0);
   const [selectedColumns, setSelectedColumns] = useState(allColumns.slice(0, 10));
   const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
   
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const offset = currentPage * rowsPerPage;
-      const columnsParam = selectedColumns.join(',');
-      let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
-      let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams/count`;
-
-      // Add filters to the URL
-      if (Object.keys(filters).length > 0) {
-        const filterParams = Object.entries(filters)
-          .map(([column, values]) => values.map(value => `${column}:${value}`))
-          .flat()
-          .join(',');
-        dataUrl += `&filters=${filterParams}`;
-        countUrl += `?filters=${filterParams}`;
-      }
-    
-      try {
-        const [dataResponse, countResponse] = await Promise.all([
-          fetch(dataUrl),
-          fetch(countUrl)
-        ]);
-
-        if (!dataResponse.ok || !countResponse.ok) {
-          throw new Error(`HTTP error! status: ${dataResponse.status} or ${countResponse.status}`);
-        }
-
-        const [result, countResult] = await Promise.all([
-          dataResponse.json(),
-          countResponse.json()
-        ]);
-
-        setData(result);
-        setTotalRows(countResult.total);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters]);
+  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters, sortBy, sortOrder]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const offset = currentPage * rowsPerPage;
+    const columnsParam = selectedColumns.join(',');
+    let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
+    if (sortBy) {
+      dataUrl += `&sortBy=${sortBy}&order=${sortOrder}`;
+    }
+    let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams/count`;
+
+    // Add filters to the URL
+    if (Object.keys(filters).length > 0) {
+      const filterParams = Object.entries(filters)
+        .map(([column, values]) => values.map(value => `${column}:${value}`))
+        .flat()
+        .join(',');
+      dataUrl += `&filters=${filterParams}`;
+      countUrl += `?filters=${filterParams}`;
+    }
+  
+    try {
+      const [dataResponse, countResponse] = await Promise.all([
+        fetch(dataUrl),
+        fetch(countUrl)
+      ]);
+
+      if (!dataResponse.ok || !countResponse.ok) {
+        throw new Error(`HTTP error! status: ${dataResponse.status} or ${countResponse.status}`);
+      }
+
+      const [result, countResult] = await Promise.all([
+        dataResponse.json(),
+        countResponse.json()
+      ]);
+
+      setData(result);
+      setTotalRows(countResult.total);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -123,12 +130,83 @@ export default function TeamsPage({ params }) {
   };
 
   const handleColumnChange = (newColumns) => {
-    setSelectedColumns(newColumns);newColumns;
+    setSelectedColumns(newColumns);
   };
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     setCurrentPage(0); // Reset to first page when filters change
+  };
+
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
+  const handleAdd = async (newRowData) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newRowData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchData(); // Refresh data after successful add
+      return true;
+    } catch (error) {
+      console.error('Error adding new row:', error);
+      throw error;
+    }
+  };
+
+  const handleDelete = async (season_team_id) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/${season_team_id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchData(); // Refresh data after successful delete
+      return true;
+    } catch (error) {
+      console.error('Error deleting row:', error);
+      throw error;
+    }
+  };
+
+  const handleUpdate = async (season_team_id, column, value) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/${season_team_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [column]: value }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchData(); // Refresh data after successful update
+      return true;
+    } catch (error) {
+      console.error('Error updating row:', error);
+      throw error;
+    }
   };
 
   if (error) return <p>Error: {error}</p>;
@@ -150,6 +228,13 @@ export default function TeamsPage({ params }) {
             onColumnChange={handleColumnChange}
             onFilterChange={handleFilterChange}
             isLoading={loading}
+            onSort={handleSort}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onAdd={handleAdd}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
+            foreignKeyColumns={foreignKeyColumns}
           />
         </div>
       </div>

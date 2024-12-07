@@ -12,6 +12,8 @@ const allColumns = [
   'zone_of_play', 'minute', 'points_a', 'points_b', 'date_time_stp'
 ];
 
+const foreignKeyColumns = ['season_team_id', 'game_id', 'game_play_id', 'game_player_id', 'season_player_id'];
+
 export default function PointsPage({ params }) {
   const { league } = React.use(params);
 
@@ -191,6 +193,7 @@ export default function PointsPage({ params }) {
             onAdd={handleAdd}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
+            foreignKeyColumns={foreignKeyColumns}
           />
         </div>
       </div>
