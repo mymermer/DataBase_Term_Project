@@ -103,7 +103,7 @@ class Lig_Player:
 
 class Lig_PlayersDAO():
     @staticmethod
-    def create_Lig_Players(db: db, player: Lig_Player) -> None:
+    def create_lig_players(db: db, player: Lig_Player) -> None:
         try:
             connection  = db.get_connection()
             cursor = db.connection.cursor()
@@ -133,7 +133,7 @@ class Lig_PlayersDAO():
                 connection.close()
     
     @staticmethod
-    def get_Lig_Player(db: db, season_player_id: str) -> Lig_Player: 
+    def get_lig_player(db: db, season_player_id: str) -> Lig_Player: 
         try:
             connection = db.get_connection()
             query = """
@@ -153,7 +153,7 @@ class Lig_PlayersDAO():
             connection.close()
     
     @staticmethod
-    def get_all_Lig_Players(db: db) -> list:
+    def get_all_lig_players(db: db) -> list:
         try:
             connection = db.get_connection()
             query = """
@@ -174,7 +174,7 @@ class Lig_PlayersDAO():
     
     
     @staticmethod
-    def update_Lig_Player(db: db, player:Lig_Player) -> None:
+    def update_lig_player(db: db, player:Lig_Player) -> None:
         try:
             connection = db.get_connection()
             cursor = connection.cursor()
@@ -312,7 +312,7 @@ class Lig_PlayersDAO():
             cursor.close()
             connection.close()
     @staticmethod
-    def get_paginated_cup_teams(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
+    def get_paginated_lig_player(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
         try:
             connection = db.get_connection()
 
