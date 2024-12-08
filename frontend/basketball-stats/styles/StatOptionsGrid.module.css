@@ -2,56 +2,148 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
   padding: 2rem;
 }
 
 .optionsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
 }
 
 .optionCard {
   background: white;
-  border-radius: 10px;
+  border-radius: 15px;
   padding: 1.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  justify-content: center;
+  gap: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   text-decoration: none;
-  color: inherit;
+  color: #333;
+  width: 180px;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: var(--delay);
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.optionCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color);
+  opacity: 0.1;
+  transition: opacity 0.3s ease;
+}
+
+.optionCard:hover::before {
+  opacity: 0.2;
 }
 
 .optionCard.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
+  opacity: 0.5 !important; /* Ensures the opacity applies */
+  cursor: not-allowed !important; /* Disables the pointer */
+  pointer-events: none !important; /* Prevents interaction */
+  background-color: #e0e0e0 !important; /* Light gray background */
+  color: #a0a0a0 !important; /* Muted text color */
+  box-shadow: none !important; /* Removes any shadow for disabled state */
 }
 
-.optionCard:nth-child(7) {
-  grid-column: 2;
+
+.iconWrapper {
+  background: var(--color);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
 }
 
 .icon {
-  font-size: 2rem;
-  min-width: 2.5rem;
-  transition: transform 0.3s ease;
+  color: white;
 }
 
 .label {
-  font-size: 1.2rem;
-  font-weight: 500;
-  text-align: left;
-  flex-grow: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
   transition: transform 0.3s ease;
+}
+
+.optionCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.optionCard:hover .iconWrapper {
+  transform: scale(1.1);
+}
+
+.optionCard:active {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .optionCard {
+    width: 150px;
+    height: 150px;
+  }
+
+  .iconWrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .optionCard {
+    width: 130px;
+    height: 130px;
+  }
+
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .label {
+    font-size: 0.9rem;
+  }
 }
 
 .optionCard:hover:not(.disabled) {
