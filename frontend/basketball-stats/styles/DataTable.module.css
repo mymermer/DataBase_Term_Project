@@ -1,8 +1,7 @@
 .dataTable {
   font-family: Arial, sans-serif;
-  margin: 20px 165px;
-  width: 95%;
-  max-width: 1600px;
+  width: 100%;
+  max-width: none;
   position: relative;
   font-size: 14px;
   display: flex;
@@ -10,7 +9,12 @@
   align-items: stretch;
 }
 
-
+.fullWidthWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0;
+}
 
 .tableWrapper {
   width: 100%;
@@ -25,6 +29,7 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  padding: 0 1rem;
 }
 
 .topButtons {
@@ -60,6 +65,9 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .controlButton:hover {
@@ -73,7 +81,6 @@
 
 .crudButton {
   padding: 8px 12px;
-  background-color: #000080;
   color: white;
   border: none;
   border-radius: 4px;
@@ -83,6 +90,30 @@
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.addButton {
+  background-color: #4CAF50;
+}
+
+.addButton:hover {
+  background-color: #45a049;
+}
+
+.deleteButton {
+  background-color: #f44336;
+}
+
+.deleteButton:hover {
+  background-color: #d32f2f;
+}
+
+.updateButton {
+  background-color: #2196F3;
+}
+
+.updateButton:hover {
+  background-color: #1976D2;
 }
 
 .crudButton:hover {
@@ -102,7 +133,7 @@
   align-items: center;
   background-color: #e6e6fa;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 14px;
   margin-right: 5px;
   border: 1px solid #000080;
@@ -116,6 +147,9 @@
   font-size: 16px;
   margin-left: 5px;
   color: #000080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .selectorBubble {
@@ -214,16 +248,16 @@
   min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: 2px solid #000080;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
   margin-bottom: 0;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .table th, .table td {
   padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .table th {
@@ -236,19 +270,17 @@
   border-bottom: 2px solid #000066;
   cursor: pointer;
   user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .table th:hover {
   background-color: #000066;
 }
 
-.table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
 .table tr:nth-child(even) {
-  background-color: #f0f8ff;
+  background-color: #f8f8ff;
 }
 
 .table tr:hover {
@@ -269,6 +301,7 @@
   gap: 10px;
   margin-top: 20px;
   width: 100%;
+  padding: 0 1rem;
 }
 
 .paginationControls {
@@ -284,22 +317,25 @@
   justify-content: flex-start;
 }
 
-.pagination button {
-  padding: 8px 12px;
+.paginationButton {
+  padding: 8px;
   background-color: #000080;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pagination button:disabled {
+.paginationButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.pagination button:hover:not(:disabled) {
+.paginationButton:hover:not(:disabled) {
   background-color: #000066;
 }
 
@@ -343,5 +379,165 @@
 @keyframes fadeInOut {
   0%, 100% { opacity: 0; }
   10%, 90% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .dataTable {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .topButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .leftButtons {
+    flex-direction: column;
+  }
+
+  .crudButtons {
+    flex-direction: column;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bottomButtons {
+    justify-content: space-between;
+  }
+}
+
+.buttonIcon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup {
+  background-color: white;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.popupTitle {
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  background-color: #f0f0f0;
+}
+
+.warningMessage {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 4px;
+}
+
+.popupContent {
+  padding: 1rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.popupFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f0f0f0;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.cancelButton,
+.applyButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background-color: #ccc;
+}
+
+.applyButton {
+  background-color: #000080;
+  color: white;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.message {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  z-index: 1001;
+}
+
+.success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.error {
+  background-color: #f44336;
+  color: white;
+}
+
+.tableTitle {
+  margin-bottom: 1rem;
+}
+
+.tableTitle h2 {
+  font-size: 1.5rem;
+  color: #333;
 }
 

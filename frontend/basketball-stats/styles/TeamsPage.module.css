@@ -1,11 +1,11 @@
-.pointsPageContent {
+.teamsPageContent {
   width: 100%;
   max-width: none;
   margin: 0;
   padding: 0;
 }
 
-.pointsPageContent h2 {
+.teamsPageContent h2 {
   margin-bottom: 1rem;
   font-size: 1.5rem;
   color: #333;

@@ -1,0 +1,15 @@
+.viewToggle {
+  padding: 8px 16px;
+  background-color: #000080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.viewToggle:hover {
+  background-color: #000066;
+}
+

@@ -1,10 +1,33 @@
-.content {
-  max-width: 1200px;
-  margin: 0 0;
-  padding: 0rem;
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.content h1 {
+.main {
+  flex: 1;
+  padding: 5rem 2rem 2rem;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
+}
+
+.headerContainer h1 {
+  margin: 0;
+}
+
+.main h1 {
+  margin-bottom: 1rem;
+}
+
+.userView {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f0f0f0;
+  border-radius: 8px;
 }
 
