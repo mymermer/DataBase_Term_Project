@@ -33,7 +33,9 @@ def get_paginated_teams():
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
         filters_raw = request.args.get('filters', None)  # Optional filters
-        
+        sort_by = request.args.get('sortBy', None)  # Optional sort column
+        order = request.args.get('order', 'asc')  # Default to ascending order
+
         # Parse columns if provided
         if columns:
             columns = columns.split(",")
@@ -43,12 +45,21 @@ def get_paginated_teams():
         if filters_raw:
             filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
-        lig_teams = Lig_TeamsDAO.get_paginated_lig_teams(db, offset=offset, limit=limit, columns=columns, filters=filters)
+        # Call the DAO method with the sort_by and order parameters
+        lig_teams = Lig_TeamsDAO.get_paginated_lig_teams(
+            db, 
+            offset=offset, 
+            limit=limit, 
+            columns=columns, 
+            filters=filters, 
+            sort_by=sort_by, 
+            order=order
+        )
         if lig_teams is None:
             return jsonify([]), 200
         return jsonify(lig_teams), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset, limit, columns, or filters'}), 400
+        return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -57,11 +68,19 @@ def get_paginated_teams():
 @lig_teams_bp.route('/lig_teams/count', methods=['GET'])
 def get_total_teams_count():
     try:
-        total_count = Lig_TeamsDAO.get_total_lig_teams(db)
+        filters_raw = request.args.get('filters', None)  # Optional filters
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            
+
+
+        total_count = Lig_TeamsDAO.get_total_lig_teams(db,filters=filters)
         return jsonify({'total': total_count}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @lig_teams_bp.route('/lig_teams', methods=['POST'])
 def create_lig_teams():

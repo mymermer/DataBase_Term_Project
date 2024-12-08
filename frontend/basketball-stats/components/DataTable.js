@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
-import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingOverlay from './LoadingOverlay';
 
 const DataTable = ({ 
@@ -15,17 +15,33 @@ const DataTable = ({
   onPageChange, 
   onRowsPerPageChange,
   onColumnChange,
-  isLoading
+  onFilterChange,
+  isLoading,
+  onSort,
+  sortBy,
+  sortOrder,
+  onAdd,
+  onDelete,
+  onUpdate,
+  foreignKeyColumns
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [filters, setFilters] = useState({});
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilterSelector, setShowFilterSelector] = useState(false);
   const [currentFilterColumn, setCurrentFilterColumn] = useState(null);
   const [tempVisibleColumns, setTempVisibleColumns] = useState(visibleColumns);
   const [bubbleWidth, setBubbleWidth] = useState(200);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupType, setPopupType] = useState(null);
+  const [newRowData, setNewRowData] = useState({});
+  const [deleteId, setDeleteId] = useState('');
+  const [updateId, setUpdateId] = useState('');
+  const [updateColumn, setUpdateColumn] = useState('');
+  const [updateValue, setUpdateValue] = useState('');
+  const [message, setMessage] = useState(null);
+
   const columnSelectorRef = useRef(null);
   const filterSelectorRef = useRef(null);
   const columnButtonRef = useRef(null);
@@ -87,146 +103,95 @@ const DataTable = ({
   };
 
   const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
+    onSort(key);
   };
 
   const applyFilter = () => {
     const filterValue = document.querySelector(`.${styles.filterInput}`).value;
     if (filterValue.trim() !== '') {
-      setFilters(prev => {
-        const newFilters = { ...prev };
-        if (!newFilters[currentFilterColumn]) {
-          newFilters[currentFilterColumn] = [];
-        }
-        if (!newFilters[currentFilterColumn].includes(filterValue)) {
-          newFilters[currentFilterColumn].push(filterValue);
-        }
-        return newFilters;
-      });
+      const newFilters = { ...filters };
+      if (!newFilters[currentFilterColumn]) {
+        newFilters[currentFilterColumn] = [];
+      }
+      if (!newFilters[currentFilterColumn].includes(filterValue)) {
+        newFilters[currentFilterColumn].push(filterValue);
+      }
+      setFilters(newFilters);
+      onFilterChange(newFilters);
     }
     setShowFilterSelector(false);
     setCurrentFilterColumn(null);
   };
 
   const removeFilter = (column, value) => {
-    setFilters(prev => {
-      const newFilters = { ...prev };
-      newFilters[column] = newFilters[column].filter(v => v !== value);
-      if (newFilters[column].length === 0) {
-        delete newFilters[column];
-      }
-      return newFilters;
-    });
-  };
-
-  const filteredAndSortedData = useMemo(() => {
-    let processedData = [...data];
-
-    Object.entries(filters).forEach(([column, values]) => {
-      processedData = processedData.filter(item => 
-        values.some(value => String(item[column]).toLowerCase().includes(value.toLowerCase()))
-      );
-    });
-
-    if (sortConfig.key) {
-      processedData.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
+    const newFilters = { ...filters };
+    newFilters[column] = newFilters[column].filter(v => v !== value);
+    if (newFilters[column].length === 0) {
+      delete newFilters[column];
     }
-
-    return processedData;
-  }, [data, sortConfig, filters]);
-
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
 
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
 
-  const handleModeChange = (mode) => {
-    if (activeMode === mode) {
-      handleApply();
-    } else {
-      setActiveMode(mode);
-      setNewRow({});
-      setSelectedRows([]);
-      setValidationErrors([]);
-      setEditingCell(null);
+  const handlePopupOpen = (type) => {
+    setPopupType(type);
+    setShowPopup(true);
+  };
+
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    setPopupType(null);
+    setNewRowData({});
+    setDeleteId('');
+    setUpdateId('');
+    setUpdateColumn('');
+    setUpdateValue('');
+  };
+
+  const handleApply = async () => {
+    try {
+      let result;
+      switch (popupType) {
+        case 'add':
+          result = await onAdd(newRowData);
+          break;
+        case 'delete':
+          result = await onDelete(deleteId);
+          break;
+        case 'update':
+          result = await onUpdate(updateId, updateColumn, updateValue);
+          break;
+      }
+      setMessage({ type: 'success', text: 'Operation successful' });
+      handlePopupClose();
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
     }
+    setTimeout(() => setMessage(null), 3000);
   };
 
-  const handleApply = () => {
-    switch (activeMode) {
-      case 'add':
-        const compulsoryFields = ['Player', 'Team'];
-        const missingFields = compulsoryFields.filter(field => !newRow[field]);
-        if (missingFields.length > 0) {
-          setValidationErrors(missingFields);
-          return;
-        }
-        setData(prevData => [...prevData, newRow]);
-        setNewRow({});
-        setValidationErrors([]);
-        break;
-      case 'delete':
-        if (selectedRows.length > 0) {
-          setData(prevData => prevData.filter((_, index) => !selectedRows.includes(index)));
-          setSelectedRows([]);
-        }
-        break;
-      case 'update':
-        // No need to do anything here as updates are applied in real-time
-        break;
-    }
-    setActiveMode(null);
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
-  };
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        handlePopupClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
 
-  const handleNewRowChange = (column, value) => {
-    setNewRow(prev => ({ ...prev, [column]: value }));
-  };
-
-  const handleRowSelection = (index) => {
-    setSelectedRows(prev => 
-      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
-    );
-  };
-
-  const handleCellEdit = (rowIndex, column, value) => {
-    setData(prevData => {
-      const newData = [...prevData];
-      newData[rowIndex] = { ...newData[rowIndex], [column]: value };
-      return newData;
-    });
-  };
-
-  const handleCellClick = (rowIndex, column) => {
-    if (activeMode === 'update') {
-      setEditingCell({ rowIndex, column });
-    }
-  };
-  const [activeMode, setActiveMode] = useState(null);
-  const [newRow, setNewRow] = useState({});
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [validationErrors, setValidationErrors] = useState([]);
-  const [editingCell, setEditingCell] = useState(null);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
 
   return (
     <div className={styles.fullWidthWrapper}>
       <div className={styles.dataTable}>
         <LoadingOverlay isLoading={isLoading} tableWrapperRef={tableWrapperRef} />
-        {showSuccessMessage && (
-          <div className={styles.successMessage}>
-            Save successful
+        {message && (
+          <div className={`${styles.message} ${styles[message.type]}`}>
+            {message.text}
           </div>
         )}
         <div className={styles.tableControls}>
@@ -330,23 +295,14 @@ const DataTable = ({
               </div>
             </div>
             <div className={styles.crudButtons}>
-              <button
-                onClick={() => handleModeChange('add')}
-                className={`${styles.crudButton} ${activeMode === 'add' ? styles.active : ''}`}
-              >
-                {activeMode === 'add' ? 'Apply' : <><Plus size={16} /> Add</>}
+              <button onClick={() => handlePopupOpen('add')} className={`${styles.crudButton} ${styles.addButton}`}>
+                <Plus size={16} /> Add
               </button>
-              <button
-                onClick={() => handleModeChange('delete')}
-                className={`${styles.crudButton} ${activeMode === 'delete' ? styles.active : ''}`}
-              >
-                {activeMode === 'delete' ? 'Apply' : <><Trash size={16} /> Delete</>}
+              <button onClick={() => handlePopupOpen('delete')} className={`${styles.crudButton} ${styles.deleteButton}`}>
+                <Trash size={16} /> Delete
               </button>
-              <button
-                onClick={() => handleModeChange('update')}
-                className={`${styles.crudButton} ${activeMode === 'update' ? styles.active : ''}`}
-              >
-                {activeMode === 'update' ? 'Apply' : <><Edit size={16} /> Update</>}
+              <button onClick={() => handlePopupOpen('update')} className={`${styles.crudButton} ${styles.updateButton}`}>
+                <Edit size={16} /> Update
               </button>
             </div>
           </div>
@@ -369,8 +325,8 @@ const DataTable = ({
                   <th key={column} onClick={() => requestSort(column)}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{column}</span>
-                      {sortConfig.key === column ? (
-                        sortConfig.direction === 'ascending' ? <ChevronUp className={styles.sortIcon} /> : <ChevronDown className={styles.sortIcon} />
+                      {sortBy === column ? (
+                        sortOrder === 'asc' ? <ChevronUp className={styles.sortIcon} /> : <ChevronDown className={styles.sortIcon} />
                       ) : (
                         <ArrowUpDown className={styles.sortIcon} />
                       )}
@@ -380,7 +336,7 @@ const DataTable = ({
               </tr>
             </thead>
             <tbody>
-              {filteredAndSortedData.map((row, rowIndex) => (
+              {data.map((row, rowIndex) => (
                 <tr key={rowIndex}>
                   {visibleColumns.map(column => (
                     <td key={column}>{row[column]}</td>
@@ -395,14 +351,16 @@ const DataTable = ({
             <button 
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 0}
+              className={styles.paginationButton}
             >
-              Previous
+              <ChevronLeft size={20} />
             </button>
             <button 
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages - 1}
+              className={styles.paginationButton}
             >
-              Next
+              <ChevronRight size={20} />
             </button>
           </div>
           <div className={styles.paginationControls}>
@@ -418,6 +376,88 @@ const DataTable = ({
           </div>
         </div>
       </div>
+      {showPopup && (
+        <div className={styles.popupOverlay} onClick={handlePopupClose}>
+          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeButton} onClick={handlePopupClose}>
+              <X size={24} />
+            </button>
+            <h2 className={styles.popupTitle}>{popupType.charAt(0).toUpperCase() + popupType.slice(1)}</h2>
+            <div className={styles.warningMessage}>
+              WARNING: This method will have impact on other tables due to foreign key columns: {foreignKeyColumns.join(', ')}.
+            </div>
+            <div className={styles.popupContent}>
+              {popupType === 'add' && (
+                <div className={styles.addForm}>
+                  {allColumns.map(column => (
+                    <div key={column} className={styles.formGroup}>
+                      <label htmlFor={column}>{column}</label>
+                      <input
+                        type="text"
+                        id={column}
+                        value={newRowData[column] || ''}
+                        onChange={(e) => setNewRowData({...newRowData, [column]: e.target.value})}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {popupType === 'delete' && (
+                <div className={styles.deleteForm}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="deleteId">game_point_id</label>
+                    <input
+                      type="text"
+                      id="deleteId"
+                      value={deleteId}
+                      onChange={(e) => setDeleteId(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+              {popupType === 'update' && (
+                <div className={styles.updateForm}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="updateId">game_point_id</label>
+                    <input
+                      type="text"
+                      id="updateId"
+                      value={updateId}
+                      onChange={(e) => setUpdateId(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="updateColumn">Column to Update</label>
+                    <select
+                      id="updateColumn"
+                      value={updateColumn}
+                      onChange={(e) => setUpdateColumn(e.target.value)}
+                    >
+                      <option value="">Select a column</option>
+                      {allColumns.map(column => (
+                        <option key={column} value={column}>{column}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="updateValue">New Value</label>
+                    <input
+                      type="text"
+                      id="updateValue"
+                      value={updateValue}
+                      onChange={(e) => setUpdateValue(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className={styles.popupFooter}>
+              <button onClick={handlePopupClose} className={styles.cancelButton}>Cancel</button>
+              <button onClick={handleApply} className={styles.applyButton}>Apply</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

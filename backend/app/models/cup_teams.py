@@ -315,7 +315,7 @@ class Cup_TeamsDAO():
 
 
     @staticmethod
-    def get_paginated_cup_teams(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None) -> list:
+    def get_paginated_cup_teams(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
         try:
             connection = db.get_connection()
             
@@ -331,11 +331,19 @@ class Cup_TeamsDAO():
                     params.append(value)
 
             where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
-            
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
             # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT {selected_columns} FROM CUP_TEAMS
                 {where_clause}
+                {order_clause}
                 LIMIT %s OFFSET %s
             """
             
@@ -349,7 +357,7 @@ class Cup_TeamsDAO():
             if teams is None:
                 return None
 
-            # Map fetched rows to Cup_Points objects or dicts
+            # Map fetched rows to Cup_Teams objects or dicts
             if columns:
                 return [dict(zip(columns, team)) for team in teams]
             else:
@@ -364,16 +372,28 @@ class Cup_TeamsDAO():
             connection.close()
 
 
+
     @staticmethod
-    def get_total_cup_teams(db: db) -> int:
-        """
-        Fetch total number of rows in the CUP_TEAMS table.
-        """
+    def get_total_cup_teams(db: db, filters: dict = None) -> int:
         try:
             connection = db.get_connection()
-            query = "SELECT COUNT(*) FROM CUP_TEAMS"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")  # Use %s as a placeholder
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                SELECT COUNT(*) FROM CUP_TEAMS
+                {where_clause}
+            """
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.execute(query, params)  # Pass params for the placeholders
             result = cursor.fetchone()
             if result:
                 return result[0]
