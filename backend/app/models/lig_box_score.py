@@ -1,39 +1,40 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional, List, Dict
 
 @dataclass
 class LigBoxScore:
-    game_player_id: str
-    game_id: str
-    game: str
-    round_of_game: int
-    phase: str
-    season_player_id: str
-    season_team_id: str
-    is_starter: bool
-    is_playing: bool
-    dorsal: int
-    player: str
-    points: int
-    two_points_made: int
-    two_points_attempted: int
-    three_points_made: int
-    three_points_attempted: int
-    free_throws_made: int
-    free_throws_attempted: int
-    offensive_rebounds: int
-    defensive_rebounds: int
-    total_rebounds: int
-    assists: int
-    steals: int
-    turnovers: int
-    blocks_favour: int
-    blocks_against: int
-    fouls_committed: int
-    fouls_received: int
-    valuation: int
+    game_player_id: Optional[str] = None
+    game_id: Optional[str] = None
+    game: Optional[str] = None
+    round_of_game: Optional[int] = None
+    phase: Optional[str] = None
+    season_player_id: Optional[str] = None
+    season_team_id: Optional[str] = None
+    is_starter: Optional[bool] = None
+    is_playing: Optional[bool] = None
+    dorsal: Optional[int] = None
+    player: Optional[str] = None
+    points: Optional[int] = None
+    two_points_made: Optional[int] = None
+    two_points_attempted: Optional[int] = None
+    three_points_made: Optional[int] = None
+    three_points_attempted: Optional[int] = None
+    free_throws_made: Optional[int] = None
+    free_throws_attempted: Optional[int] = None
+    offensive_rebounds: Optional[int] = None
+    defensive_rebounds: Optional[int] = None
+    total_rebounds: Optional[int] = None
+    assists: Optional[int] = None
+    steals: Optional[int] = None
+    turnovers: Optional[int] = None
+    blocks_favour: Optional[int] = None
+    blocks_against: Optional[int] = None
+    fouls_committed: Optional[int] = None
+    fouls_received: Optional[int] = None
+    valuation: Optional[int] = None
 
 class LigBoxScoreDAO:
     @staticmethod
@@ -41,126 +42,174 @@ class LigBoxScoreDAO:
         try:
             connection = db.get_connection()
             cursor = connection.cursor()
-            query = """
-                INSERT INTO LIG_BOX_SCORE (
-                    game_player_id, game_id, game, round_of_game, phase, season_player_id, season_team_id,
-                    is_starter, is_playing, dorsal, player, points, two_points_made, two_points_attempted,
-                    three_points_made, three_points_attempted, free_throws_made, free_throws_attempted,
-                    offensive_rebounds, defensive_rebounds, total_rebounds, assists, steals, turnovers,
-                    blocks_favour, blocks_against, fouls_committed, fouls_received, valuation
-                ) VALUES (
-                    %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s, %s
-                )
-            """
-            cursor.execute(query, (
-                boxscore.game_player_id, boxscore.game_id, boxscore.game, boxscore.round_of_game,
-                boxscore.phase, boxscore.season_player_id, boxscore.season_team_id,
-                boxscore.is_starter, boxscore.is_playing, boxscore.dorsal, boxscore.player,
-                boxscore.points, boxscore.two_points_made, boxscore.two_points_attempted,
-                boxscore.three_points_made, boxscore.three_points_attempted,
-                boxscore.free_throws_made, boxscore.free_throws_attempted,
-                boxscore.offensive_rebounds, boxscore.defensive_rebounds, boxscore.total_rebounds,
-                boxscore.assists, boxscore.steals, boxscore.turnovers,
-                boxscore.blocks_favour, boxscore.blocks_against,
-                boxscore.fouls_committed, boxscore.fouls_received, boxscore.valuation
-            ))
+
+            if isinstance(boxscore, LigBoxScore):
+                boxscore = boxscore.__dict__
+
+            columns = ", ".join(boxscore.keys())
+            placeholders = ", ".join(["%s"] * len(boxscore))
+            query = f"INSERT INTO LIG_BOX_SCORE ({columns}) VALUES ({placeholders})"
+
+            cursor.execute(query, list(boxscore.values()))
             connection.commit()
+            print("Successfully created LigBoxScore with provided data.")
         except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            connection.rollback()
+            print(f"Database Error: {err}")
+            if connection:
+                connection.rollback()
+            raise
+        except Exception as e:
+            print(f"General Error: {e}")
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
 
     @staticmethod
-    def get_lig_box_score(db: db, game_player_id: str) -> LigBoxScore:
+    def get_lig_box_score(db: db, game_player_id: str) -> Optional[LigBoxScore]:
         try:
             connection = db.get_connection()
-            query = """
-            SELECT * FROM LIG_BOX_SCORE WHERE game_player_id = %s 
-            """
+            query = "SELECT * FROM LIG_BOX_SCORE WHERE game_player_id = %s"
             cursor = connection.cursor()
             cursor.execute(query, (game_player_id,))
             result = cursor.fetchone()
-            if result is None:
-                return None
-            return LigBoxScore(*result)
+            return LigBoxScore(*result) if result else None
         except mysql.connector.Error as err:
             print(f"Error: {err}")
-            connection.rollback()
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals():
+                connection.close()
 
     @staticmethod
-    def get_all_lig_box_score(db: db) -> list[LigBoxScore]:
+    def get_all_lig_box_scores(db: db) -> List[LigBoxScore]:
         try:
             connection = db.get_connection()
-            query = """
-            SELECT * FROM LIG_BOX_SCORE
-            """
+            query = "SELECT * FROM LIG_BOX_SCORE"
             cursor = connection.cursor()
             cursor.execute(query)
-            results = cursor.fetchall()
-            return [LigBoxScore(*row) for row in results]
+            box_scores = cursor.fetchall()
+            return [LigBoxScore(*row) for row in box_scores]
         except mysql.connector.Error as err:
             print(f"Error: {err}")
-            connection.rollback()
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals():
+                connection.close()
 
     @staticmethod
     def update_lig_box_score(db: db, boxscore: LigBoxScore) -> None:
         try:
             connection = db.get_connection()
-            query = """
-                UPDATE LIG_BOX_SCORE SET
-                    game_id = %s, game = %s, round_of_game = %s, phase = %s, season_player_id = %s,
-                    season_team_id = %s, is_starter = %s, is_playing = %s, dorsal = %s, player = %s,
-                    points = %s, two_points_made = %s, two_points_attempted = %s,
-                    three_points_made = %s, three_points_attempted = %s,
-                    free_throws_made = %s, free_throws_attempted = %s,
-                    offensive_rebounds = %s, defensive_rebounds = %s, total_rebounds = %s,
-                    assists = %s, steals = %s, turnovers = %s, blocks_favour = %s,
-                    blocks_against = %s, fouls_committed = %s, fouls_received = %s, valuation = %s
-                WHERE game_player_id = %s
-            """
-            cursor.execute(query, (
-                boxscore.game_id, boxscore.game, boxscore.round_of_game, boxscore.phase,
-                boxscore.season_player_id, boxscore.season_team_id, boxscore.is_starter,
-                boxscore.is_playing, boxscore.dorsal, boxscore.player, boxscore.points,
-                boxscore.two_points_made, boxscore.two_points_attempted, boxscore.three_points_made,
-                boxscore.three_points_attempted, boxscore.free_throws_made, boxscore.free_throws_attempted,
-                boxscore.offensive_rebounds, boxscore.defensive_rebounds, boxscore.total_rebounds,
-                boxscore.assists, boxscore.steals, boxscore.turnovers, boxscore.blocks_favour,
-                boxscore.blocks_against, boxscore.fouls_committed, boxscore.fouls_received,
-                boxscore.valuation, boxscore.game_player_id
-            ))
+            cursor = connection.cursor()
+
+            fields_to_update = {k: v for k, v in boxscore.__dict__.items() if v is not None and k != 'game_player_id'}
+            if not fields_to_update:
+                raise ValueError("No fields to update were provided.")
+
+            set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+            query = f"UPDATE LIG_BOX_SCORE SET {set_clause} WHERE game_player_id = %s"
+
+            values = list(fields_to_update.values())
+            values.append(boxscore.game_player_id)
+
+            cursor.execute(query, tuple(values))
             connection.commit()
-        except mysql.connector.Error as err:
+        except Exception as err:
             print(f"Error: {err}")
-            connection.rollback()
+            if connection:
+                connection.rollback()
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals():
+                connection.close()
 
     @staticmethod
     def delete_lig_box_score(db: db, game_player_id: str) -> None:
         try:
             connection = db.get_connection()
-            query = """
-            DELETE FROM LIG_BOX_SCORE WHERE game_player_id = %s
-            """
             cursor = connection.cursor()
+            query = "DELETE FROM LIG_BOX_SCORE WHERE game_player_id = %s"
             cursor.execute(query, (game_player_id,))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
-            connection.rollback()
+            if connection:
+                connection.rollback()
+            raise
         finally:
-            cursor.close()
-            connection.close()
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals():
+                connection.close()
+
+    @staticmethod
+    def get_paginated_lig_box_scores(
+        db: db, offset: int = 0, limit: int = 25, columns: List[str] = None, filters: Dict[str, str] = None
+    ) -> List[LigBoxScore]:
+        try:
+            connection = db.get_connection()
+            selected_columns = ", ".join(columns) if columns else "*"
+            where_clauses = []
+            params = []
+
+            if filters:
+                where_clauses = [f"{col} = %s" for col in filters.keys()]
+                params.extend(filters.values())
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            query = f"SELECT {selected_columns} FROM LIG_BOX_SCORE {where_clause} LIMIT %s OFFSET %s"
+            params.extend([limit, offset])
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            box_scores = cursor.fetchall()
+
+            if not box_scores:
+                return []
+
+            if columns:
+                return [dict(zip(columns, box_score)) for box_score in box_scores]
+            else:
+                return [LigBoxScore(*box_score) for box_score in box_scores]
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            raise
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals():
+                connection.close()
+
+    @staticmethod
+    def get_total_lig_box_scores(db: db, filters: Dict[str, str] = None) -> int:
+        try:
+            connection = db.get_connection()
+            where_clauses = []
+            params = []
+
+            if filters:
+                where_clauses = [f"{col} = %s" for col in filters.keys()]
+                params.extend(filters.values())
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            query = f"SELECT COUNT(*) FROM LIG_BOX_SCORE {where_clause}"
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+            return result[0] if result else 0
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals():
+                connection.close()
