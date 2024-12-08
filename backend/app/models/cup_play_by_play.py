@@ -1,28 +1,29 @@
 from dataclasses import dataclass
 from datetime import datetime
-from db.db import db
+from app.db.db import db
 import mysql.connector
+from typing import Optional
 
 @dataclass
 class CupPlayByPlay:
-    game_play_id: str
-    game_player_id: str
-    game_point_id: str
-    game_id: str
-    game: str
-    round_of_game: int
-    phase: str
-    season_player_id: str
-    season_team_id: str
-    quarter: str
-    play_type: str
-    player: str
-    team: str
-    dorsal: int
-    minute: int
-    points_a: int
-    points_b: int
-    play_info: str
+    game_play_id: Optional[str] = None
+    game_player_id: Optional[str] = None
+    game_point_id: Optional[str] = None
+    game_id: Optional[str] = None
+    game: Optional[str] = None
+    round_of_game: Optional[int] = None
+    phase: Optional[str] = None
+    season_player_id: Optional[str] = None
+    season_team_id: Optional[str] = None
+    quarter: Optional[str] = None
+    play_type: Optional[str] = None
+    player: Optional[str] = None
+    team: Optional[str] = None
+    dorsal: Optional[int] = None
+    minute: Optional[int] = None
+    points_a: Optional[int] = None
+    points_b: Optional[int] = None
+    play_info: Optional[str] = None
 
 class CupPlayByPlayDAO:
     @staticmethod
@@ -30,19 +31,57 @@ class CupPlayByPlayDAO:
         try:
             connection = db.get_connection()
             cursor = connection.cursor()
-            query = """
-                INSERT INTO CUP_PLAY_BY_PLAY (
-                    game_play_id, game_player_id, game_point_id, game_id, game, round_of_game, phase,
-                    season_player_id, season_team_id, quarter, play_type, player, team, dorsal,
-                    minute, points_a, points_b, play_info
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+
+            if isinstance(play, CupPlayByPlay):
+                play = play.__dict__
+
+            columns = ", ".join(play.keys())
+            placeholders = ", ".join(["%s"] * len(play))
+            query = f"INSERT INTO CUP_PLAY_BY_PLAY ({columns}) VALUES ({placeholders})"
+
+            cursor.execute(query, list(play.values()))
+            connection.commit()
+
+            print(f"Successfully created CUP_PLAY_BY_PLAY with provided data.")
+
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            connection.rollback()
+            raise
+        except Exception as e:
+            print(f"General Error: {e}")
+            raise
+        finally:
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
+
+    @staticmethod
+    def update_play(db: db, play: CupPlayByPlay) -> None:
+        try:
+            connection = db.get_connection()
+            cursor = connection.cursor()
+            
+            fields_to_update = {}
+            for field, value in play.__dict__.items():
+                if value is not None and field != 'game_play_id':
+                    fields_to_update[field] = value
+            
+            if not fields_to_update:
+                raise ValueError("No fields to update were provided.")
+            
+            set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+            query = f"""
+            UPDATE CUP_PLAY_BY_PLAY
+            SET {set_clause}
+            WHERE game_play_id = %s
             """
-            cursor.execute(query, (
-                play.game_play_id, play.game_player_id, play.game_point_id, play.game_id, play.game,
-                play.round_of_game, play.phase, play.season_player_id, play.season_team_id, play.quarter,
-                play.play_type, play.player, play.team, play.dorsal, play.minute,
-                play.points_a, play.points_b, play.play_info
-            ))
+            
+            values = list(fields_to_update.values())
+            values.append(play.game_play_id)
+
+            cursor.execute(query, tuple(values))
             connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -56,7 +95,7 @@ class CupPlayByPlayDAO:
         try:
             connection = db.get_connection()
             query = """
-            SELECT * FROM CUP_PLAY_BY_PLAY WHERE game_play_id = %s
+                SELECT * FROM CUP_PLAY_BY_PLAY WHERE game_play_id = %s
             """
             cursor = connection.cursor()
             cursor.execute(query, (game_play_id,))
@@ -72,43 +111,18 @@ class CupPlayByPlayDAO:
             connection.close()
 
     @staticmethod
-    def get_all_plays(db: db) -> list[CupPlayByPlay]:
+    def get_all_plays(db: db) -> list:
         try:
             connection = db.get_connection()
             query = """
-            SELECT * FROM CUP_PLAY_BY_PLAY
+                SELECT * FROM CUP_PLAY_BY_PLAY
             """
             cursor = connection.cursor()
             cursor.execute(query)
             plays = cursor.fetchall()
+            if plays is None:
+                return None
             return [CupPlayByPlay(*play) for play in plays]
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            connection.rollback()
-        finally:
-            cursor.close()
-            connection.close()
-
-    @staticmethod
-    def update_play(db: db, play: CupPlayByPlay) -> None:
-        try:
-            connection = db.get_connection()
-            query = """
-                UPDATE CUP_PLAY_BY_PLAY SET
-                    game_player_id = %s, game_point_id = %s, game_id = %s, game = %s,
-                    round_of_game = %s, phase = %s, season_player_id = %s, season_team_id = %s,
-                    quarter = %s, play_type = %s, player = %s, team = %s, dorsal = %s,
-                    minute = %s, points_a = %s, points_b = %s, play_info = %s
-                WHERE game_play_id = %s
-            """
-            cursor = connection.cursor()
-            cursor.execute(query, (
-                play.game_player_id, play.game_point_id, play.game_id, play.game,
-                play.round_of_game, play.phase, play.season_player_id, play.season_team_id,
-                play.quarter, play.play_type, play.player, play.team, play.dorsal,
-                play.minute, play.points_a, play.points_b, play.play_info, play.game_play_id
-            ))
-            connection.commit()
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             connection.rollback()
@@ -121,7 +135,7 @@ class CupPlayByPlayDAO:
         try:
             connection = db.get_connection()
             query = """
-            DELETE FROM CUP_PLAY_BY_PLAY WHERE game_play_id = %s
+                DELETE FROM CUP_PLAY_BY_PLAY WHERE game_play_id = %s
             """
             cursor = connection.cursor()
             cursor.execute(query, (game_play_id,))
@@ -132,3 +146,84 @@ class CupPlayByPlayDAO:
         finally:
             cursor.close()
             connection.close()
+
+    @staticmethod
+    def get_paginated_plays(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None) -> list:
+        try:
+            connection = db.get_connection()
+            
+            selected_columns = ", ".join(columns) if columns else "*"
+
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                SELECT {selected_columns} FROM CUP_PLAY_BY_PLAY
+                {where_clause}
+                LIMIT %s OFFSET %s
+            """
+            
+            params.extend([limit, offset])
+            
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            plays = cursor.fetchall()
+
+            if plays is None:
+                return None
+
+            if columns:
+                return [dict(zip(columns, play)) for play in plays]
+            else:
+                return [CupPlayByPlay(*play) for play in plays]
+        
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
+    @staticmethod
+    def get_total_plays(db: db, filters: dict = None) -> int:
+        try:
+            connection = db.get_connection()
+
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                SELECT COUNT(*) FROM CUP_PLAY_BY_PLAY
+                {where_clause}
+            """
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                raise ValueError("Query returned no results.")
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
