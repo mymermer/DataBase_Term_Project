@@ -67,7 +67,7 @@ def update_cup_players(season_player_id):
     try:
         data = request.get_json()
         cup_player = Cup_Player(season_player_id=season_player_id, **data)
-        Cup_PlayersDAO.update_cup_players(db, cup_player, season_player_id)
+        Cup_PlayersDAO.update_cup_player(db, cup_player, season_player_id)
         return jsonify({"message": "Cup player updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -75,7 +75,7 @@ def update_cup_players(season_player_id):
 @cup_players_bp.route('/cup_players/<string:season_player_id>', methods=['DELETE'])
 def delete_cup_players(season_player_id):
     try:
-        Cup_PlayersDAO.delete_cup_players(db, season_player_id)
+        Cup_PlayersDAO.delete_player(db, season_player_id)
         return jsonify({"message": "Cup player deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
