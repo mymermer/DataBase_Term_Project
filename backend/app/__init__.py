@@ -21,16 +21,32 @@ def create_app():
     from app.routes.lig_teams_routes import lig_teams_bp
     app.register_blueprint(lig_teams_bp, url_prefix='/api/v1')
 
-    # # Register blueprints for comparison and header tables
-    # from app.routes.cup_comparison_routes import cup_comparison_bp
-    # app.register_blueprint(cup_comparison_bp, url_prefix='/api/v1')
-    # from app.routes.lig_comparison_routes import lig_comparison_bp
-    # app.register_blueprint(lig_comparison_bp, url_prefix='/api/v1')
-    # from app.routes.cup_header_routes import cup_header_bp
-    # app.register_blueprint(cup_header_bp, url_prefix='/api/v1')
-    # from app.routes.lig_header_routes import lig_header_bp
-    # app.register_blueprint(lig_header_bp, url_prefix='/api/v1')
+    # Register blueprints for comparison and header tables
+    from app.routes.cup_comparison_routes import cup_comparison_bp
+    app.register_blueprint(cup_comparison_bp, url_prefix='/api/v1')
+    from app.routes.lig_comparison_routes import lig_comparison_bp
+    app.register_blueprint(lig_comparison_bp, url_prefix='/api/v1')
+    from app.routes.cup_header_routes import cup_header_bp
+    app.register_blueprint(cup_header_bp, url_prefix='/api/v1')
+    from app.routes.lig_header_routes import lig_header_bp
+    app.register_blueprint(lig_header_bp, url_prefix='/api/v1')
     
+    # Register blueprints for players tables
+    from app.routes.cup_players_routes import cup_players_bp
+    app.register_blueprint(cup_players_bp, url_prefix='/api/v1')
+    from app.routes.lig_players_routes import lig_players_bp
+    app.register_blueprint(lig_players_bp, url_prefix='/api/v1')
+    
+     # Register blueprints for box_score and play_by_play tables
+    from app.routes.cup_box_score_routes import cup_box_score_bp
+    app.register_blueprint(cup_box_score_bp, url_prefix='/api/v1')
+    from app.routes.lig_box_score_routes import lig_box_score_bp
+    app.register_blueprint(lig_box_score_bp, url_prefix='/api/v1')
+    from app.routes.cup_play_by_play_routes import cup_play_by_play_bp
+    app.register_blueprint(cup_play_by_play_bp, url_prefix='/api/v1')
+    from app.routes.lig_play_by_play_routes import lig_play_by_play_bp
+    app.register_blueprint(lig_play_by_play_bp, url_prefix='/api/v1')
+
 
     # Teardown logic to close DB connections
     @app.teardown_appcontext
@@ -38,3 +54,4 @@ def create_app():
         db.close_connection()
 
     return app
+

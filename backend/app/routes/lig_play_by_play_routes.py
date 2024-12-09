@@ -17,11 +17,6 @@ def get_lig_play_by_play(game_play_id):
 
 
 
-
-
-
-
-
 @lig_play_by_play_bp.route('/lig_play_by_play', methods=['GET'])
 def get_paginated_points():
     try:
@@ -59,11 +54,6 @@ def get_total_points_count():
 
 
 
-
-
-
-
-
 @lig_play_by_play_bp.route('/lig_play_by_play', methods=['POST'])
 def create_lig_play_by_play():
     try:
@@ -77,9 +67,6 @@ def create_lig_play_by_play():
 
 
 
-
-
-
 @lig_play_by_play_bp.route('/lig_play_by_play/<string:game_play_id>', methods=['PUT'])
 def update_lig_play_by_play(game_play_id):
     try:
@@ -89,10 +76,6 @@ def update_lig_play_by_play(game_play_id):
         return jsonify({"message": "Lig Play updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-
-
 
 
 
