@@ -31,6 +31,13 @@ def create_app():
     from app.routes.lig_header_routes import lig_header_bp
     app.register_blueprint(lig_header_bp, url_prefix='/api/v1')
     
+    # Register blueprints for players tables
+    from app.routes.cup_players_routes import cup_players_bp
+    app.register_blueprint(cup_players_bp, url_prefix='/api/v1')
+    from app.routes.lig_players_routes import lig_players_bp
+    app.register_blueprint(lig_players_bp, url_prefix='/api/v1')
+    
+
 
     # Teardown logic to close DB connections
     @app.teardown_appcontext
