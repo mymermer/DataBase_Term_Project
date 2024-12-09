@@ -183,8 +183,6 @@ class Cup_PlayersDAO():
             fields_to_update = {}
             if player.season_player_id is not None:
                 fields_to_update['season_player_id'] = player.season_player_id
-            if player.season_player_id is not None:
-                fields_to_update['season_player_id'] = player.season_player_id
             if player.season_team_id is not None:
                 fields_to_update['season_team_id'] = player.season_team_id
             if player.player is not None:
@@ -315,6 +313,7 @@ class Cup_PlayersDAO():
         finally:
             cursor.close()
             connection.close()
+
     @staticmethod
     def get_paginated_cup_players(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
         try:

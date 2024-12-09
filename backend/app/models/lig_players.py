@@ -54,7 +54,7 @@ from typing import Optional
 
 @dataclass
 class Lig_Player:
-    season_player_id: Optional[str]
+    season_player_id: Optional[str] #? why can the primary key be optional?
     season_team_id: Optional[str]
     player: Optional[str]
     games_played: Optional[int]
@@ -127,6 +127,7 @@ class Lig_PlayersDAO():
             print(f"General Error: {e}")
             raise
         finally:
+            # ? why close is conditional unlike the other methods
             if 'cursor' in locals():
                 cursor.close()
             if 'connection' in locals() and connection:
@@ -181,6 +182,8 @@ class Lig_PlayersDAO():
             # Extract fields from player object
 
             fields_to_update = {}
+            if player.season_player_id is not None:
+                fields_to_update['season_player_id'] = player.season_player_id
             if player.season_team_id is not None:
                 fields_to_update['season_team_id'] = player.season_team_id
             if player.player is not None:
@@ -294,7 +297,6 @@ class Lig_PlayersDAO():
             cursor.close()
             connection.close()
 
-
     @staticmethod
     def delete_player(db: db, player_id: str) -> None:
         try:
@@ -303,6 +305,7 @@ class Lig_PlayersDAO():
                 DELETE FROM LIG_PLAYERS WHERE season_player_id = %s
             """
             cursor = connection.cursor()
+            # comma is needed to make it a tuple
             cursor.execute(query, (player_id,))
             connection.commit()
         except mysql.connector.Error as err:
@@ -311,6 +314,7 @@ class Lig_PlayersDAO():
         finally:
             cursor.close()
             connection.close()
+            
     @staticmethod
     def get_paginated_lig_player(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
         try:
