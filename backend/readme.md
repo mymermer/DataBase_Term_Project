@@ -18,7 +18,7 @@ We may further .gitignore "load_tables.sql" file to not push different directori
 
 
 
-config.py *********************************************
+backend/app/config.py *********************************************
 ```python
 class Config:
     DB_HOST = "127.0.0.1"
