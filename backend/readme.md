@@ -14,3 +14,16 @@ for update and create you need to fill body in json format
 TODO: create route files and from your models files, update "update", "create" functions and allow varabiles to take NULL values (look my code). __init__.py add the register_blueprint
 
 We may further .gitignore "load_tables.sql" file to not push different directories in the future 
+
+
+
+
+config.py *********************************************
+```python
+class Config:
+    DB_HOST = "127.0.0.1"
+    DB_PORT = 3306
+    DB_USER = "root"
+    DB_PASSWORD = "yourpassword"
+    DB_NAME = "basketball"
+    DEBUG = True
