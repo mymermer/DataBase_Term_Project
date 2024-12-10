@@ -393,7 +393,6 @@ class Cup_PointsDAO():
 
 
 
-# TODO Maybe add pagination to this
     @staticmethod
     def get_distinct_games_with_like(
         db: db,
