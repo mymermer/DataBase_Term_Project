@@ -1,10 +1,11 @@
-from flask import Flask, jsonify, request
-from app.db.db import db
+from flask import Blueprint, request, jsonify
 from app.models.team import TeamsDAO, Team
+from app.db.db import db
 
-app = Flask(__name__)
 
-@app.route('/team', methods=['GET'])
+team_bp = Blueprint('team', __name__)
+
+@team_bp.route('/team', methods=['GET'])
 def get_team():
     abbreviation = request.args.get('abbreviation')
     full_name = request.args.get('full_name')
@@ -13,7 +14,7 @@ def get_team():
         return jsonify({"error": "Either 'abbreviation' or 'full_name' must be provided."}), 400
     
     # Call the DAO to get the team data
-    team = TeamsDAO.get_cup_points(db, abbreviation=abbreviation, full_name=full_name)
+    team = TeamsDAO.get_team(db, abbreviation=abbreviation, full_name=full_name)
     
     if team:
         return jsonify({

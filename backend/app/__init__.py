@@ -47,6 +47,10 @@ def create_app():
     from app.routes.lig_play_by_play_routes import lig_play_by_play_bp
     app.register_blueprint(lig_play_by_play_bp, url_prefix='/api/v1')
 
+    #Team Table
+    from app.routes.team_routes import team_bp
+    app.register_blueprint(team_bp, url_prefix='/api/v1')
+
 
     # Teardown logic to close DB connections
     @app.teardown_appcontext
