@@ -1,4 +1,4 @@
-first!!! open mysql and please run in the order create -> load ->prepare -> foreign keys. 
+first!!! open mysql and please run in the order create -> load ->prepare -> foreign keys.
 DONT FORGET TO HAVE LATEST VERSION OF CSV'S FROM WHATSAPP!!!!!!!
 
 If you are having problems in rerunning the files, use this code in your local SQL first:
@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS CUP_HEADER;
 DROP TABLE IF EXISTS LIG_HEADER;
 DROP TABLE IF EXISTS CUP_TEAMS;
 DROP TABLE IF EXISTS LIG_TEAMS;
+DROP TABLE IF EXISTS teams;
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
@@ -40,11 +41,12 @@ download postman app and open new request for whatever operation you wanna do.
 
 for update and create you need to fill body in json format
 
-TODO: create route files and from your models files, update "update", "create" functions and allow varabiles to take NULL values (look my code). __init__.py add the register_blueprint
+TODO: create route files and from your models files, update "update", "create" functions and allow varabiles to take NULL values (look my code). **init**.py add the register_blueprint
 
-We may further .gitignore "load_tables.sql" file to not push different directories in the future 
+We may further .gitignore "load_tables.sql" file to not push different directories in the future
 
-backend/app/config.py *********************************************
+backend/app/config.py **********************\***********************
+
 ```python
 class Config:
     DB_HOST = "127.0.0.1"
@@ -53,3 +55,4 @@ class Config:
     DB_PASSWORD = "yourpassword"
     DB_NAME = "basketball"
     DEBUG = True
+```
