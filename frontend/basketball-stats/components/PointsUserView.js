@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import styles from '../styles/PointsUserView.module.css';
 
@@ -12,8 +12,11 @@ const PointsUserView = ({ league }) => {
   const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [teamInfo, setTeamInfo] = useState({});
+  const [showGameDropdown, setShowGameDropdown] = useState(false);
+  const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null, team2: null });
 
-  const seasons = Array.from({ length: 2023 - 2007 + 1 }, (_, i) => 2007 + i);
+  const seasons = Array.from({ length: 2017 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   useEffect(() => {
@@ -25,6 +28,7 @@ const PointsUserView = ({ league }) => {
   useEffect(() => {
     if (selectedGame) {
       fetchScoreAttempts();
+      updateCurrentGameTeams();
     }
   }, [selectedGame, offset, rowsPerPage]);
 
@@ -39,6 +43,10 @@ const PointsUserView = ({ league }) => {
       }
       const data = await response.json();
       setGames(data);
+
+      // Fetch team info for all teams in the games
+      const allTeams = new Set(data.flatMap(game => game.split('-')));
+      await fetchTeamInfo(Array.from(allTeams));
     } catch (error) {
       console.error('Error fetching games:', error);
     } finally {
@@ -64,6 +72,38 @@ const PointsUserView = ({ league }) => {
     }
   };
 
+  const fetchTeamInfo = async (abbreviations) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/team?abbreviation=${abbreviations.join(',')}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      const teamInfoMap = {};
+      data.forEach(team => {
+        teamInfoMap[team.abbreviation] = {
+          fullName: team.full_name,
+          logoUrl: team.logo_url && team.logo_url.trim() !== '' 
+            ? `/teams_icons${team.logo_url.trimEnd()}` 
+            : '/teams_icons/default_team_icon.png'
+        };
+      });
+      setTeamInfo(prevTeamInfo => ({...prevTeamInfo, ...teamInfoMap}));
+    } catch (error) {
+      console.error('Error fetching team info:', error);
+    }
+  };
+
+  const updateCurrentGameTeams = () => {
+    if (selectedGame) {
+      const [team1, team2] = selectedGame.split('-');
+      setCurrentGameTeams({
+        team1: teamInfo[team1] || { fullName: team1, logoUrl: '/teams_icons/default_team_icon.png' },
+        team2: teamInfo[team2] || { fullName: team2, logoUrl: '/teams_icons/default_team_icon.png' }
+      });
+    }
+  };
+
   const getTeamCode = (seasonTeamId) => {
     return seasonTeamId.split('_')[1];
   };
@@ -83,71 +123,108 @@ const PointsUserView = ({ league }) => {
     setOffset(offset + rowsPerPage);
   };
 
-  return (
-    <div className={styles.container}>
-      {!selectedGame ? (
-        <div className={styles.initialView}>
-          <h2>Select a competition to see score changes</h2>
-          <div className={styles.selectors}>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={selectedSeason} 
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className={selectedSeason ? styles.filled : ''}
-              >
-                <option value="">Season</option>
-                {seasons.map(season => (
-                  <option key={season} value={season}>{season}-{season + 1}</option>
-                ))}
-              </select>
-              <span className={styles.selectLabel}>Season</span>
-            </div>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={selectedGame} 
-                onChange={(e) => setSelectedGame(e.target.value)} 
-                disabled={!selectedSeason}
-                className={selectedGame ? styles.filled : ''}
-              >
-                <option value="">Game</option>
-                {games.map(game => (
-                  <option key={game} value={game}>{game}</option>
-                ))}
-              </select>
-              <span className={styles.selectLabel}>Game</span>
-            </div>
+  const renderGameOptions = () => {
+    return games.map(game => {
+      const [team1, team2] = game.split('-');
+      const fullName1 = teamInfo[team1]?.fullName || team1;
+      const fullName2 = teamInfo[team2]?.fullName || team2;
+      return (
+        <div 
+          key={game} 
+          className={`${styles.gameOption} ${selectedGame === game ? styles.selectedGame : ''}`}
+          onClick={() => {
+            setSelectedGame(game);
+            setShowGameDropdown(false);
+          }}
+        >
+          <div className={styles.teamInfo}>
+            <Image 
+              src={teamInfo[team1]?.logoUrl || '/teams_icons/default_team_icon.png'} 
+              alt={`${fullName1} logo`} 
+              width={30} 
+              height={30} 
+              className={styles.teamLogo}
+            />
+            <span className={styles.teamName}>{fullName1}</span>
+          </div>
+          <span className={styles.vsText}>vs</span>
+          <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
+            <span className={styles.teamName}>{fullName2}</span>
+            <Image 
+              src={teamInfo[team2]?.logoUrl || '/teams_icons/default_team_icon.png'} 
+              alt={`${fullName2} logo`} 
+              width={30} 
+              height={30} 
+              className={styles.teamLogo}
+            />
           </div>
         </div>
-      ) : (
-        <>
-          <div className={styles.topControls}>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={selectedSeason} 
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className={styles.filled}
-              >
-                <option value="">Season</option>
-                {seasons.map(season => (
-                  <option key={season} value={season}>{season}-{season + 1}</option>
-                ))}
-              </select>
-              <span className={styles.selectLabel}>Season</span>
-            </div>
-            <div className={styles.selectWrapper}>
-              <select 
-                value={selectedGame} 
-                onChange={(e) => setSelectedGame(e.target.value)}
-                className={styles.filled}
-              >
-                <option value="">Game</option>
-                {games.map(game => (
-                  <option key={game} value={game}>{game}</option>
-                ))}
-              </select>
-              <span className={styles.selectLabel}>Game</span>
-            </div>
+      );
+    });
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.initialView}>
+        {!selectedSeason && <h2>Select a competition to see score changes</h2>}
+        <div className={styles.selectors}>
+          <div className={styles.selectWrapper}>
+            <select 
+              value={selectedSeason} 
+              onChange={(e) => setSelectedSeason(e.target.value)}
+              className={selectedSeason ? styles.filled : ''}
+            >
+              <option value="">Season</option>
+              {seasons.map(season => (
+                <option key={season} value={season}>{season}-{season + 1}</option>
+              ))}
+            </select>
+            <span className={styles.selectLabel}>Season</span>
           </div>
+          <div className={styles.customSelect}>
+            <div 
+              className={`${styles.selectedGame} ${selectedGame ? styles.filled : ''} ${!selectedSeason ? styles.disabled : ''}`}
+              onClick={() => selectedSeason && setShowGameDropdown(!showGameDropdown)}
+            >
+              {selectedGame ? (
+                <>
+                  <div className={styles.teamInfo}>
+                    <Image 
+                      src={currentGameTeams.team1?.logoUrl || '/teams_icons/default_team_icon.png'} 
+                      alt={`${currentGameTeams.team1?.fullName} logo`} 
+                      width={30} 
+                      height={30} 
+                      className={styles.teamLogo}
+                    />
+                    <span className={styles.teamName}>{currentGameTeams.team1?.fullName}</span>
+                  </div>
+                  <span className={styles.vsText}>vs</span>
+                  <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
+                    <span className={styles.teamName}>{currentGameTeams.team2?.fullName}</span>
+                    <Image 
+                      src={currentGameTeams.team2?.logoUrl || '/teams_icons/default_team_icon.png'} 
+                      alt={`${currentGameTeams.team2?.fullName} logo`} 
+                      width={30} 
+                      height={30} 
+                      className={styles.teamLogo}
+                    />
+                  </div>
+                </>
+              ) : (
+                <span>Select a game</span>
+              )}
+            </div>
+            <span className={styles.selectLabel}>Game</span>
+            {showGameDropdown && (
+              <div className={styles.gameDropdown}>
+                {renderGameOptions()}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {selectedGame && (
+        <>
           {loading && <p>Loading...</p>}
           <div className={styles.scoreAttempts}>
             {scoreAttempts.map((attempt, index) => {
@@ -170,10 +247,11 @@ const PointsUserView = ({ league }) => {
                   <div className={styles.attemptInfo}>
                     <div className={styles.teamInfo}>
                       <Image 
-                        src={`/team-logos/${getTeamCode(attempt.season_team_id)}.png`} 
+                        src={teamInfo[getTeamCode(attempt.season_team_id)]?.logoUrl || '/teams_icons/default_team_icon.png'} 
                         alt="Team Logo" 
                         width={60} 
                         height={60} 
+                        className={styles.teamLogo}
                       />
                       <span className={styles.playerName}>{formatPlayerName(attempt.player)}</span>
                     </div>
