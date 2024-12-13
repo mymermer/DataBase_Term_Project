@@ -1,19 +1,41 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import StatPageTemplate from '../../../components/StatPageTemplate';
-import DataTable from '../../../components/DataTable';
-import styles from '../../../styles/PointsPage.module.css';
-import PointsUserView from '../../../components/PointsUserView';
+import React, { useEffect, useState } from "react";
+import StatPageTemplate from "../../../components/StatPageTemplate";
+import DataTable from "../../../components/DataTable";
+import styles from "../../../styles/Page.module.css";
+import PointsUserView from "../../../components/PointsUserView";
 
 const allColumns = [
-  'game_point_id', 'game_player_id', 'game_play_id', 'game_id', 'game',
-  'round_of_game', 'phase', 'season_player_id', 'season_team_id', 'player',
-  'action_id', 'action_of_play', 'points', 'coord_x', 'coord_y',
-  'zone_of_play', 'minute', 'points_a', 'points_b', 'date_time_stp'
+  "game_point_id",
+  "game_player_id",
+  "game_play_id",
+  "game_id",
+  "game",
+  "round_of_game",
+  "phase",
+  "season_player_id",
+  "season_team_id",
+  "player",
+  "action_id",
+  "action_of_play",
+  "points",
+  "coord_x",
+  "coord_y",
+  "zone_of_play",
+  "minute",
+  "points_a",
+  "points_b",
+  "date_time_stp",
 ];
 
-const foreignKeyColumns = ['season_team_id', 'game_id', 'game_play_id', 'game_player_id', 'season_player_id'];
+const foreignKeyColumns = [
+  "season_team_id",
+  "game_id",
+  "game_play_id",
+  "game_player_id",
+  "season_player_id",
+];
 
 export default function PointsPage({ params }) {
   const { league } = React.use(params);
@@ -24,21 +46,31 @@ export default function PointsPage({ params }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
-  const [selectedColumns, setSelectedColumns] = useState(allColumns.slice(0, 10));
+  const [selectedColumns, setSelectedColumns] = useState(
+    allColumns.slice(0, 10)
+  );
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState(null);
-  const [sortOrder, setSortOrder] = useState('asc');
-  
+  const [sortOrder, setSortOrder] = useState("asc");
+
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters, sortBy, sortOrder]);
+  }, [
+    currentPage,
+    rowsPerPage,
+    tournament,
+    selectedColumns,
+    filters,
+    sortBy,
+    sortOrder,
+  ]);
 
   const fetchData = async () => {
     setLoading(true);
     const offset = currentPage * rowsPerPage;
-    const columnsParam = selectedColumns.join(',');
+    const columnsParam = selectedColumns.join(",");
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
     if (sortBy) {
       dataUrl += `&sortBy=${sortBy}&order=${sortOrder}`;
@@ -48,33 +80,35 @@ export default function PointsPage({ params }) {
     // Add filters to the URL
     if (Object.keys(filters).length > 0) {
       const filterParams = Object.entries(filters)
-        .map(([column, values]) => values.map(value => `${column}:${value}`))
+        .map(([column, values]) => values.map((value) => `${column}:${value}`))
         .flat()
-        .join(',');
+        .join(",");
       dataUrl += `&filters=${filterParams}`;
       countUrl += `?filters=${filterParams}`;
     }
-  
+
     try {
       const [dataResponse, countResponse] = await Promise.all([
         fetch(dataUrl),
-        fetch(countUrl)
+        fetch(countUrl),
       ]);
 
       if (!dataResponse.ok || !countResponse.ok) {
-        throw new Error(`HTTP error! status: ${dataResponse.status} or ${countResponse.status}`);
+        throw new Error(
+          `HTTP error! status: ${dataResponse.status} or ${countResponse.status}`
+        );
       }
 
       const [result, countResult] = await Promise.all([
         dataResponse.json(),
-        countResponse.json()
+        countResponse.json(),
       ]);
 
       setData(result);
       setTotalRows(countResult.total);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
       setError(error.message);
       setLoading(false);
     }
@@ -100,22 +134,25 @@ export default function PointsPage({ params }) {
 
   const handleSort = (column) => {
     if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(column);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
   const handleAdd = async (newRowData) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newRowData),
-      });
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/v1/${tournament}_points`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newRowData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -124,16 +161,19 @@ export default function PointsPage({ params }) {
       await fetchData(); // Refresh data after successful add
       return true;
     } catch (error) {
-      console.error('Error adding new row:', error);
+      console.error("Error adding new row:", error);
       throw error;
     }
   };
 
   const handleDelete = async (gamePointId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -142,20 +182,23 @@ export default function PointsPage({ params }) {
       await fetchData(); // Refresh data after successful delete
       return true;
     } catch (error) {
-      console.error('Error deleting row:', error);
+      console.error("Error deleting row:", error);
       throw error;
     }
   };
 
   const handleUpdate = async (gamePointId, column, value) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ [column]: value }),
-      });
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ [column]: value }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -164,7 +207,7 @@ export default function PointsPage({ params }) {
       await fetchData(); // Refresh data after successful update
       return true;
     } catch (error) {
-      console.error('Error updating row:', error);
+      console.error("Error updating row:", error);
       throw error;
     }
   };
@@ -173,11 +216,13 @@ export default function PointsPage({ params }) {
 
   return (
     <StatPageTemplate league={league} stat="Points" UserView={PointsUserView}>
-      <div className={styles.pointsPageContent}>
-        <h2>{league.charAt(0).toUpperCase() + league.slice(1)} Points Statistics</h2>
+      <div className={styles.PageContent}>
+        <h2>
+          {league.charAt(0).toUpperCase() + league.slice(1)} Points Statistics
+        </h2>
         <div className={styles.tableContainer}>
-          <DataTable 
-            initialData={data} 
+          <DataTable
+            initialData={data}
             initialColumns={selectedColumns}
             allColumns={allColumns}
             currentPage={currentPage}
@@ -201,4 +246,3 @@ export default function PointsPage({ params }) {
     </StatPageTemplate>
   );
 }
-
