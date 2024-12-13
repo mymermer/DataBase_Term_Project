@@ -4,7 +4,7 @@ from app.db.db import db
 import mysql.connector
 from typing import Optional
 
-# game_id VARCHAR(50),
+# game_id VARCHAR(50) PRIMARY KEY,
 # game VARCHAR(50),
 # round_of_game INT,
 # phase VARCHAR(50),
