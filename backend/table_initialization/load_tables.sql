@@ -1,5 +1,4 @@
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' INTO TABLE CUP_POINTS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' 
- LINES TERMINATED BY '\n' IGNORE 1 ROWS  (
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' INTO TABLE CUP_POINTS FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS  (
     game_point_id,
     game_player_id,
     game_play_id,
@@ -22,7 +21,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' 
     @date_time_stp
 );
 UPDATE CUP_POINTS
-SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
+    SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
 
 -- End of load table for CUP_POINTS
 
@@ -48,8 +47,8 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_POINTS.csv' 
     points_b,
     @date_time_stp
 );
-UPDATE CUP_POINTS
-SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
+UPDATE LIG_POINTS
+    SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
 
 -- End of load table for LIG_POINTS
 
@@ -281,8 +280,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' 
 );
 
 UPDATE CUP_HEADER
-SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
-
+    SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
 
     score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
     score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
@@ -340,17 +338,15 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' 
 );
 
 UPDATE LIG_HEADER
-SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
-
-
-    score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
-    score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
-    score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
-    score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
-    score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
-    score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
-    score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
-    score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
+    SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
+        score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
+        score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
+        score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
+        score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
+        score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
+        score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
+        score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
+        score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
 
 -- End of load table for LIG_HEADER
 
@@ -404,9 +400,9 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAY_BY_PLAY
 );
 
 UPDATE LIG_PLAY_BY_PLAY
-SET points_a = NULLIF(@points_a, ''),
-    points_b = NULLIF(@points_b, ''),
-    dorsal = NULLIF(@dorsal, '');
+    SET points_a = NULLIF(@points_a, ''),
+        points_b = NULLIF(@points_b, ''),
+        dorsal = NULLIF(@dorsal, '');
 
 
 -- End of load table for LIG_PLAY_BY_PLAY
@@ -585,10 +581,19 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_PLAYERS.csv'
     @valuation_per_game
 );
 UPDATE LIG_PLAYERS 
-    SET     points_per_game = NULLIF(@points_per_game, 'inf'),
-            two_points_made_per_game =  NULLIF(@two_points_made_per_game, 'inf'),
-            two_points_attempted_per_game =  NULLIF(@two_points_attempted_per_game, 'inf'),
-            valuation_per_game =  NULLIF(@valuation_per_game, 'inf');
-
+    SET points_per_game = NULLIF(@points_per_game, 'inf'),
+        two_points_made_per_game =  NULLIF(@two_points_made_per_game, 'inf'),
+        two_points_attempted_per_game =  NULLIF(@two_points_attempted_per_game, 'inf'),
+        valuation_per_game =  NULLIF(@valuation_per_game, 'inf');
 
 -- End of load table for LIG_PLAYERS
+
+LOAD DATA INFILE "C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/unique_teams_with_logos.csv" INTO TABLE teams FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+    abbreviation,
+    full_name,
+    logo_url
+);
+UPDATE teams
+    SET logo_url = NULLIF(logo_url, '');
+
+-- End of load table for teams

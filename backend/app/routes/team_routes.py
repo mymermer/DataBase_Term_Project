@@ -7,21 +7,35 @@ team_bp = Blueprint('team', __name__)
 
 @team_bp.route('/team', methods=['GET'])
 def get_team():
-    abbreviation = request.args.get('abbreviation')
-    full_name = request.args.get('full_name')
+    abbreviations = request.args.get('abbreviation')
+    full_names = request.args.get('full_name')
 
-    if not abbreviation and not full_name:
+    if not abbreviations and not full_names:
         return jsonify({"error": "Either 'abbreviation' or 'full_name' must be provided."}), 400
-    
+
+    # Split comma-separated values into lists
+    abbreviation_list = abbreviations.split(',') if abbreviations else []
+    full_name_list = full_names.split(',') if full_names else []
+
     # Call the DAO to get the team data
-    team = TeamsDAO.get_team(db, abbreviation=abbreviation, full_name=full_name)
-    
-    if team:
-        return jsonify({
-            "abbreviation": team.abbreviation,
-            "full_name": team.full_name,
-            "logo_url": team.logo_url
-        }), 200
-    else:
-        return jsonify({"error": "Team not found."}), 404
+    try:
+        teams = TeamsDAO.get_teams(
+            db,
+            abbreviations=abbreviation_list,
+            full_names=full_name_list
+        )
+        if teams:
+            return jsonify([
+                {
+                    "abbreviation": team.abbreviation,
+                    "full_name": team.full_name,
+                    "logo_url": team.logo_url
+                } for team in teams
+            ]), 200
+        else:
+            return jsonify({"error": "No matching teams found."}), 404
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
 
