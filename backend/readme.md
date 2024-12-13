@@ -45,7 +45,7 @@ TODO: create route files and from your models files, update "update", "create" f
 
 We may further .gitignore "load_tables.sql" file to not push different directories in the future
 
-backend/app/config.py **********************\***********************
+backend/app/config.py *********************************************
 
 ```python
 class Config:
