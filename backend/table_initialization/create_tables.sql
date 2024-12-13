@@ -1,7 +1,6 @@
 USE basketball;
 
 -- Step 1: Create tables without foreign keys
-
 CREATE TABLE CUP_POINTS(
     game_point_id VARCHAR(50) PRIMARY KEY,
     game_player_id VARCHAR(50),
@@ -141,7 +140,7 @@ CREATE TABLE LIG_TEAMS(
 );
 
 CREATE TABLE CUP_COMPARISON(
-    game_id VARCHAR(50),
+    game_id VARCHAR(50) PRIMARY KEY,
     game VARCHAR(50),
     round_of_game INT,
     phase VARCHAR(50),
@@ -181,9 +180,8 @@ CREATE TABLE CUP_COMPARISON(
     points_max_lead_b VARCHAR(50)
 );
 
--- Creating LIG_COMPARISON table without foreign keys
 CREATE TABLE LIG_COMPARISON(
-    game_id VARCHAR(50),
+    game_id VARCHAR(50) PRIMARY KEY,
     game VARCHAR(50),
     round_of_game INT,
     phase VARCHAR(50),
@@ -223,7 +221,6 @@ CREATE TABLE LIG_COMPARISON(
     points_max_lead_b VARCHAR(50)
 );
 
--- Creating CUP_HEADER table without foreign keys
 CREATE TABLE CUP_HEADER(
     game_id VARCHAR(50) PRIMARY KEY,
     game VARCHAR(50),
@@ -268,7 +265,6 @@ CREATE TABLE CUP_HEADER(
     winner CHAR(6)
 );
 
--- Creating LIG_HEADER table without foreign keys
 CREATE TABLE LIG_HEADER(
     game_id VARCHAR(50) PRIMARY KEY,
     game VARCHAR(50),
@@ -313,7 +309,6 @@ CREATE TABLE LIG_HEADER(
     winner CHAR(6)
 );
 
--- Creating CUP_PLAY_BY_PLAY table without foreign keys
 CREATE TABLE CUP_PLAY_BY_PLAY(
     game_play_id VARCHAR(50) PRIMARY KEY,
     game_player_id VARCHAR(50),
@@ -335,7 +330,6 @@ CREATE TABLE CUP_PLAY_BY_PLAY(
     play_info VARCHAR(100)
 );
 
-
 CREATE TABLE LIG_PLAY_BY_PLAY(
     game_play_id VARCHAR(50) PRIMARY KEY,
     game_player_id VARCHAR(50),
@@ -356,7 +350,6 @@ CREATE TABLE LIG_PLAY_BY_PLAY(
     points_b INT,
     play_info VARCHAR(100)
 );
-
 
 CREATE TABLE CUP_BOX_SCORE(
     game_player_id VARCHAR(50) PRIMARY KEY,
@@ -390,7 +383,6 @@ CREATE TABLE CUP_BOX_SCORE(
     valuation INT
 );
 
--- Creating LIG_BOX_SCORE table without foreign keys
 CREATE TABLE LIG_BOX_SCORE(
     game_player_id VARCHAR(50) PRIMARY KEY,
     game_id VARCHAR(50),
@@ -423,7 +415,6 @@ CREATE TABLE LIG_BOX_SCORE(
     valuation INT
 );
 
--- Creating CUP_PLAYERS table without foreign keys
 CREATE TABLE CUP_PLAYERS(
     season_player_id VARCHAR(50) PRIMARY KEY,
     season_team_id VARCHAR(50),
@@ -473,7 +464,6 @@ CREATE TABLE CUP_PLAYERS(
     valuation_per_game FLOAT
 );
 
--- Creating LIG_PLAYERS table without foreign keys
 CREATE TABLE LIG_PLAYERS(
     season_player_id VARCHAR(50) PRIMARY KEY,
     season_team_id VARCHAR(50),
@@ -521,4 +511,10 @@ CREATE TABLE LIG_PLAYERS(
     fouls_committed_per_game FLOAT,
     fouls_received_per_game FLOAT,
     valuation_per_game FLOAT
+);
+
+CREATE TABLE teams (
+    abbreviation VARCHAR(3),
+    full_name VARCHAR(50),
+    logo_url VARCHAR(100)
 );
