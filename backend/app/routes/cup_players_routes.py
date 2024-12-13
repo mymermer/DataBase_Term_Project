@@ -79,3 +79,20 @@ def delete_cup_players(season_player_id):
         return jsonify({"message": "Cup player deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+
+@cup_players_bp.route('/cup_players/count', methods=['GET'])
+def get_total_cup_players():
+    try:
+        filters_raw = request.args.get('filters', None)  # Optional filters
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            
+        total_count = Cup_PlayersDAO.get_total_cup_players(db,filters=filters)
+        return jsonify({'total': total_count}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

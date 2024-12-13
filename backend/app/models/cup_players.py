@@ -137,7 +137,7 @@ class Cup_PlayersDAO():
         try:
             connection = db.get_connection()
             query = """
-                SELECT * FROM CUP_PLAYERS WHERE player_id = %s
+                SELECT * FROM CUP_PLAYERS WHERE season_player_id = %s
             """
             cursor = connection.cursor()
             cursor.execute(query, (season_player_id,))
@@ -367,7 +367,47 @@ class Cup_PlayersDAO():
             cursor.close()
             connection.close()
 
-        
+    @staticmethod
+    def get_total_cup_players(db: db, filters: dict = None) -> int:
+        try:
+            connection = db.get_connection()
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")  # Use %s as a placeholder
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+            
+            query = f"""
+                SELECT COUNT(*) FROM CUP_PLAYERS
+                {where_clause}
+            """
+            cursor = connection.cursor()
+            cursor.execute(query, params)  # Pass params for the placeholders
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                raise ValueError("Query returned no results.")
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+
+
+
+
 
 
 
