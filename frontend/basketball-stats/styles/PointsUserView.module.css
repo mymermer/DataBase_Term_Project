@@ -1,11 +1,33 @@
+.containerWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 240px); /* Assuming a 60px header */
+  padding: 0;
+  margin: 0;
+}
+
 .container {
-  padding: 20px;
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  min-height: 100vh;
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.initialView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.initialView h2 {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
 }
 
 .selectors {
@@ -29,13 +51,24 @@
   appearance: none;
   background-color: white;
   transition: all 0.3s ease;
-  height: 50px;
+  height: 60px;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .selectWrapper select:focus, .selectedGame:focus {
   outline: none;
   border-color: #000080;
+}
+
+.selectWrapper select:hover, .selectedGame:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 128, 0.2);
+  transform: translateY(-2px);
+}
+
+.selectWrapper select:active, .selectedGame:active {
+  transform: translateY(1px);
 }
 
 .selectLabel {
@@ -119,7 +152,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-  width: calc(50% - 30px); /* Adjust based on the width of vsText */
+  width: calc(50% - 30px);
 }
 
 .playerName {
@@ -186,7 +219,8 @@
   border-radius: 4px;
   cursor: pointer;
   background-color: white;
-  min-height: 50px;
+  min-height: 60px;
+  transition: all 0.3s ease;
 }
 
 .selectedGame.filled {
@@ -209,6 +243,7 @@
   overflow-y: auto;
   z-index: 10;
   width: 100%;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .gameOption {
@@ -218,10 +253,16 @@
   padding: 10px;
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .gameOption:hover {
   background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.gameOption:active {
+  transform: translateX(2px);
 }
 
 .gameOption.selectedGame {
@@ -239,24 +280,14 @@
   width: auto;
 }
 
+.teamLogo[src*="default_team_icon.png"] {
+  filter: grayscale(100%) brightness(1);
+}
+
 .teamName {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.initialView {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.initialView h2 {
-  font-size: 1.5rem;
-  color: #333;
-  text-align: center;
 }
 
 .rightTeam {
@@ -264,9 +295,24 @@
 }
 
 .disabled {
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: not-allowed;
   pointer-events: none;
+  background-color: #f0f0f0;
+}
+
+
+
+
+.disabledGame {
+  border-color: #ccc !important; 
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {
