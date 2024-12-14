@@ -16,7 +16,7 @@ const PointsUserView = ({ league }) => {
   const [showGameDropdown, setShowGameDropdown] = useState(false);
   const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null, team2: null });
 
-  const seasons = Array.from({ length: 2017 - 2007 + 1 }, (_, i) => 2007 + i);
+  const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   useEffect(() => {
