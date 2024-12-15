@@ -18,7 +18,7 @@ def get_lig_play_by_play(game_play_id):
 
 
 @lig_play_by_play_bp.route('/lig_play_by_play', methods=['GET'])
-def get_paginated_points():
+def get_paginated_plays():
     try:
         offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
@@ -34,7 +34,7 @@ def get_paginated_points():
         if filters_raw:
             filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
-        lig_play_by_play = LigPlayByPlayDAO.get_paginated_lig_play_by_play(db, offset=offset, limit=limit, columns=columns, filters=filters)
+        lig_play_by_play = LigPlayByPlayDAO.get_paginated_plays(db, offset=offset, limit=limit, columns=columns, filters=filters)
         if lig_play_by_play is None:
             return jsonify([]), 200
         return jsonify(lig_play_by_play), 200  # Already a list of dicts if columns are specified
@@ -45,9 +45,9 @@ def get_paginated_points():
 
     
 @lig_play_by_play_bp.route('/lig_play_by_play/count', methods=['GET'])
-def get_total_points_count():
+def get_total_play_by_play_count():
     try:
-        total_count = LigPlayByPlayDAO.get_total_lig_points(db)
+        total_count = LigPlayByPlayDAO.get_total_plays(db)
         return jsonify({'total': total_count}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
