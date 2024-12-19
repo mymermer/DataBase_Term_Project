@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Header from '../components/Header';
 import LeagueSelectorButtons from '../components/LeagueSelectorButtons';
 import StatOptionsGrid from '../components/StatOptionsGrid';
+import DynamicText from '../components/DynamicText';
 import Footer from '../components/Footer';
 import styles from '../styles/HomePage.module.css';
 
@@ -13,23 +14,16 @@ export default function HomePage() {
   const statsRef = useRef(null);
   const titleRef = useRef(null);
 
-  // Ensure scroll position resets on reload or navigation
   useEffect(() => {
-    // Disable browser's default scroll restoration
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
-
-    // Scroll to the top on initial load
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     return () => {
-      // Restore browser's default behavior if needed
       history.scrollRestoration = 'auto';
     };
   }, []);
 
-  // Handle header visibility on scroll
   useEffect(() => {
     const handleScroll = () => {
       if (titleRef.current) {
@@ -42,11 +36,10 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle back navigation and reset scroll position
   useEffect(() => {
     const handlePopState = () => {
-      setSelectedLeague(null); // Reset league selection
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top of the page
+      setSelectedLeague(null);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -75,9 +68,11 @@ export default function HomePage() {
           </div>
           <div className={styles.leagueSection}>
             <LeagueSelectorButtons onSelect={handleLeagueSelect} />
+            <p className={styles.selectPrompt}>Select a tournament to start.</p>
           </div>
         </div>
         <div ref={statsRef} className={styles.statsSection}>
+          <DynamicText />
           <StatOptionsGrid league={selectedLeague} />
         </div>
       </main>
@@ -85,3 +80,4 @@ export default function HomePage() {
     </div>
   );
 }
+
