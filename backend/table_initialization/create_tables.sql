@@ -21,7 +21,7 @@ CREATE TABLE CUP_POINTS(
     minute INT,
     points_a INT,
     points_b INT,
-    date_time_stp DATETIME
+    date_time_stp VARCHAR(50)
 );
 
 CREATE TABLE LIG_POINTS(
@@ -44,7 +44,7 @@ CREATE TABLE LIG_POINTS(
     minute INT,
     points_a INT,
     points_b INT,
-    date_time_stp DATETIME
+    date_time_stp VARCHAR(50)
 );
 
 CREATE TABLE CUP_TEAMS(

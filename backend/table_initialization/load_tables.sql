@@ -18,10 +18,8 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' 
     minute,
     points_a,
     points_b,
-    @date_time_stp
+    date_time_stp
 );
-UPDATE CUP_POINTS
-    SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
 
 -- End of load table for CUP_POINTS
 
@@ -45,10 +43,10 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_POINTS.csv' 
     minute,
     points_a,
     points_b,
-    @date_time_stp
+    date_time_stp
+
 );
-UPDATE LIG_POINTS
-    SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
+
 
 -- End of load table for LIG_POINTS
 

@@ -34,7 +34,7 @@ const PointsUserView = ({ league }) => {
 
   const fetchGames = async () => {
     setLoading(true);
-    const yearPrefix = tournament === 'cup' ? 'U' : 'e';
+    const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/year_distinct_games?likePattern=${year}`);
