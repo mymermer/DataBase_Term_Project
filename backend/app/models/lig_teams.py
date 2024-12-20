@@ -551,3 +551,66 @@ class Lig_TeamsDAO():
         finally:
             cursor.close()
             connection.close()
+
+
+    @staticmethod
+    def get_paginated_lig_teams_by_abbr(
+        db: db,
+        team_abbr: str,
+        offset: int = 0,
+        limit: int = 25,
+        columns: list = None,
+        filters: dict = None,
+        sort_by: str = None,
+        order: str = 'asc'
+    ) -> list:
+        try:
+            connection = db.get_connection()
+
+            # Build the SELECT part of the query
+            selected_columns = ", ".join(columns) if columns else "*"
+
+            # Build the WHERE clause dynamically based on team abbreviation
+            where_clauses = [f"season_team_id LIKE %s"]
+            params = [f"%_{team_abbr}"]
+
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}"
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
+            # Final query with LIMIT and OFFSET
+            query = f"""
+                SELECT {selected_columns} FROM LIG_TEAMS
+                {where_clause}
+                {order_clause}
+                LIMIT %s OFFSET %s
+            """
+            
+            # Append limit and offset to the params
+            params.extend([limit, offset])
+            
+            cursor = connection.cursor(dictionary=True)  # Use dictionary cursor for easier manipulation
+            cursor.execute(query, params)
+            teams = cursor.fetchall()
+
+            if not teams:
+                return None
+
+            return teams  # Return raw rows for further processing
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()

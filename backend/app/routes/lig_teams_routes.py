@@ -172,3 +172,56 @@ def get_paginated_teams_with_like():
         return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+@lig_teams_bp.route('/lig_teams/by_team_abbr', methods=['GET'])
+def get_paginated_teams_by_abbr():
+    try:
+        # Retrieve query parameters
+        team_abbr = request.args.get('teamAbbr', None)  # Three-letter team abbreviation
+        if not team_abbr or len(team_abbr) != 3:
+            return jsonify({'error': 'Invalid team abbreviation. It must be exactly 3 characters long.'}), 400
+
+        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
+        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
+        columns = request.args.get('columns', None)  # Optional column list
+        filters_raw = request.args.get('filters', None)  # Optional filters
+        sort_by = request.args.get('sortBy', None)  # Optional sort column
+        order = request.args.get('order', 'asc')  # Default to ascending order
+
+        # Parse columns if provided
+        if columns:
+            columns = columns.split(",")
+
+        # Parse filters if provided
+        filters = None
+        if filters_raw:
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+
+        # Call the DAO method with the team abbreviation
+        lig_teams = Lig_TeamsDAO.get_paginated_lig_teams_by_abbr(
+            db,
+            team_abbr=team_abbr,
+            offset=offset,
+            limit=limit,
+            columns=columns,
+            filters=filters,
+            sort_by=sort_by,
+            order=order
+        )
+        if lig_teams is None:
+            return jsonify([]), 200
+
+        # Add year information to each row
+        for team in lig_teams:
+            season_team_id = team.get('season_team_id', '')
+            if len(season_team_id) >= 9:
+                year = season_team_id[1:5]  # Extract year
+                team['year'] = year
+
+        return jsonify(lig_teams), 200  # Already a list of dicts if columns are specified
+    except ValueError:
+        return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
