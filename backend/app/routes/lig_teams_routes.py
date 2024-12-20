@@ -174,13 +174,19 @@ def get_paginated_teams_with_like():
         return jsonify({'error': str(e)}), 500
     
 
-@lig_teams_bp.route('/lig_teams/by_team_abbr', methods=['GET'])
-def get_paginated_teams_by_abbr():
+
+@lig_teams_bp.route('/lig_teams/by_team_abbrs', methods=['GET'])
+def get_paginated_teams_by_abbrs():
     try:
         # Retrieve query parameters
-        team_abbr = request.args.get('teamAbbr', None)  # Three-letter team abbreviation
-        if not team_abbr or len(team_abbr) != 3:
-            return jsonify({'error': 'Invalid team abbreviation. It must be exactly 3 characters long.'}), 400
+        team_abbrs_raw = request.args.get('teamAbbrs', None)  # Comma-separated list of abbreviations
+        if not team_abbrs_raw:
+            return jsonify({'error': 'teamAbbrs parameter is required and cannot be empty.'}), 400
+        
+        team_abbrs = team_abbrs_raw.split(',')
+        team_abbrs = [abbr.strip() for abbr in team_abbrs if len(abbr.strip()) == 3]
+        if not team_abbrs:
+            return jsonify({'error': 'All team abbreviations must be exactly 3 characters long.'}), 400
 
         offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
@@ -198,10 +204,10 @@ def get_paginated_teams_by_abbr():
         if filters_raw:
             filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
-        # Call the DAO method with the team abbreviation
-        lig_teams = Lig_TeamsDAO.get_paginated_lig_teams_by_abbr(
+        # Call the DAO method with the list of team abbreviations
+        lig_teams_by_abbr = Lig_TeamsDAO.get_paginated_lig_teams_by_abbrs(
             db,
-            team_abbr=team_abbr,
+            team_abbrs=team_abbrs,
             offset=offset,
             limit=limit,
             columns=columns,
@@ -209,19 +215,20 @@ def get_paginated_teams_by_abbr():
             sort_by=sort_by,
             order=order
         )
-        if lig_teams is None:
-            return jsonify([]), 200
 
-        # Add year information to each row
-        for team in lig_teams:
-            season_team_id = team.get('season_team_id', '')
-            if len(season_team_id) >= 9:
-                year = season_team_id[1:5]  # Extract year
-                team['year'] = year
+        # Add year information to each row and separate by abbreviation
+        response = {}
+        for abbr, lig_teams in lig_teams_by_abbr.items():
+            response[abbr] = []
+            for team in lig_teams:
+                season_team_id = team.get('season_team_id', '')
+                if len(season_team_id) >= 9:
+                    year = season_team_id[1:5]  # Extract year
+                    team['year'] = year
+                response[abbr].append(team)
 
-        return jsonify(lig_teams), 200  # Already a list of dicts if columns are specified
+        return jsonify(response), 200  # Structured by team abbreviation
     except ValueError:
         return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
