@@ -389,3 +389,121 @@ class Lig_ComparisonDAO():
                 cursor.close()
             if connection:
                 connection.close()
+
+    @staticmethod
+    def get_paginated_lig_comparison_with_like(
+        db: db,
+        like_pattern: str,
+        offset: int = 0,
+        limit: int = 25,
+        columns: list = None,
+        filters: dict = None,
+        sort_by: str = None,
+        order: str = 'asc'
+    ) -> list:
+        
+        try:
+            connection = db.get_connection()
+
+            # Add `%` wildcard to the LIKE pattern
+            like_pattern = f"{like_pattern}%"
+
+            # Build the SELECT part of the query
+            selected_columns = ", ".join(columns) if columns else "*"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = [f"game_id LIKE %s"]
+            params = [like_pattern]
+
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}"
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
+            # Final query with LIMIT and OFFSET
+            query = f"""
+                SELECT {selected_columns} FROM LIG_COMPARISON
+                {where_clause}
+                {order_clause}
+                LIMIT %s OFFSET %s
+            """
+            
+            # Append limit and offset to the params
+            params.extend([limit, offset])
+            
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            comparisons = cursor.fetchall()
+
+            if comparisons is None:
+                return None
+
+            # Map fetched rows to dicts or raw objects
+            if columns:
+                return [dict(zip(columns, comparison)) for comparison in comparisons]
+            else:
+                return [Lig_Comparison(*comparison) for comparison in comparisons]
+
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
+
+    @staticmethod
+    def get_distinct_games_with_like(
+        db: db,
+        like_pattern: str,
+        columns: list = None
+    ) -> list:
+
+        try:
+            connection = db.get_connection()
+
+            # Add `%` wildcard to the LIKE pattern
+            like_pattern = f"{like_pattern}%"
+
+            # Default columns to return
+            selected_columns = ", ".join(columns) if columns else "game"
+
+            # WHERE clause for the LIKE filter
+            where_clause = "WHERE game_id LIKE %s"
+            params = [like_pattern]
+
+            # Query to fetch distinct games
+            query = f"""
+                SELECT DISTINCT {selected_columns} FROM LIG_COMPARISON
+                {where_clause}
+            """
+
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            distinct_games = cursor.fetchall()
+
+            if distinct_games is None:
+                return None
+
+            # Map fetched rows to dicts or raw values if only one column is selected
+            if columns:
+                return [dict(zip(columns, row)) for row in distinct_games]
+            else:
+                return [row[0] for row in distinct_games]  # Only return 'game' column
+
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            raise
+        finally:
+            cursor.close()
+            connection.close()

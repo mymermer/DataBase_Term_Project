@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
-// import ComparisonUserView from "../../../components/ComparisonUserView";
+import ComparisonUserView from "../../../components/ComparisonUserView";
 
 const allColumns = [
   "game_id",
@@ -230,7 +230,7 @@ export default function ComparisonPage({ params }) {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <StatPageTemplate league={league} stat="Comparison">
+    <StatPageTemplate league={league} stat="Comparison" UserView={ComparisonUserView}>
       <div className={styles.PageContent}>
         <h2>
           {league.charAt(0).toUpperCase() + league.slice(1)} Comparison Statistics
