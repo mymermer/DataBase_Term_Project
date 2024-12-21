@@ -31,14 +31,13 @@ const TeamsUserView = ({ league }) => {
     const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/with_year_like?likePattern=${year}`);
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/with_year_like?likePattern=${year}&sortBy=points&order=desc`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setTeamsData(data);
 
-      // Fetch team info for all teams
       const teamAbbrs = data.map(team => team.season_team_id.split('_')[1]);
       await fetchTeamInfo(teamAbbrs);
       await fetchPerformanceData(teamAbbrs);
@@ -109,8 +108,8 @@ const TeamsUserView = ({ league }) => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="year" />
             <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="valuation_per_game" stroke="#8884d8" />
+            <Tooltip formatter={(value, name) => [value, 'Value per Game']} />
+            <Line type="monotone" dataKey="valuation_per_game" name="Value per Game" stroke="#8884d8" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -125,21 +124,19 @@ const TeamsUserView = ({ league }) => {
       { name: 'Blocks', value: team.blocks_favour_per_game, avg: averageValues.blocks_favour_per_game },
     ];
 
+    const scaledData = stats.map(stat => ({
+      ...stat,
+      scaledValue: (stat.value / stat.avg) * 100
+    }));
+
     const data = {
-      labels: stats.map(stat => stat.name),
+      labels: scaledData.map(stat => stat.name),
       datasets: [
         {
           label: 'Team',
-          data: stats.map(stat => stat.value),
+          data: scaledData.map(stat => stat.scaledValue),
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           borderColor: 'rgba(255, 99, 132, 1)',
-          borderWidth: 1,
-        },
-        {
-          label: 'League Average',
-          data: stats.map(stat => stat.avg),
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
         },
       ],
@@ -152,9 +149,23 @@ const TeamsUserView = ({ league }) => {
             display: false
           },
           suggestedMin: 0,
-          suggestedMax: Math.max(...stats.map(stat => Math.max(stat.value, stat.avg))) * 1.1
+          suggestedMax: 200,
+          ticks: {
+            stepSize: 50,
+            callback: (value) => value === 100 ? 'Avg' : ''
+          }
         }
-      }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false },
+      },
+      pointLabels: {
+        font: { size: 12 },
+        callback: (label, index) => {
+          return `${label}: ${scaledData[index].value.toFixed(2)}`;
+        },
+      },
     };
 
     return (
@@ -165,11 +176,33 @@ const TeamsUserView = ({ league }) => {
     );
   };
 
+  if (!selectedSeason) {
+    return (
+      <div className={styles.initialView}>
+        <h2>Select a season to see team information</h2>
+        <select 
+          value={selectedSeason} 
+          onChange={(e) => setSelectedSeason(e.target.value)}
+          className={styles.selectTrigger}
+        >
+          <option value="">Select Season</option>
+          {seasons.map(season => (
+            <option key={season} value={season.toString()}>
+              {season}-{season + 1}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
         <div className={styles.seasonSelector}>
+          <label htmlFor="seasonSelect" className={styles.seasonLabel}>Season</label>
           <select 
+            id="seasonSelect"
             value={selectedSeason} 
             onChange={(e) => setSelectedSeason(e.target.value)}
             className={styles.selectTrigger}
@@ -188,24 +221,40 @@ const TeamsUserView = ({ league }) => {
             const teamAbbr = team.season_team_id.split('_')[1];
             return (
               <div key={team.season_team_id} className={styles.teamCard}>
-                <div className={styles.teamHeader}>
-                  <h3 className={styles.teamName}>
-                    <Image
-                      src={teamInfo[teamAbbr]?.logoUrl || '/teams_icons/default_team_icon.png'}
-                      alt={teamInfo[teamAbbr]?.fullName || 'Team Logo'}
-                      width={40}
-                      height={40}
-                      className={styles.teamLogo}
-                    />
-                    {teamInfo[teamAbbr]?.fullName || teamAbbr}
-                  </h3>
-                </div>
                 <div className={styles.teamContent}>
-                  <div className={styles.teamStats}>
-                    <p>Games Played: {team.games_played}</p>
-                    <p>Minutes Played: {team.minutes_played}</p>
-                    <p>Points: {team.points}</p>
-                    <p>Valuation: {team.valuation}</p>
+                  <div className={styles.teamInfo}>
+                    <div className={styles.teamLogo}>
+                      <Image
+                        src={teamInfo[teamAbbr]?.logoUrl || '/teams_icons/default_team_icon.png'}
+                        alt={teamInfo[teamAbbr]?.fullName || 'Team Logo'}
+                        width={60}
+                        height={60}
+                        objectFit="contain"
+                      />
+                    </div>
+                    <div className={styles.teamDetails}>
+                      <h3 className={styles.teamName}>
+                        {teamInfo[teamAbbr]?.fullName || teamAbbr}
+                      </h3>
+                      <div className={styles.teamStats}>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Games</span>
+                          <span className={styles.statValue}>{team.games_played}</span>
+                        </div>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Points</span>
+                          <span className={styles.statValue}>{team.points}</span>
+                        </div>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Minutes</span>
+                          <span className={styles.statValue}>{team.minutes_played}</span>
+                        </div>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Valuation</span>
+                          <span className={styles.statValue}>{team.valuation}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className={styles.charts}>
                     {renderPerformanceChart(teamAbbr)}
