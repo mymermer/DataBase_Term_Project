@@ -407,8 +407,3 @@ class Lig_PlayersDAO():
             if connection:
                 connection.close()
 
-        
-
-
-
-
