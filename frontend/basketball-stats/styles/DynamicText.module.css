@@ -1,0 +1,20 @@
+.dynamicText {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+  padding: 1rem 0;
+}
+
+.changingWord {
+  display: inline-block;
+  color: #000080;
+  font-weight: bold;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.changing {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+

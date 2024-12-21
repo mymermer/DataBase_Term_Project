@@ -21,7 +21,7 @@ CREATE TABLE CUP_POINTS(
     minute INT,
     points_a INT,
     points_b INT,
-    date_time_stp DATETIME
+    date_time_stp VARCHAR(50)
 );
 
 CREATE TABLE LIG_POINTS(
@@ -44,7 +44,7 @@ CREATE TABLE LIG_POINTS(
     minute INT,
     points_a INT,
     points_b INT,
-    date_time_stp DATETIME
+    date_time_stp VARCHAR(50)
 );
 
 CREATE TABLE CUP_TEAMS(
@@ -224,8 +224,8 @@ CREATE TABLE LIG_COMPARISON(
 CREATE TABLE CUP_HEADER(
     game_id VARCHAR(50) PRIMARY KEY,
     game VARCHAR(50),
-    date_of_game DATE,
-    time_of_game TIME,
+    date_of_game VARCHAR(50),
+    time_of_game VARCHAR(50),
     round_of_game INT,
     phase VARCHAR(50),
     season_team_id_a VARCHAR(50),
@@ -236,7 +236,7 @@ CREATE TABLE CUP_HEADER(
     team_b VARCHAR(50),
     coach_a VARCHAR(50),
     coach_b VARCHAR(50),
-    game_time TIME,
+    game_time VARCHAR(50),
     referee_1 VARCHAR(50),
     referee_2 VARCHAR(50),
     referee_3 VARCHAR(50),
@@ -268,8 +268,8 @@ CREATE TABLE CUP_HEADER(
 CREATE TABLE LIG_HEADER(
     game_id VARCHAR(50) PRIMARY KEY,
     game VARCHAR(50),
-    date_of_game DATE,
-    time_of_game TIME,
+    date_of_game VARCHAR(50),
+    time_of_game VARCHAR(50),
     round_of_game INT,
     phase VARCHAR(50),
     season_team_id_a VARCHAR(50),
@@ -280,7 +280,7 @@ CREATE TABLE LIG_HEADER(
     team_b VARCHAR(50),
     coach_a VARCHAR(50),
     coach_b VARCHAR(50),
-    game_time TIME,
+    game_time VARCHAR(50),
     referee_1 VARCHAR(50),
     referee_2 VARCHAR(50),
     referee_3 VARCHAR(50),

@@ -51,11 +51,21 @@
   max-width: 1200px;
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.selectPrompt {
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.4rem;
+  text-align: center;
 }
 
 .statsSection {
   width: 100%;
-  padding: 4rem 2rem;
+  padding: 6rem 2rem;
   background-color: white;
 }
 

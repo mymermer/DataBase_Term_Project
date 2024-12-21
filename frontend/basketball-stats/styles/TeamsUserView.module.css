@@ -1,0 +1,196 @@
+.containerWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.initialView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
+
+.initialView h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.seasonSelector {
+  position: relative;
+  margin-bottom: 2rem;
+  display: inline-block;
+}
+
+.seasonLabel {
+  position: absolute;
+  top: -0.5rem;
+  left: 0.5rem;
+  background-color: white;
+  padding: 0 0.25rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.selectTrigger {
+  width: 200px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.7rem top 50%;
+  background-size: 0.65rem auto;
+}
+
+.selectTrigger:hover {
+  border-color: #888;
+}
+
+.selectTrigger:focus {
+  outline: none;
+  border-color: #0070f3;
+  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+}
+
+.teamsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.teamCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.teamContent {
+  display: flex;
+  padding: 1rem;
+  align-items: flex-start;
+}
+
+.teamInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 2rem;
+  width: 200px;
+}
+
+.teamLogo {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+}
+
+.teamDetails {
+  width: 100%;
+}
+
+.teamName {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.teamStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.statLabel {
+  font-weight: bold;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.statValue {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.charts {
+  display: flex;
+  flex-grow: 1;
+  gap: 1rem;
+}
+
+.performanceChart,
+.spiderChart {
+  flex: 1;
+  min-width: 300px;
+  height: 300px;
+}
+
+.performanceChart h4,
+.spiderChart h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+
+@media (max-width: 1024px) {
+  .teamContent {
+    flex-direction: column;
+  }
+
+  .teamInfo {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .charts {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .performanceChart,
+  .spiderChart {
+    width: 100%;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

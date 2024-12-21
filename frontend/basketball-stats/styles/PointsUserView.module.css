@@ -1,7 +1,19 @@
+.containerWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(65vh); /* Assuming a 60px header */
+  padding: 0;
+  margin: 0;
+}
+
 .container {
-  padding: 20px;
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .initialView {
@@ -9,27 +21,28 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
+  gap: 2rem;
 }
 
 .initialView h2 {
-  margin-bottom: 2rem;
   font-size: 1.5rem;
   color: #333;
+  text-align: center;
 }
 
-.selectors, .topControls {
+.selectors {
   display: flex;
   gap: 20px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
-.selectWrapper {
+.selectWrapper, .customSelect {
   position: relative;
-  width: 200px;
+  width: 100%;
 }
 
-.selectWrapper select {
+.selectWrapper select, .selectedGame {
   width: 100%;
   padding: 10px;
   font-size: 16px;
@@ -38,11 +51,24 @@
   appearance: none;
   background-color: white;
   transition: all 0.3s ease;
+  height: 60px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
-.selectWrapper select:focus {
+.selectWrapper select:focus, .selectedGame:focus {
   outline: none;
   border-color: #000080;
+}
+
+.selectWrapper select:hover, .selectedGame:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 128, 0.2);
+  transform: translateY(-2px);
+}
+
+.selectWrapper select:active, .selectedGame:active {
+  transform: translateY(1px);
 }
 
 .selectLabel {
@@ -57,7 +83,9 @@
 }
 
 .selectWrapper select.filled + .selectLabel,
-.selectWrapper select:focus + .selectLabel {
+.selectWrapper select:focus + .selectLabel,
+.customSelect .selectedGame.filled + .selectLabel,
+.customSelect:focus-within .selectLabel {
   top: -10px;
   font-size: 12px;
   color: #000080;
@@ -67,6 +95,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
+  margin-top: 20px;
 }
 
 .attemptBlock {
@@ -76,6 +105,12 @@
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.attemptBlock:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 .courtWrapper {
@@ -121,8 +156,9 @@
 .teamInfo {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   margin-bottom: 10px;
+  width: calc(50% - 30px);
 }
 
 .playerName {
@@ -139,7 +175,7 @@
 
 .scoringTeam {
   font-weight: bold;
-  color: red;
+  color: green;
 }
 
 .paginationControls {
@@ -173,5 +209,140 @@
   border: 1px solid #000080;
   border-radius: 4px;
   color: #000080;
+}
+
+.customSelect {
+  position: relative;
+  width: 100%;
+}
+
+.selectedGame {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: white;
+  min-height: 60px;
+  transition: all 0.3s ease;
+}
+
+.selectedGame.filled {
+  border-color: #000080;
+}
+
+.selectedGame .teamInfo:last-child {
+  justify-content: flex-end;
+}
+
+.gameDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 10;
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.gameOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.gameOption:hover {
+  background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.gameOption:active {
+  transform: translateX(2px);
+}
+
+.gameOption.selectedGame {
+  background-color: #e6e6fa;
+}
+
+.vsText {
+  margin: 0 auto;
+  font-weight: bold;
+}
+
+.teamLogo {
+  object-fit: contain;
+  height: 30px;
+  width: auto;
+}
+
+.teamLogo[src*="default_team_icon.png"] {
+  filter: grayscale(100%) brightness(1);
+}
+
+.teamName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rightTeam {
+  justify-content: flex-end;
+}
+
+.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f0f0f0;
+}
+
+
+
+
+.disabledGame {
+  border-color: #ccc !important; 
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .selectors {
+    flex-direction: column;
+  }
+
+  .selectWrapper, .customSelect {
+    width: 100%;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 

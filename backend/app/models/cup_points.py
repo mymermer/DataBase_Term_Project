@@ -23,7 +23,7 @@ from typing import Optional
 # minute INT,
 # points_a INT,
 # points_b INT,
-# date_time_stp DATETIME
+# date_time_stp VARCHAR(50)
 
 @dataclass
 class Cup_Points:
@@ -46,7 +46,7 @@ class Cup_Points:
     minute: Optional[int] = None
     points_a: Optional[int] = None
     points_b: Optional[int] = None
-    date_time_stp: Optional[datetime] = None
+    date_time_stp: Optional[str] = None
 
 class Cup_PointsDAO():
     @staticmethod

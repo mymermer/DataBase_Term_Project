@@ -18,10 +18,8 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_POINTS.csv' 
     minute,
     points_a,
     points_b,
-    @date_time_stp
+    date_time_stp
 );
-UPDATE CUP_POINTS
-    SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
 
 -- End of load table for CUP_POINTS
 
@@ -45,10 +43,9 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_POINTS.csv' 
     minute,
     points_a,
     points_b,
-    @date_time_stp
+    date_time_stp
 );
-UPDATE LIG_POINTS
-    SET date_time_stp = STR_TO_DATE(@date_time_stp, '%m/%d/%Y %H:%i');
+
 
 -- End of load table for LIG_POINTS
 
@@ -237,7 +234,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_COMPARISON.c
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' INTO TABLE CUP_HEADER FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_id,
     game,
-    @date_of_game,
+    date_of_game,
     time_of_game,
     round_of_game,
     phase,
@@ -276,27 +273,25 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' 
     @score_extra_time_3_b,
     @score_extra_time_4_b,
     winner
-    
 );
 
 UPDATE CUP_HEADER
-    SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
-
-    score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
-    score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
-    score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
-    score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
-    score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
-    score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
-    score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
-    score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
+    SET
+        score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
+        score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
+        score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
+        score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
+        score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
+        score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
+        score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
+        score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
 
 -- End of load table for CUP_HEADER
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' INTO TABLE LIG_HEADER FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  LINES TERMINATED BY '\n' IGNORE 1 LINES (
     game_id,
     game,
-    @date_of_game,
+    date_of_game,
     time_of_game,
     round_of_game,
     phase,
@@ -338,7 +333,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' 
 );
 
 UPDATE LIG_HEADER
-    SET date_of_game = STR_TO_DATE(@date_of_game, '%m/%d/%Y %H:%i'),
+    SET
         score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
         score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
         score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),

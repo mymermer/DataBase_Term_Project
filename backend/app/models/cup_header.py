@@ -50,8 +50,8 @@ from typing import Optional
 class Cup_Header:
     game_id: Optional[str] = None
     game: Optional[str] = None
-    date_of_game: Optional[datetime] = None
-    time_of_game: Optional[datetime] = None
+    date_of_game: Optional[str] = None
+    time_of_game: Optional[str] = None
     round_of_game: Optional[int] = None
     phase: Optional[str] = None
     season_team_id_a: Optional[str] = None
@@ -62,7 +62,7 @@ class Cup_Header:
     team_b: Optional[str] = None
     coach_a: Optional[str] = None
     coach_b: Optional[str] = None
-    game_time: Optional[datetime] = None
+    game_time: Optional[str] = None
     referee_1: Optional[str] = None
     referee_2: Optional[str] = None
     referee_3: Optional[str] = None

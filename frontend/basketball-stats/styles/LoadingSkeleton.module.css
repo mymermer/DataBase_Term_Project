@@ -1,0 +1,31 @@
+.loadingContainer {
+    width: 100%;
+  }
+  
+  .loadingRow {
+    display: flex;
+    margin-bottom: 1rem;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .loadingCell {
+    height: 20px;
+    background-color: #e0e0e0;
+    margin-right: 1rem;
+    border-radius: 4px;
+    flex: 1;
+  }
+  
+  @keyframes pulse {
+    0% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
+  }
+  
+  

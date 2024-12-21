@@ -408,3 +408,212 @@ class Lig_TeamsDAO():
                 cursor.close()
             if connection:
                 connection.close()
+
+
+
+   #special to teams
+
+    @staticmethod
+    def get_average_values_by_season(db, season: int):
+        try:
+            connection = db.get_connection()
+            cursor = connection.cursor(dictionary=True)
+            
+            # Query to calculate averages for a given season
+            query = f"""
+                SELECT 
+                    AVG(games_played) AS games_played,
+                    AVG(minutes_played) AS minutes_played,
+                    AVG(points) AS points,
+                    AVG(two_points_made) AS two_points_made,
+                    AVG(two_points_attempted) AS two_points_attempted,
+                    AVG(three_points_made) AS three_points_made,
+                    AVG(three_points_attempted) AS three_points_attempted,
+                    AVG(free_throws_made) AS free_throws_made,
+                    AVG(free_throws_attempted) AS free_throws_attempted,
+                    AVG(offensive_rebounds) AS offensive_rebounds,
+                    AVG(defensive_rebounds) AS defensive_rebounds,
+                    AVG(total_rebounds) AS total_rebounds,
+                    AVG(assists) AS assists,
+                    AVG(steals) AS steals,
+                    AVG(turnovers) AS turnovers,
+                    AVG(blocks_favour) AS blocks_favour,
+                    AVG(blocks_against) AS blocks_against,
+                    AVG(fouls_committed) AS fouls_committed,
+                    AVG(fouls_received) AS fouls_received,
+                    AVG(valuation) AS valuation,
+                    AVG(minutes_per_game) AS minutes_per_game,
+                    AVG(points_per_game) AS points_per_game,
+                    AVG(two_points_made_per_game) AS two_points_made_per_game,
+                    AVG(two_points_attempted_per_game) AS two_points_attempted_per_game,
+                    AVG(two_points_percentage) AS two_points_percentage,
+                    AVG(three_points_made_per_game) AS three_points_made_per_game,
+                    AVG(three_points_attempted_per_game) AS three_points_attempted_per_game,
+                    AVG(three_points_percentage) AS three_points_percentage,
+                    AVG(free_throws_made_per_game) AS free_throws_made_per_game,
+                    AVG(free_throws_attempted_per_game) AS free_throws_attempted_per_game,
+                    AVG(free_throws_percentage) AS free_throws_percentage,
+                    AVG(offensive_rebounds_per_game) AS offensive_rebounds_per_game,
+                    AVG(defensive_rebounds_per_game) AS defensive_rebounds_per_game,
+                    AVG(total_rebounds_per_game) AS total_rebounds_per_game,
+                    AVG(assists_per_game) AS assists_per_game,
+                    AVG(steals_per_game) AS steals_per_game,
+                    AVG(turnovers_per_game) AS turnovers_per_game,
+                    AVG(blocks_favour_per_game) AS blocks_favour_per_game,
+                    AVG(blocks_against_per_game) AS blocks_against_per_game,
+                    AVG(fouls_committed_per_game) AS fouls_committed_per_game,
+                    AVG(fouls_received_per_game) AS fouls_received_per_game,
+                    AVG(valuation_per_game) AS valuation_per_game
+                FROM LIG_TEAMS
+                WHERE SUBSTRING(season_team_id, 2, 4) = %s
+            """
+            cursor.execute(query, (str(season),))
+            result = cursor.fetchone()
+            return result
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        finally:
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
+
+
+
+    @staticmethod
+    def get_paginated_lig_teams_with_like(
+        db: db,
+        like_pattern: str,
+        offset: int = 0,
+        limit: int = 25,
+        columns: list = None,
+        filters: dict = None,
+        sort_by: str = None,
+        order: str = 'asc'
+    ) -> list:
+        
+        try:
+            connection = db.get_connection()
+
+            # Add `%` wildcard to the LIKE pattern
+            like_pattern = f"{like_pattern}%"
+
+            # Build the SELECT part of the query
+            selected_columns = ", ".join(columns) if columns else "*"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = [f"season_team_id LIKE %s"]
+            params = [like_pattern]
+
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}"
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
+            # Final query with LIMIT and OFFSET
+            query = f"""
+                SELECT {selected_columns} FROM LIG_TEAMS
+                {where_clause}
+                {order_clause}
+                LIMIT %s OFFSET %s
+            """
+            
+            # Append limit and offset to the params
+            params.extend([limit, offset])
+            
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            teams = cursor.fetchall()
+
+            if teams is None:
+                return None
+
+            # Map fetched rows to Lig_Teams objects or dicts
+            if columns:
+                return [dict(zip(columns, team)) for team in teams]
+            else:
+                return [Lig_Teams(*team) for team in teams]
+
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
+
+
+    @staticmethod
+    def get_paginated_lig_teams_by_abbrs(
+        db: db,
+        team_abbrs: list,
+        offset: int = 0,
+        limit: int = 25,
+        columns: list = None,
+        filters: dict = None,
+        sort_by: str = None,
+        order: str = 'asc'
+    ) -> dict:
+        try:
+            connection = db.get_connection()
+
+            # Build the SELECT part of the query
+            selected_columns = ", ".join(columns) if columns else "*"
+
+            # Prepare results dictionary
+            results = {abbr: [] for abbr in team_abbrs}
+
+            # Loop through each team abbreviation and execute the query
+            for abbr in team_abbrs:
+                where_clauses = [f"season_team_id LIKE %s"]
+                params = [f"%_{abbr}"]
+
+                if filters:
+                    for column, value in filters.items():
+                        where_clauses.append(f"{column} = %s")
+                        params.append(value)
+
+                where_clause = f"WHERE {' AND '.join(where_clauses)}"
+
+                # Add ORDER BY clause
+                order_clause = ""
+                if sort_by:
+                    if order.lower() not in ['asc', 'desc']:
+                        order = 'asc'  # Default to ascending
+                    order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
+                # Final query with LIMIT and OFFSET
+                query = f"""
+                    SELECT {selected_columns} FROM LIG_TEAMS
+                    {where_clause}
+                    {order_clause}
+                    LIMIT %s OFFSET %s
+                """
+
+                # Append limit and offset to the params
+                params.extend([limit, offset])
+                
+                cursor = connection.cursor(dictionary=True)
+                cursor.execute(query, params)
+                teams = cursor.fetchall()
+
+                results[abbr] = teams  # Store results for the current abbreviation
+
+            return results  # Return results grouped by abbreviation
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
