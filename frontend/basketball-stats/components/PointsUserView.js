@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '../styles/PointsUserView.module.css';
+import LoadingSkeleton from './LoadingSkeleton';
 
 const PointsUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState('');
@@ -34,7 +35,7 @@ const PointsUserView = ({ league }) => {
 
   const fetchGames = async () => {
     setLoading(true);
-    const yearPrefix = tournament === 'cup' ? 'U' : 'E';
+    const yearPrefix = tournament === 'cup' ? 'U' : 'e';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/year_distinct_games?likePattern=${year}`);
@@ -44,7 +45,6 @@ const PointsUserView = ({ league }) => {
       const data = await response.json();
       setGames(data);
 
-      // Fetch team info for all teams in the games
       const allTeams = new Set(data.flatMap(game => game.split('-')));
       await fetchTeamInfo(Array.from(allTeams));
     } catch (error) {
@@ -226,14 +226,12 @@ const PointsUserView = ({ league }) => {
         </div>
         {selectedGame && (
           <>
-            {loading && <p>Loading...</p>}
-            <div className={styles.scoreAttempts}>
-              {scoreAttempts.map((attempt, index) => {
-                const [team1, team2] = attempt.game.split('-');
-                const scoringTeam = attempt.points > 0 ? getTeamCode(attempt.season_team_id) : null;
-                const isTeam1Scoring = scoringTeam === team1;
-                return (
-                  <div key={attempt.game_point_id} className={styles.attemptBlock}>
+            {loading ? (
+              <LoadingSkeleton rows={5} columns={3} />
+            ) : (
+              <div className={styles.scoreAttempts}>
+                {scoreAttempts.map((attempt, index) => (
+                  <div key={attempt.game_point_id} className={`${styles.attemptBlock} ${styles.fadeIn}`}>
                     <div className={styles.courtWrapper}>
                       <Image src="/basketball-court.png" alt="Basketball Court" width={300} height={150} />
                       <div 
@@ -259,20 +257,20 @@ const PointsUserView = ({ league }) => {
                       <div className={styles.actionInfo}>
                         <span>{attempt.action_of_play}</span>
                         <span>
-                          <span className={attempt.points > 0 && isTeam1Scoring ? styles.scoringTeam : ''}>
+                          <span className={attempt.points > 0 && getTeamCode(attempt.season_team_id) === attempt.game.split('-')[0] ? styles.scoringTeam : ''}>
                             {attempt.points_a}
                           </span>
                           {' - '}
-                          <span className={attempt.points > 0 && !isTeam1Scoring ? styles.scoringTeam : ''}>
+                          <span className={attempt.points > 0 && getTeamCode(attempt.season_team_id) === attempt.game.split('-')[1] ? styles.scoringTeam : ''}>
                             {attempt.points_b}
                           </span>
                         </span>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
             <div className={styles.paginationControls}>
               <button onClick={handlePrevious} disabled={offset === 0}>Previous</button>
               <select 

@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import styles from '../styles/TeamsUserView.module.css';
+import LoadingSkeleton from './LoadingSkeleton';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, ChartTooltip, Legend);
 
@@ -215,55 +216,58 @@ const TeamsUserView = ({ league }) => {
             ))}
           </select>
         </div>
-        {loading && <p>Loading...</p>}
         <div className={styles.teamsGrid}>
-          {teamsData.map((team) => {
-            const teamAbbr = team.season_team_id.split('_')[1];
-            return (
-              <div key={team.season_team_id} className={styles.teamCard}>
-                <div className={styles.teamContent}>
-                  <div className={styles.teamInfo}>
-                    <div className={styles.teamLogo}>
-                      <Image
-                        src={teamInfo[teamAbbr]?.logoUrl || '/teams_icons/default_team_icon.png'}
-                        alt={teamInfo[teamAbbr]?.fullName || 'Team Logo'}
-                        width={60}
-                        height={60}
-                        objectFit="contain"
-                      />
-                    </div>
-                    <div className={styles.teamDetails}>
-                      <h3 className={styles.teamName}>
-                        {teamInfo[teamAbbr]?.fullName || teamAbbr}
-                      </h3>
-                      <div className={styles.teamStats}>
-                        <div className={styles.statItem}>
-                          <span className={styles.statLabel}>Games</span>
-                          <span className={styles.statValue}>{team.games_played}</span>
-                        </div>
-                        <div className={styles.statItem}>
-                          <span className={styles.statLabel}>Points</span>
-                          <span className={styles.statValue}>{team.points}</span>
-                        </div>
-                        <div className={styles.statItem}>
-                          <span className={styles.statLabel}>Minutes</span>
-                          <span className={styles.statValue}>{team.minutes_played}</span>
-                        </div>
-                        <div className={styles.statItem}>
-                          <span className={styles.statLabel}>Valuation</span>
-                          <span className={styles.statValue}>{team.valuation}</span>
+          {loading ? (
+            <LoadingSkeleton rows={5} columns={4} />
+          ) : (
+            teamsData.map((team) => {
+              const teamAbbr = team.season_team_id.split('_')[1];
+              return (
+                <div key={team.season_team_id} className={`${styles.teamCard} ${styles.fadeIn}`}>
+                  <div className={styles.teamContent}>
+                    <div className={styles.teamInfo}>
+                      <div className={styles.teamLogo}>
+                        <Image
+                          src={teamInfo[teamAbbr]?.logoUrl || '/teams_icons/default_team_icon.png'}
+                          alt={teamInfo[teamAbbr]?.fullName || 'Team Logo'}
+                          width={60}
+                          height={60}
+                          objectFit="contain"
+                        />
+                      </div>
+                      <div className={styles.teamDetails}>
+                        <h3 className={styles.teamName}>
+                          {teamInfo[teamAbbr]?.fullName || teamAbbr}
+                        </h3>
+                        <div className={styles.teamStats}>
+                          <div className={styles.statItem}>
+                            <span className={styles.statLabel}>Games</span>
+                            <span className={styles.statValue}>{team.games_played}</span>
+                          </div>
+                          <div className={styles.statItem}>
+                            <span className={styles.statLabel}>Points</span>
+                            <span className={styles.statValue}>{team.points}</span>
+                          </div>
+                          <div className={styles.statItem}>
+                            <span className={styles.statLabel}>Minutes</span>
+                            <span className={styles.statValue}>{team.minutes_played}</span>
+                          </div>
+                          <div className={styles.statItem}>
+                            <span className={styles.statLabel}>Valuation</span>
+                            <span className={styles.statValue}>{team.valuation}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className={styles.charts}>
-                    {renderPerformanceChart(teamAbbr)}
-                    {renderSpiderChart(team)}
+                    <div className={styles.charts}>
+                      {renderPerformanceChart(teamAbbr)}
+                      {renderSpiderChart(team)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
     </div>
