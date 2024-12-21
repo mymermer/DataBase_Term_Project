@@ -6,6 +6,7 @@ import DataTable from '../../../components/DataTable';
 import TeamsUserView from '../../../components/TeamsUserView';
 import styles from '../../../styles/Page.module.css';
 
+
 const allColumns = [
   'season_team_id',
   'games_played',
@@ -76,6 +77,7 @@ export default function TeamsPage({ params }) {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const offset = currentPage * rowsPerPage;
     const columnsParam = selectedColumns.join(',');
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_teams?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
@@ -163,6 +165,7 @@ export default function TeamsPage({ params }) {
       return true;
     } catch (error) {
       console.error('Error adding new row:', error);
+      setError(error.message);
       throw error;
     }
   };
@@ -181,6 +184,7 @@ export default function TeamsPage({ params }) {
       return true;
     } catch (error) {
       console.error('Error deleting row:', error);
+      setError(error.message);
       throw error;
     }
   };
@@ -207,8 +211,6 @@ export default function TeamsPage({ params }) {
     }
   };
 
-  if (error) return <p>Error: {error}</p>;
-
   return (
     <StatPageTemplate league={league} stat="Teams" UserView={TeamsUserView}>
       <div className={styles.teamsPageContent}>
@@ -234,6 +236,8 @@ export default function TeamsPage({ params }) {
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
             league={league}
+            onFetchData={fetchData}
+            error={error}
           />
         </div>
       </div>

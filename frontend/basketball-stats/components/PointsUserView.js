@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '../styles/PointsUserView.module.css';
 import LoadingSkeleton from './LoadingSkeleton';
+import ErrorDisplay from './ErrorDisplay';
+
 
 const PointsUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState('');
@@ -16,6 +18,8 @@ const PointsUserView = ({ league }) => {
   const [teamInfo, setTeamInfo] = useState({});
   const [showGameDropdown, setShowGameDropdown] = useState(false);
   const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null, team2: null });
+  const [error, setError] = useState(null);
+  
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
@@ -35,7 +39,8 @@ const PointsUserView = ({ league }) => {
 
   const fetchGames = async () => {
     setLoading(true);
-    const yearPrefix = tournament === 'cup' ? 'U' : 'e';
+    setError(null);
+    const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/year_distinct_games?likePattern=${year}`);
@@ -48,6 +53,7 @@ const PointsUserView = ({ league }) => {
       const allTeams = new Set(data.flatMap(game => game.split('-')));
       await fetchTeamInfo(Array.from(allTeams));
     } catch (error) {
+      setError('Unable to fetch teams data. Please try again later.');
       console.error('Error fetching games:', error);
     } finally {
       setLoading(false);
@@ -56,6 +62,7 @@ const PointsUserView = ({ league }) => {
 
   const fetchScoreAttempts = async () => {
     setLoading(true);
+    setError(null);
     const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
@@ -67,12 +74,14 @@ const PointsUserView = ({ league }) => {
       setScoreAttempts(data);
     } catch (error) {
       console.error('Error fetching score attempts:', error);
+      setError('Unable to fetch teams data. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
   const fetchTeamInfo = async (abbreviations) => {
+    setError(null);
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/team?abbreviation=${abbreviations.join(',')}`);
       if (!response.ok) {
@@ -91,6 +100,7 @@ const PointsUserView = ({ league }) => {
       setTeamInfo(prevTeamInfo => ({...prevTeamInfo, ...teamInfoMap}));
     } catch (error) {
       console.error('Error fetching team info:', error);
+      setError('Unable to fetch teams data. Please try again later.');
     }
   };
 
@@ -224,6 +234,7 @@ const PointsUserView = ({ league }) => {
             </div>
           </div>
         </div>
+        {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
         {selectedGame && (
           <>
             {loading ? (

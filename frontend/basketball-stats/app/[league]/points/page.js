@@ -6,6 +6,7 @@ import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
 import PointsUserView from "../../../components/PointsUserView";
 
+
 const allColumns = [
   "game_point_id",
   "game_player_id",
@@ -69,6 +70,7 @@ export default function PointsPage({ params }) {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const offset = currentPage * rowsPerPage;
     const columnsParam = selectedColumns.join(",");
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
@@ -108,7 +110,6 @@ export default function PointsPage({ params }) {
       setTotalRows(countResult.total);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
       setError(error.message);
       setLoading(false);
     }
@@ -142,6 +143,7 @@ export default function PointsPage({ params }) {
   };
 
   const handleAdd = async (newRowData) => {
+    setError(null)
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_points`,
@@ -162,11 +164,13 @@ export default function PointsPage({ params }) {
       return true;
     } catch (error) {
       console.error("Error adding new row:", error);
+      setError(error.message);
       throw error;
     }
   };
 
   const handleDelete = async (gamePointId) => {
+    setError(null)
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`,
@@ -183,11 +187,13 @@ export default function PointsPage({ params }) {
       return true;
     } catch (error) {
       console.error("Error deleting row:", error);
+      setError(error.message);
       throw error;
     }
   };
 
   const handleUpdate = async (gamePointId, column, value) => {
+    setError(null)
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`,
@@ -208,11 +214,12 @@ export default function PointsPage({ params }) {
       return true;
     } catch (error) {
       console.error("Error updating row:", error);
+      setError(error.message);
+
       throw error;
     }
   };
 
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <StatPageTemplate league={league} stat="Points" UserView={PointsUserView}>
@@ -240,6 +247,9 @@ export default function PointsPage({ params }) {
             onDelete={handleDelete}
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
+            league={league}
+            onFetchData={fetchData}
+            error={error}
           />
         </div>
       </div>

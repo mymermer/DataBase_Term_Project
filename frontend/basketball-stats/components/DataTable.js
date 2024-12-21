@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
 import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingOverlay from './LoadingOverlay';
+import ErrorDisplay from './ErrorDisplay';
 
 const DataTable = ({ 
   initialData, 
@@ -23,7 +24,10 @@ const DataTable = ({
   onAdd,
   onDelete,
   onUpdate,
-  foreignKeyColumns
+  foreignKeyColumns,
+  league,
+  onFetchData,
+  error
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
@@ -184,6 +188,32 @@ const DataTable = ({
       window.removeEventListener('keydown', handleEsc);
     };
   }, []);
+
+  const fetchData = async () => { 
+
+    try {
+
+      setError(null);
+
+      setIsLoading(true);
+
+      await onFetchData();
+
+    } catch (err) {
+
+      setError("Unable to fetch data. Please try again later.");
+
+    } finally {
+
+      setIsLoading(false);
+
+    }
+
+  };
+
+
+
+
 
   return (
     <div className={styles.fullWidthWrapper}>
@@ -346,6 +376,7 @@ const DataTable = ({
             </tbody>
           </table>
         </div>
+        {error && <ErrorDisplay message={error} onRetry={onFetchData} />}
         <div className={styles.pagination}>
           <div className={styles.bottomButtons}>
             <button 
