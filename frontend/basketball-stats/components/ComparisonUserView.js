@@ -76,20 +76,20 @@ const ComparisonUserView = ({ league }) => {
     }
   };
 
-  const updateCurrentGameTeams = () => {
-    if (selectedGame) {
-      const [team1, team2] = selectedGame.split("-");
-      setCurrentGameTeams({
-        team1: teamInfo[team1] || {
-          fullName: team1,
-          logoUrl: "/teams_icons/default_team_icon.png",
-        },
-        team2: teamInfo[team2] || {
-          fullName: team2,
-          logoUrl: "/teams_icons/default_team_icon.png",
-        },
-      });
-    }
+  const handleGameClick = (game) => {
+    const [team1, team2] = game.split("-");
+    setSelectedGame(game);
+    setCurrentGameTeams({
+      team1: teamInfo[team1] || {
+        fullName: team1,
+        logoUrl: "/teams_icons/default_team_icon.png",
+      },
+      team2: teamInfo[team2] || {
+        fullName: team2,
+        logoUrl: "/teams_icons/default_team_icon.png",
+      },
+    });
+    setShowGameDropdown(false);
   };
 
   const renderGameOptions = () => {
@@ -99,13 +99,9 @@ const ComparisonUserView = ({ league }) => {
         <div
           key={game}
           className={`${styles.gameOption} ${
-            selectedGame === game ? styles.selectedGame : ''
+            selectedGame === game ? styles.selectedGame : ""
           }`}
-          onClick={() => {
-            setSelectedGame(game);
-            setShowGameDropdown(false);
-            updateCurrentGameTeams();
-          }}
+          onClick={() => handleGameClick(game)}
         >
           <div className={styles.teamInfo}>
             <Image
@@ -146,7 +142,10 @@ const ComparisonUserView = ({ league }) => {
       <div className={styles.container}>
         <div className={styles.initialView}>
           {!selectedGame && (
-            <h2>Select a game to view the comparison between the 2 teams in that game</h2>
+            <h2>
+              Select a game to view the comparison between the 2 teams in that
+              game
+            </h2>
           )}
           <div className={styles.selectors}>
             <div className={styles.selectWrapper}>
@@ -174,33 +173,11 @@ const ComparisonUserView = ({ league }) => {
                 }
               >
                 {selectedGame ? (
-                  <>
-                    <div className={styles.teamInfo}>
-                      <Image
-                        src={currentGameTeams.team1.logoUrl}
-                        alt={`${currentGameTeams.team1.fullName} logo`}
-                        width={30}
-                        height={30}
-                        className={styles.teamLogo}
-                      />
-                      <span className={styles.teamName}>
-                        {currentGameTeams.team1.fullName}
-                      </span>
-                    </div>
-                    <span className={styles.vsText}>vs</span>
-                    <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
-                      <span className={styles.teamName}>
-                        {currentGameTeams.team2.fullName}
-                      </span>
-                      <Image
-                        src={currentGameTeams.team2.logoUrl}
-                        alt={`${currentGameTeams.team2.fullName} logo`}
-                        width={30}
-                        height={30}
-                        className={styles.teamLogo}
-                      />
-                    </div>
-                  </>
+                  <span>
+                    {currentGameTeams.team1
+                      ? `${currentGameTeams.team1.fullName} vs ${currentGameTeams.team2.fullName}`
+                      : "Loading..."}
+                  </span>
                 ) : (
                   <span>Select a game</span>
                 )}
@@ -212,6 +189,21 @@ const ComparisonUserView = ({ league }) => {
             </div>
           </div>
         </div>
+        {selectedGame && (
+          <div className={styles.comparisonView}>
+            {currentGameTeams.team1 && currentGameTeams.team2 ? (
+              <div>
+                {/* Placeholder for comparison view */}
+                <h3>Comparison view will be implemented soon!</h3>
+                <p>Details for {selectedGame} will appear here.</p>
+              </div>
+            ) : (
+              <div className={styles.comingSoon}>
+                <p>Coming soon or being updated...</p>
+              </div>
+            )}
+          </div>
+        )}
         {loading && <p>Loading...</p>}
       </div>
     </div>
