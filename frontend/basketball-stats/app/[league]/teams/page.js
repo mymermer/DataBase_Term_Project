@@ -54,6 +54,52 @@ const allColumns = [
 ];
 
 const foreignKeyColumns = [];
+const primaryKey = 'season_team_id';
+const columnTypes = {
+  season_team_id: 'string',
+  games_played: 'integer',
+  minutes_played: 'integer',
+  points: 'integer',
+  two_points_made: 'integer',
+  two_points_attempted: 'integer',
+  three_points_made: 'integer',
+  three_points_attempted: 'integer',
+  free_throws_made: 'integer',
+  free_throws_attempted: 'integer',
+  offensive_rebounds: 'integer',
+  defensive_rebounds: 'integer',
+  total_rebounds: 'integer',
+  assists: 'integer',
+  steals: 'integer',
+  turnovers: 'integer',
+  blocks_favour: 'integer',
+  blocks_against: 'integer',
+  fouls_committed: 'integer',
+  fouls_received: 'integer',
+  valuation: 'integer',
+  minutes_per_game: 'float',
+  points_per_game: 'float',
+  two_points_made_per_game: 'float',
+  two_points_attempted_per_game: 'float',
+  two_points_percentage: 'float',
+  three_points_made_per_game: 'float',
+  three_points_attempted_per_game: 'float',
+  three_points_percentage: 'float',
+  free_throws_made_per_game: 'float',
+  free_throws_attempted_per_game: 'float',
+  free_throws_percentage: 'float',
+  offensive_rebounds_per_game: 'float',
+  defensive_rebounds_per_game: 'float',
+  total_rebounds_per_game: 'float',
+  assists_per_game: 'float',
+  steals_per_game: 'float',
+  turnovers_per_game: 'float',
+  blocks_favour_per_game: 'float',
+  blocks_against_per_game: 'float',
+  fouls_committed_per_game: 'float',
+  fouls_received_per_game: 'float',
+  valuation_per_game: 'float'
+};
 
 export default function TeamsPage({ params }) {
   const { league } = React.use(params);
@@ -238,6 +284,8 @@ export default function TeamsPage({ params }) {
             league={league}
             onFetchData={fetchData}
             error={error}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>

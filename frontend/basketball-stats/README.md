@@ -28,6 +28,8 @@ you need to put ErrorDisplay to your path as:
 If you need to handle error from other files, please also add them as paramter you are sending. like:
 <DataTable error={error} />
 
+Besides of your user view, you need to also send your errors to DataTable as well as parmater. DataTable will handle the rest.
+
 
 
 ****************************HANDILING LOADING****************************

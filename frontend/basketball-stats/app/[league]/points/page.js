@@ -38,6 +38,30 @@ const foreignKeyColumns = [
   "season_player_id",
 ];
 
+const primaryKey = 'game_point_id';
+const columnTypes = {
+  game_point_id: 'string',
+  game_player_id: 'string',
+  game_play_id: 'string',
+  game_id: 'string',
+  game: 'string',
+  round_of_game: 'integer',
+  phase: 'string',
+  season_player_id: 'string',
+  season_team_id: 'string',
+  player: 'string',
+  action_id: 'integer',
+  action_of_play: 'string',
+  points: 'integer',
+  coord_x: 'float',
+  coord_y: 'float',
+  zone_of_play: 'string',
+  minute: 'integer',
+  points_a: 'integer',
+  points_b: 'integer',
+  date_time_stp: 'date'
+};
+
 export default function PointsPage({ params }) {
   const { league } = React.use(params);
 
@@ -250,9 +274,12 @@ export default function PointsPage({ params }) {
             league={league}
             onFetchData={fetchData}
             error={error}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>
     </StatPageTemplate>
   );
 }
+

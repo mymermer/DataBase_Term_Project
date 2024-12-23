@@ -1,0 +1,21 @@
+.dateTimeInputWrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  .dateTimeInput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .dateTimeInput:focus {
+    outline: none;
+    border-color: #000080;
+    box-shadow: 0 0 0 2px rgba(0, 0, 128, 0.1);
+  }
+  
+  
