@@ -131,7 +131,6 @@ def get_average_values(season):
 
 @lig_teams_bp.route('/lig_teams/with_year_like', methods=['GET'])
 def get_paginated_teams_with_like():
-
     try:
         # Retrieve query parameters
         like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
