@@ -120,10 +120,10 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  cursor: pointer;
   background-color: white;
   min-height: 60px;
-  transition: all 0.3s ease;
+  height: auto;
+  overflow: hidden; /* Prevent any child from overflowing */
 }
 
 .selectedGame.filled {
@@ -138,7 +138,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
   width: calc(50% - 30px);
 }
 
@@ -182,8 +181,11 @@
 
 /* Text and images inside game dropdown */
 .vsText {
-  margin: 0 auto;
+  margin: 0 auto; /* Centers the text */
   font-weight: bold;
+  font-size: 1rem; /* Adjust font size as needed */
+  display: flex;
+  align-items: center; /* Aligns "vs" with the logos and names */
 }
 
 .teamLogo {
@@ -400,10 +402,12 @@
 }
 
 .selectedGame .teamName {
-  white-space: nowrap; /* Prevent wrapping */
-  overflow: hidden;    /* Hide overflow */
-  text-overflow: ellipsis; /* Show ellipsis if needed */
-  max-width: 120px;    /* Adjust this width as per your design */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Add dots when text overflows */
+  max-width: calc(
+    100%
+  ); /* Adjust width dynamically to prevent overflow over 'vs' */
   display: inline-block; /* Ensure ellipsis works */
-  text-align: center;  /* Center the text */
+  text-align: left; /* Optional: Align text neatly */
 }

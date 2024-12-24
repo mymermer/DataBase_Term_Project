@@ -22,6 +22,10 @@ const ComparisonUserView = ({ league }) => {
 
   useEffect(() => {
     if (selectedSeason) {
+      // Reset the selected game, current game teams, and comparison data
+      setSelectedGame("");
+      setCurrentGameTeams({ team1: null, team2: null });
+      setComparisonData(null);
       fetchGames();
     }
   }, [selectedSeason]);
@@ -287,6 +291,14 @@ const ComparisonUserView = ({ league }) => {
                           {comparisonData.phase}
                         </span>
                       </span>
+                      {selectedSeason && ( // Conditionally render if season is selected
+                        <span className={styles.detail}>
+                          <strong>Season:</strong>{" "}
+                          <span style={{ color: "black" }}>
+                            {selectedSeason}-{parseInt(selectedSeason) + 1}
+                          </span>
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -298,8 +310,44 @@ const ComparisonUserView = ({ league }) => {
                     <thead>
                       <tr>
                         <th>Statistic</th>
-                        <th>{currentGameTeams.team1.fullName}</th>
-                        <th>{currentGameTeams.team2.fullName}</th>
+                        <th>
+                          <div className={styles.teamHeader}>
+                            <div className={styles.teamLogoWrapper}>
+                              <Image
+                                src={
+                                  currentGameTeams.team1.logoUrl ||
+                                  "/teams_icons/default_team_icon.png"
+                                }
+                                alt={`${currentGameTeams.team1.fullName} logo`}
+                                width={30}
+                                height={30}
+                                className={styles.teamLogo}
+                              />
+                            </div>
+                            <div className={styles.teamNameWrapper}>
+                              {currentGameTeams.team1.fullName}
+                            </div>
+                          </div>
+                        </th>
+                        <th>
+                          <div className={styles.teamHeader}>
+                            <div className={styles.teamLogoWrapper}>
+                              <Image
+                                src={
+                                  currentGameTeams.team2.logoUrl ||
+                                  "/teams_icons/default_team_icon.png"
+                                }
+                                alt={`${currentGameTeams.team2.fullName} logo`}
+                                width={30}
+                                height={30}
+                                className={styles.teamLogo}
+                              />
+                            </div>
+                            <div className={styles.teamNameWrapper}>
+                              {currentGameTeams.team2.fullName}
+                            </div>
+                          </div>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
