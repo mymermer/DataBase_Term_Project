@@ -51,22 +51,22 @@
   margin-left: 10px;
 }
 
-.nav {
-  margin: 0;
-  display: flex;
-  list-style: none;
-  gap: 3rem; /* Spacing between nav items */
-  margin-left: 0px; /* Push navigation to the far right */
-  padding-left: 20rem; /* Add extra space between logo/title and nav */
-  margin-left: -12rem;
-}
-
 .nav ul {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem; /* Increased gap between menu items */
+  gap: 2rem; /* Space between items */
+}
+
+.nav li {
+  display: flex;
+  align-items: center;
+}
+
+.navIcon {
+  margin-right: 0.5rem; /* Space between icon and text */
+  vertical-align: middle; /* Align icon with text */
 }
 
 .nav li a {
@@ -74,9 +74,12 @@
   color: #fff;
   font-size: 1.1rem;
   font-weight: 500;
-  letter-spacing: 0.5px; /* Slight letter-spacing for a modern feel */
+  letter-spacing: 0.5px;
+  display: flex; /* Align icon and text in a row */
+  align-items: center; /* Vertically center icon and text */
+  gap: 0.5rem; /* Add space between icon and text */
   position: relative;
-  overflow: hidden; /* Ensure animations are confined */
+  overflow: hidden;
   transition: color 0.3s ease;
 }
 
@@ -99,3 +102,12 @@
 .nav li a:hover {
   color: #4169e1; /* Elegant highlight for text */
 }
+
+.navIcon {
+  color: #4169e1; /* Adjust icon color */
+  margin-right: 0.5rem; /* Space between icon and text */
+  vertical-align: middle;
+  font-size: 1.2rem; /* Adjust icon size */
+}
+
+

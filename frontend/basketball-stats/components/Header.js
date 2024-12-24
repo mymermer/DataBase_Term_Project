@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import styles from "../styles/Header.module.css";
+import { FaHome, FaInfoCircle, FaEnvelope } from "react-icons/fa";
 
 export default function Header({ onLogoClick, alwaysVisible }) {
   return (
@@ -25,13 +26,19 @@ export default function Header({ onLogoClick, alwaysVisible }) {
         <nav className={styles.nav}>
           <ul>
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/" className={styles.navLink}>
+                <FaHome className={styles.navIcon} /> Home
+              </Link>
             </li>
             <li>
-              <Link href="/about">About</Link>
+              <Link href="/about" className={styles.navLink}>
+                <FaInfoCircle className={styles.navIcon} /> About
+              </Link>
             </li>
             <li>
-              <Link href="/contact">Contact</Link>
+              <Link href="/contact" className={styles.navLink}>
+                <FaEnvelope className={styles.navIcon} /> Contact
+              </Link>
             </li>
           </ul>
         </nav>
