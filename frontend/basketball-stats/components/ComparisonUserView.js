@@ -406,7 +406,7 @@ const ComparisonUserView = ({ league }) => {
                   <table className={styles.comparisonTable}>
                     <thead>
                       <tr>
-                        <th>Statistic</th>
+                        <th style={{fontSize: "18px"}}>Statistic</th>
                         <th>
                           <div className={styles.teamHeader}>
                             <div className={styles.teamLogoWrapper}>

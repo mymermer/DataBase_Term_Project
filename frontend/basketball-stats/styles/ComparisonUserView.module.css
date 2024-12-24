@@ -420,7 +420,7 @@
 
 .categoryHeader {
   font-weight: bold;
-  text-align: center !important; /* Align to the left for a cleaner, modern look */
+  text-align: left; /* Align to the left for a cleaner, modern look */
   background-color: #000000; /* Black background for contrast */
   color: #ffffff !important; /* White font for better readability */
   padding: 12px 15px; /* Consistent padding for a balanced look */
