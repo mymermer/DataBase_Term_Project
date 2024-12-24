@@ -163,34 +163,29 @@ def get_paginated_points_with_like():
         return jsonify({'error': str(e)}), 500
 
 
-@cup_points_bp.route('/cup_points/year_distinct_games', methods=['GET'])
-def get_distinct_games_with_like():
+
+@cup_points_bp.route('/cup_points/season_games_scores', methods=['GET'])
+def get_games_with_scores_by_season():
     """
-    API endpoint for retrieving distinct values of the 'game' column with a compulsory 'LIKE' filter on game_point_id.
+    API endpoint for retrieving distinct games with their scores for a specific season.
     """
     try:
         # Retrieve query parameters
-        like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
-        if not like_pattern or len(like_pattern) < 5:
-            return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
-
-        columns = request.args.get('columns', None)  # Optional columns to fetch
-
-        # Parse columns if provided
-        if columns:
-            columns = columns.split(",")
+        season = request.args.get('season', None)  # The season pattern (e.g., "ABCDE")
+        if not season or len(season) < 5:
+            return jsonify({'error': 'Invalid season. It must be at least 5 characters long.'}), 400
 
         # Call the DAO method
-        distinct_games = Cup_PointsDAO.get_distinct_games_with_like(
+        games_with_scores = Cup_PointsDAO.get_games_with_scores_by_season(
             db,
-            like_pattern=like_pattern,
-            columns=columns
+            season=season
         )
-        if distinct_games is None:
+        if games_with_scores is None:
             return jsonify([]), 200
-        return jsonify(distinct_games), 200  # Return the distinct values
+
+        return jsonify(games_with_scores), 200
 
     except ValueError:
-        return jsonify({'error': 'Invalid columns or likePattern'}), 400
+        return jsonify({'error': 'Invalid season'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500

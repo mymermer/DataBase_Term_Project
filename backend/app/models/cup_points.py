@@ -394,43 +394,42 @@ class Cup_PointsDAO():
 
 
     @staticmethod
-    def get_distinct_games_with_like(
+    def get_games_with_scores_by_season(
         db: db,
-        like_pattern: str,
-        columns: list = None
+        season: str
     ) -> list:
-
+        """
+        Retrieves distinct games and their scores (score_a, score_b) for a specific season.
+        """
         try:
             connection = db.get_connection()
 
             # Add `%` wildcard to the LIKE pattern
-            like_pattern = f"{like_pattern}%"
+            season_pattern = f"{season}%"
 
-            # Default columns to return
-            selected_columns = ", ".join(columns) if columns else "game"
+            # Query to fetch games and their scores for the season
+            query = """
+                    SELECT DISTINCT
+                    cp.game,
+                    ch.score_a,
+                    ch.score_b
+                    FROM CUP_POINTS cp
+                    JOIN CUP_HEADER ch
+                    ON cp.game = ch.game
+                    WHERE cp.game_point_id LIKE %s
+                    AND ch.game_id LIKE %s
+                    """
 
-            # WHERE clause for the LIKE filter
-            where_clause = "WHERE game_point_id LIKE %s"
-            params = [like_pattern]
+            params = [season_pattern,season_pattern]
 
-            # Query to fetch distinct games
-            query = f"""
-                SELECT DISTINCT {selected_columns} FROM CUP_POINTS
-                {where_clause}
-            """
-
-            cursor = connection.cursor()
+            cursor = connection.cursor(dictionary=True)
             cursor.execute(query, params)
-            distinct_games = cursor.fetchall()
+            games_with_scores = cursor.fetchall()
 
-            if distinct_games is None:
+            if games_with_scores is None:
                 return None
 
-            # Map fetched rows to dicts or raw values if only one column is selected
-            if columns:
-                return [dict(zip(columns, row)) for row in distinct_games]
-            else:
-                return [row[0] for row in distinct_games]  # Only return 'game' column
+            return games_with_scores
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")
