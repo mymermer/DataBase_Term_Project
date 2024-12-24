@@ -15,6 +15,7 @@ const ComparisonUserView = ({ league }) => {
     team1: null,
     team2: null,
   });
+  const [comparisonData, setComparisonData] = useState(null); // New state for fetched comparison data
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
@@ -24,6 +25,12 @@ const ComparisonUserView = ({ league }) => {
       fetchGames();
     }
   }, [selectedSeason]);
+
+  useEffect(() => {
+    if (selectedGame) {
+      fetchComparisonData();
+    }
+  }, [selectedGame]);
 
   const fetchGames = async () => {
     setLoading(true);
@@ -37,11 +44,11 @@ const ComparisonUserView = ({ league }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setGames(data);
+      setGames(data); // Now contains an array of { game_id, game }
 
-      // Extract unique team abbreviations for fetching team info
-      const allTeams = new Set(data.flatMap((game) => game.split("-")));
-      await fetchTeamInfo(Array.from(allTeams));
+      // Extract unique team abbreviations
+      const allTeams = new Set(data.flatMap(({ game }) => game.split("-")));
+      await fetchTeamInfo(Array.from(allTeams)); // Fetch team info
     } catch (error) {
       console.error("Error fetching games:", error);
     } finally {
@@ -76,16 +83,39 @@ const ComparisonUserView = ({ league }) => {
     }
   };
 
-  const handleGameClick = (game) => {
-    const [team1, team2] = game.split("-");
-    setSelectedGame(game);
+  const fetchComparisonData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${selectedGame}`
+      );
+      if (response.status === 404) {
+        console.error("Game data not found");
+        setComparisonData(null); // Handle missing data gracefully
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setComparisonData(data);
+    } catch (error) {
+      console.error("Error fetching comparison data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGameClick = (game_id) => {
+    const selectedGameData = games.find((g) => g.game_id === game_id);
+    setSelectedGame(game_id);
     setCurrentGameTeams({
-      team1: teamInfo[team1] || {
-        fullName: team1,
+      team1: teamInfo[selectedGameData?.game.split("-")[0]] || {
+        fullName: "Team 1",
         logoUrl: "/teams_icons/default_team_icon.png",
       },
-      team2: teamInfo[team2] || {
-        fullName: team2,
+      team2: teamInfo[selectedGameData?.game.split("-")[1]] || {
+        fullName: "Team 2",
         logoUrl: "/teams_icons/default_team_icon.png",
       },
     });
@@ -93,15 +123,15 @@ const ComparisonUserView = ({ league }) => {
   };
 
   const renderGameOptions = () => {
-    return games.map((game) => {
+    return games.map(({ game, game_id }) => {
       const [team1, team2] = game.split("-");
       return (
         <div
-          key={game}
+          key={game_id}
           className={`${styles.gameOption} ${
-            selectedGame === game ? styles.selectedGame : ""
+            selectedGame === game_id ? styles.selectedGame : ""
           }`}
-          onClick={() => handleGameClick(game)}
+          onClick={() => handleGameClick(game_id)}
         >
           <div className={styles.teamInfo}>
             <Image
@@ -192,11 +222,56 @@ const ComparisonUserView = ({ league }) => {
         {selectedGame && (
           <div className={styles.comparisonView}>
             {currentGameTeams.team1 && currentGameTeams.team2 ? (
-              <div>
-                {/* Placeholder for comparison view */}
-                <h3>Comparison view will be implemented soon!</h3>
-                <p>Details for {selectedGame} will appear here.</p>
-              </div>
+              comparisonData ? (
+                <div>
+                  <div className={styles.gameInfo}>
+                    <h3>Game Details</h3>
+                    <p>
+                      <strong>Game ID:</strong> {comparisonData.game_id}
+                    </p>
+                    <p>
+                      <strong>Teams:</strong> {comparisonData.game}
+                    </p>
+                    <p>
+                      <strong>Round:</strong> {comparisonData.round_of_game}
+                    </p>
+                    <p>
+                      <strong>Phase:</strong> {comparisonData.phase}
+                    </p>
+                  </div>
+                  <h3>
+                    Comparison between {currentGameTeams.team1.fullName} and{" "}
+                    {currentGameTeams.team2.fullName}
+                  </h3>
+                  <table className={styles.comparisonTable}>
+                    <thead>
+                      <tr>
+                        <th>Statistic</th>
+                        <th>{currentGameTeams.team1.fullName}</th>
+                        <th>{currentGameTeams.team2.fullName}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(comparisonData)
+                        .filter(([key]) => key.endsWith("_a"))
+                        .map(([key, value]) => {
+                          const baseKey = key.replace(/_a$/, "");
+                          return (
+                            <tr key={baseKey}>
+                              <td>{baseKey.replace(/_/g, " ")}</td>
+                              <td>{value || "N/A"}</td>
+                              <td>{comparisonData[`${baseKey}_b`] || "N/A"}</td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className={styles.comingSoon}>
+                  <p>Loading comparison data...</p>
+                </div>
+              )
             ) : (
               <div className={styles.comingSoon}>
                 <p>Coming soon or being updated...</p>

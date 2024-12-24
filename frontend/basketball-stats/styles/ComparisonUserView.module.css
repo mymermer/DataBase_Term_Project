@@ -255,3 +255,113 @@
   font-family: "Arial", sans-serif;
   font-size: 16px;
 }
+
+/* Styles for the Comparison View */
+.comparisonView {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Header for Game Details */
+.comparisonView h3 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid #000080;
+  padding-bottom: 10px;
+}
+
+.comparisonView .gameInfo {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comparisonView .gameInfo p {
+  font-size: 1rem;
+  color: #555;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.comparisonView .gameInfo strong {
+  font-weight: bold;
+  color: #000080;
+}
+
+/* Comparison Table */
+.comparisonTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.comparisonTable th, .comparisonTable td {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.comparisonTable th {
+  background-color: #000080;
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.comparisonTable tbody tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+
+.comparisonTable tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.comparisonTable td {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.comparisonTable tr:hover {
+  background-color: #e6e6fa;
+  cursor: default;
+}
+
+/* Highlight headers for Team Names */
+.comparisonTable th:first-child {
+  text-align: left;
+}
+
+.comparisonTable td:first-child {
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+  .comparisonView {
+    padding: 15px;
+  }
+
+  .comparisonView h3 {
+    font-size: 1.5rem;
+  }
+
+  .comparisonTable th, .comparisonTable td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+}
