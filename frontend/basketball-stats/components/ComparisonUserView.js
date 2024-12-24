@@ -154,7 +154,7 @@ const ComparisonUserView = ({ league }) => {
                 onChange={(e) => setSelectedSeason(e.target.value)}
                 className={selectedSeason ? styles.filled : ""}
               >
-                <option value="">Season</option>
+                <option value="">Select a Season</option>
                 {seasons.map((season) => (
                   <option key={season} value={season}>
                     {season}-{season + 1}
