@@ -309,7 +309,8 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.comparisonTable th, .comparisonTable td {
+.comparisonTable th,
+.comparisonTable td {
   padding: 12px 15px;
   text-align: center;
 }
@@ -360,8 +361,49 @@
     font-size: 1.5rem;
   }
 
-  .comparisonTable th, .comparisonTable td {
+  .comparisonTable th,
+  .comparisonTable td {
     padding: 10px;
     font-size: 0.85rem;
   }
+}
+
+.gameInfo h3 {
+  font-size: 1.8rem;
+  color: #000080; /* Dark blue */
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.detailsRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 120px; /* Add spacing between ROUND and PHASE */
+  margin-top: 10px;
+}
+
+.detail {
+  font-size: 1.6rem; /* Bigger font for details */
+  color: #000080; /* Dark blue */
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.comparisonView .detailsRow .detail {
+  font-size: 1.3rem; /* Larger font size */
+  color: #000080; /* Dark blue */
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase; /* Optional: Uppercase text */
+}
+
+.selectedGame .teamName {
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;    /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis if needed */
+  max-width: 120px;    /* Adjust this width as per your design */
+  display: inline-block; /* Ensure ellipsis works */
+  text-align: center;  /* Center the text */
 }

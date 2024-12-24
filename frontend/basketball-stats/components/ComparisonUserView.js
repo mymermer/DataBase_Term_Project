@@ -84,19 +84,27 @@ const ComparisonUserView = ({ league }) => {
   };
 
   const fetchComparisonData = async () => {
+    if (!selectedGame || !selectedGame.gameId) {
+      console.error("Invalid selectedGame:", selectedGame);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${selectedGame}`
+        `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${selectedGame.gameId}`
       );
+
       if (response.status === 404) {
         console.error("Game data not found");
-        setComparisonData(null); // Handle missing data gracefully
+        setComparisonData(null);
         return;
       }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
       setComparisonData(data);
     } catch (error) {
@@ -108,7 +116,24 @@ const ComparisonUserView = ({ league }) => {
 
   const handleGameClick = (game_id) => {
     const selectedGameData = games.find((g) => g.game_id === game_id);
-    setSelectedGame(game_id);
+    setSelectedGame({
+      gameId: game_id,
+      team1: {
+        fullName:
+          teamInfo[selectedGameData?.game.split("-")[0]]?.fullName || "Team 1",
+        logoUrl:
+          teamInfo[selectedGameData?.game.split("-")[0]]?.logoUrl ||
+          "/teams_icons/default_team_icon.png",
+      },
+      team2: {
+        fullName:
+          teamInfo[selectedGameData?.game.split("-")[1]]?.fullName || "Team 2",
+        logoUrl:
+          teamInfo[selectedGameData?.game.split("-")[1]]?.logoUrl ||
+          "/teams_icons/default_team_icon.png",
+      },
+    });
+
     setCurrentGameTeams({
       team1: teamInfo[selectedGameData?.game.split("-")[0]] || {
         fullName: "Team 1",
@@ -202,16 +227,39 @@ const ComparisonUserView = ({ league }) => {
                   selectedSeason && setShowGameDropdown(!showGameDropdown)
                 }
               >
-                {selectedGame ? (
-                  <span>
-                    {currentGameTeams.team1
-                      ? `${currentGameTeams.team1.fullName} vs ${currentGameTeams.team2.fullName}`
-                      : "Loading..."}
-                  </span>
+                {selectedGame && typeof selectedGame === "object" ? (
+                  <>
+                    <div className={styles.teamInfo}>
+                      <Image
+                        src={selectedGame.team1.logoUrl}
+                        alt={`${selectedGame.team1.fullName} logo`}
+                        width={30}
+                        height={30}
+                        className={styles.teamLogo}
+                      />
+                      <span className={styles.teamName}>
+                        {selectedGame.team1.fullName}
+                      </span>
+                    </div>
+                    <span className={styles.vsText}>vs</span>
+                    <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
+                      <span className={styles.teamName}>
+                        {selectedGame.team2.fullName}
+                      </span>
+                      <Image
+                        src={selectedGame.team2.logoUrl}
+                        alt={`${selectedGame.team2.fullName} logo`}
+                        width={30}
+                        height={30}
+                        className={styles.teamLogo}
+                      />
+                    </div>
+                  </>
                 ) : (
                   <span>Select a game</span>
                 )}
               </div>
+
               <span className={styles.selectLabel}>Game</span>
               {showGameDropdown && (
                 <div className={styles.gameDropdown}>{renderGameOptions()}</div>
@@ -226,19 +274,22 @@ const ComparisonUserView = ({ league }) => {
                 <div>
                   <div className={styles.gameInfo}>
                     <h3>Game Details</h3>
-                    <p>
-                      <strong>Game ID:</strong> {comparisonData.game_id}
-                    </p>
-                    <p>
-                      <strong>Teams:</strong> {comparisonData.game}
-                    </p>
-                    <p>
-                      <strong>Round:</strong> {comparisonData.round_of_game}
-                    </p>
-                    <p>
-                      <strong>Phase:</strong> {comparisonData.phase}
-                    </p>
+                    <div className={styles.detailsRow}>
+                      <span className={styles.detail}>
+                        <strong>Round:</strong>{" "}
+                        <span style={{ color: "black" }}>
+                          {comparisonData.round_of_game}
+                        </span>
+                      </span>
+                      <span className={styles.detail}>
+                        <strong>Phase:</strong>{" "}
+                        <span style={{ color: "black" }}>
+                          {comparisonData.phase}
+                        </span>
+                      </span>
+                    </div>
                   </div>
+
                   <h3>
                     Comparison between {currentGameTeams.team1.fullName} and{" "}
                     {currentGameTeams.team2.fullName}
