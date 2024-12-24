@@ -163,28 +163,34 @@ def get_paginated_points_with_like():
         return jsonify({'error': str(e)}), 500
 
 
-@lig_points_bp.route('/lig_points/season_games_scores', methods=['GET'])
-def get_games_with_scores_by_season():
+@lig_points_bp.route('/lig_points/year_distinct_games', methods=['GET'])
+def get_distinct_games_with_like():
     """
-    API endpoint for retrieving distinct games with their scores for a specific season.
+    API endpoint for retrieving distinct values of the 'game' column along with scores, with a compulsory 'LIKE' filter on game_point_id.
     """
     try:
         # Retrieve query parameters
-        season = request.args.get('season', None)  # The season pattern (e.g., "ABCDE")
-        if not season or len(season) < 5:
-            return jsonify({'error': 'Invalid season. It must be at least 5 characters long.'}), 400
+        like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
+        if not like_pattern or len(like_pattern) < 5:
+            return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
+
+        columns = request.args.get('columns', None)  # Optional columns to fetch
+
+        # Parse columns if provided
+        if columns:
+            columns = columns.split(",")
 
         # Call the DAO method
-        games_with_scores = Lig_PointsDAO.get_games_with_scores_by_season(
+        distinct_games = Lig_PointsDAO.get_distinct_games_with_like(
             db,
-            season=season
+            like_pattern=like_pattern,
+            columns=columns
         )
-        if games_with_scores is None:
+        if distinct_games is None:
             return jsonify([]), 200
-
-        return jsonify(games_with_scores), 200
+        return jsonify(distinct_games), 200  # Return the distinct values
 
     except ValueError:
-        return jsonify({'error': 'Invalid season'}), 400
+        return jsonify({'error': 'Invalid columns or likePattern'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
