@@ -417,3 +417,34 @@
   width: 33%; /* Or any value that ensures equal distribution */
   text-align: center; /* Keeps text and logos aligned */
 }
+
+.categoryHeader {
+  font-weight: bold;
+  text-align: center !important; /* Align to the left for a cleaner, modern look */
+  background-color: #000000; /* Black background for contrast */
+  color: #ffffff !important; /* White font for better readability */
+  padding: 12px 15px; /* Consistent padding for a balanced look */
+  font-size: 1.15rem !important; /* Slightly larger font for emphasis */
+  letter-spacing: 0.5px; /* Add slight spacing for a refined appearance */
+  border-bottom: 2px solid #ddd; /* A subtle bottom border to separate the header */
+  text-transform: capitalize; /* Make the category names appear elegant */
+  border-radius: 5px; /* Soft rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  margin-top: 15px; /* Add space above each category */
+}
+
+.chartContainer {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.chartContainer h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}

@@ -3,6 +3,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import styles from "../styles/ComparisonUserView.module.css";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const ComparisonUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
@@ -17,10 +27,72 @@ const ComparisonUserView = ({ league }) => {
   });
   const [comparisonData, setComparisonData] = useState(null); // New state for fetched comparison data
 
+  // Define categories for dividing the stats
+  const categories = {
+    OFFENSIVE: [
+      "points_bench",
+      "points_starters",
+      "offensive_rebounds",
+      "assists_bench",
+      "assists_starters",
+      "fast_break_points",
+    ],
+    DEFENSIVE: [
+      "defensive_rebounds",
+      "steals_bench",
+      "steals_starters",
+      "turnovers_bench",
+      "turnovers_starters",
+    ],
+    PERFORMANCE: ["max_lead", "points_max_lead", "minute_max_lead"],
+    MISCELLANEOUS: ["second_chance_points", "turnover_points"],
+  };
+
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   const gameDropdownRef = useRef(null);
+
+  const renderCategoryChart = (category, keys) => {
+    // Prepare data for the chart
+    const chartData = keys.map((key) => {
+      const statName = key.replace(/_/g, " ");
+      return {
+        name: statName,
+        TeamA: comparisonData[`${key}_a`] || 0,
+        TeamB: comparisonData[`${key}_b`] || 0,
+      };
+    });
+  
+    return (
+      <div key={`chart-${category}`} className={styles.chartContainer}>
+        <h4>{category} Stats Chart</h4>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart
+            data={chartData}
+            layout="horizontal" // Change layout to horizontal for vertical representation
+            margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" type="category" /> {/* Use XAxis for stat names */}
+            <YAxis type="number" /> {/* Use YAxis for numeric values */}
+            <Tooltip />
+            <Legend />
+            <Bar
+              dataKey="TeamA"
+              fill="#480000"
+              name={currentGameTeams.team1?.fullName || "Team A"}
+            />
+            <Bar
+              dataKey="TeamB"
+              fill="#000080"
+              name={currentGameTeams.team2?.fullName || "Team B"}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (selectedSeason) {
@@ -375,45 +447,51 @@ const ComparisonUserView = ({ league }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(comparisonData || {})
-                        .filter(([key]) => key.endsWith("_a"))
-                        .map(([key, value]) => {
-                          const baseKey = key.replace(/_a$/, "");
-                          const formatValue = (val) => {
-                            const trimmedVal = val?.trim ? val.trim() : val; // Trim the value if it's a string
-                            console.log(
-                              `Processing trimmed value for key "${key}":`,
-                              trimmedVal
-                            ); // Debugging output
-                            return trimmedVal === null ||
-                              trimmedVal === undefined ||
-                              trimmedVal === ""
-                              ? "N/A"
-                              : trimmedVal;
-                          };
-
-                          const formattedValueA = formatValue(value);
-                          const formattedValueB = formatValue(
-                            comparisonData[`${baseKey}_b`]
-                          );
-
-                          console.log(
-                            `Formatted value for "${key}":`,
-                            formattedValueA
-                          ); // Debug statement
-                          console.log(
-                            `Formatted value for "${baseKey}_b":`,
-                            formattedValueB
-                          ); // Debug statement
-
-                          return (
-                            <tr key={baseKey}>
-                              <td>{baseKey.replace(/_/g, " ")}</td>
-                              <td>{formattedValueA}</td>
-                              <td>{formattedValueB}</td>
+                      {Object.entries(categories).map(
+                        ([category, keys], categoryIndex) => (
+                          <React.Fragment key={`category-${categoryIndex}`}>
+                            <tr>
+                              <td colSpan="3" className={styles.categoryHeader}>
+                                {category + " STATS:"}
+                              </td>
                             </tr>
-                          );
-                        })}
+                            {keys.map((key) => {
+                              const baseKey = key;
+                              const formatValue = (val) =>
+                                val === null ||
+                                val === undefined ||
+                                (typeof val === "string" && val.trim() === "")
+                                  ? "N/A"
+                                  : typeof val === "string"
+                                  ? val.trim()
+                                  : val;
+
+                              return (
+                                <tr key={`row-${category}-${baseKey}`}>
+                                  <td>{baseKey.replace(/_/g, " ")}</td>
+                                  <td>
+                                    {formatValue(
+                                      comparisonData[`${baseKey}_a`]
+                                    )}
+                                  </td>
+                                  <td>
+                                    {formatValue(
+                                      comparisonData[`${baseKey}_b`]
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                            {/* Add chart for this category */}
+                            <tr>
+                              <td colSpan="3">
+                                {comparisonData &&
+                                  renderCategoryChart(category, keys)}
+                              </td>
+                            </tr>
+                          </React.Fragment>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
