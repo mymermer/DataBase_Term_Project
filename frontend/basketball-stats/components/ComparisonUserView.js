@@ -74,7 +74,8 @@ const ComparisonUserView = ({ league }) => {
             margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" type="category" /> {/* Use XAxis for stat names */}
+            <XAxis dataKey="name" type="category" />{" "}
+            {/* Use XAxis for stat names */}
             <YAxis type="number" /> {/* Use YAxis for numeric values */}
             <Tooltip />
             <Legend />
@@ -502,7 +503,7 @@ const ComparisonUserView = ({ league }) => {
               )
             ) : (
               <div className={styles.comingSoon}>
-                <p>Coming soon or being updated...</p>
+                <p>Under Maintenance...</p>
               </div>
             )}
           </div>

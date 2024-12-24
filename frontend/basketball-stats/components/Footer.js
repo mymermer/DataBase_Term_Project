@@ -17,7 +17,11 @@ export default function Footer({ onLogoClick }) {
                 {stats.map(stat => (
                   <li key={`${league}-${stat}`}>
                     <Link href={`/${league}/${stat}`}>
-                      {stat.replace('_', ' ').charAt(0).toUpperCase() + stat.replace('_', ' ').slice(1)}
+                      {stat
+                        .replace(/_/g, ' ')
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
                     </Link>
                   </li>
                 ))}
@@ -36,7 +40,9 @@ export default function Footer({ onLogoClick }) {
           </Link>
         </div>
       </div>
+      <div className={styles.footerCredits}>
+        <p>© 2024 KickStats. All Rights Reserved.</p>
+      </div>
     </footer>
   );
 }
-
