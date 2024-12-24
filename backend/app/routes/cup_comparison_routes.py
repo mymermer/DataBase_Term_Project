@@ -93,16 +93,6 @@ def get_cup_comparison(game_id):
     }
     return jsonify(response), 200
 
-# @cup_comparison_bp.route('/cup_comparison', methods=['GET'])
-# def get_all_cup_comparison():
-#     try:
-#         cup_comparison = Cup_ComparisonDAO.get_all_cup_comparison(db)
-#         if not cup_comparison:
-#             return jsonify({"message": "No cup comparisons found"}), 404
-#         return jsonify([comparison for comparison in cup_comparison]), 200
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
 @cup_comparison_bp.route('/cup_comparison', methods=['GET'])
 def get_paginated_comparison():
     try:

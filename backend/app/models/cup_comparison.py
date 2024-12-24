@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 from app.db.db import db
 import mysql.connector
 from typing import Optional
