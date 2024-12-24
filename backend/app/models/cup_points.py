@@ -394,42 +394,51 @@ class Cup_PointsDAO():
 
 
     @staticmethod
-    def get_games_with_scores_by_season(
+    def get_distinct_games_with_like(
         db: db,
-        season: str
+        like_pattern: str,
+        columns: list = None
     ) -> list:
-        """
-        Retrieves distinct games and their scores (score_a, score_b) for a specific season.
-        """
+
         try:
             connection = db.get_connection()
 
             # Add `%` wildcard to the LIKE pattern
-            season_pattern = f"{season}%"
+            like_pattern = f"{like_pattern}%"
 
-            # Query to fetch games and their scores for the season
-            query = """
-                    SELECT DISTINCT
-                    cp.game,
-                    ch.score_a,
-                    ch.score_b
-                    FROM CUP_POINTS cp
-                    JOIN CUP_HEADER ch
-                    ON cp.game = ch.game
-                    WHERE cp.game_point_id LIKE %s
-                    AND ch.game_id LIKE %s
-                    """
+            # Default columns to return
+            selected_columns = ", ".join(columns) if columns else "CUP_POINTS.game"
 
-            params = [season_pattern,season_pattern]
+            # Add score columns from CUP_HEADER
+            selected_columns += ", CUP_HEADER.score_a, CUP_HEADER.score_b"
 
-            cursor = connection.cursor(dictionary=True)
+            # WHERE clause for the LIKE filter
+            where_clause = "WHERE CUP_POINTS.game_point_id LIKE %s"
+            params = [like_pattern]
+
+            # Join CUP_POINTS with CUP_HEADER on game_id
+            query = f"""
+                SELECT DISTINCT {selected_columns} 
+                FROM CUP_POINTS
+                JOIN CUP_HEADER ON CUP_POINTS.game_id = CUP_HEADER.game_id
+                {where_clause}
+            """
+
+            cursor = connection.cursor()
             cursor.execute(query, params)
-            games_with_scores = cursor.fetchall()
+            distinct_games = cursor.fetchall()
 
-            if games_with_scores is None:
+            if distinct_games is None:
                 return None
 
-            return games_with_scores
+            # Map fetched rows to dicts or raw values if only one column is selected
+            if columns:
+                # Include score_a and score_b in the result
+                extended_columns = columns + ["score_a", "score_b"]
+                return [dict(zip(extended_columns, row)) for row in distinct_games]
+            else:
+                # Return 'game' with scores as tuples
+                return [{"game": row[0], "score_a": row[-2], "score_b": row[-1]} for row in distinct_games]
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -437,3 +446,4 @@ class Cup_PointsDAO():
         finally:
             cursor.close()
             connection.close()
+
