@@ -252,15 +252,42 @@ const ComparisonUserView = ({ league }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(comparisonData)
+                      {Object.entries(comparisonData || {})
                         .filter(([key]) => key.endsWith("_a"))
                         .map(([key, value]) => {
                           const baseKey = key.replace(/_a$/, "");
+                          const formatValue = (val) => {
+                            const trimmedVal = val?.trim ? val.trim() : val; // Trim the value if it's a string
+                            console.log(
+                              `Processing trimmed value for key "${key}":`,
+                              trimmedVal
+                            ); // Debugging output
+                            return trimmedVal === null ||
+                              trimmedVal === undefined ||
+                              trimmedVal === ""
+                              ? "N/A"
+                              : trimmedVal;
+                          };
+
+                          const formattedValueA = formatValue(value);
+                          const formattedValueB = formatValue(
+                            comparisonData[`${baseKey}_b`]
+                          );
+
+                          console.log(
+                            `Formatted value for "${key}":`,
+                            formattedValueA
+                          ); // Debug statement
+                          console.log(
+                            `Formatted value for "${baseKey}_b":`,
+                            formattedValueB
+                          ); // Debug statement
+
                           return (
                             <tr key={baseKey}>
                               <td>{baseKey.replace(/_/g, " ")}</td>
-                              <td>{value || "N/A"}</td>
-                              <td>{comparisonData[`${baseKey}_b`] || "N/A"}</td>
+                              <td>{formattedValueA}</td>
+                              <td>{formattedValueB}</td>
                             </tr>
                           );
                         })}
