@@ -493,7 +493,6 @@ class Cup_TeamsDAO():
         sort_by: str = None,
         order: str = 'asc'
     ) -> list:
-        
         try:
             connection = db.get_connection()
 
@@ -501,10 +500,10 @@ class Cup_TeamsDAO():
             like_pattern = f"{like_pattern}%"
 
             # Build the SELECT part of the query
-            selected_columns = ", ".join(columns) if columns else "*"
+            selected_columns = ", ".join(columns) if columns else "ct.*, cp.player AS best_player_name"
 
             # Build the WHERE clause dynamically based on filters
-            where_clauses = [f"season_team_id LIKE %s"]
+            where_clauses = [f"ct.season_team_id LIKE %s"]
             params = [like_pattern]
 
             if filters:
@@ -519,31 +518,46 @@ class Cup_TeamsDAO():
             if sort_by:
                 if order.lower() not in ['asc', 'desc']:
                     order = 'asc'  # Default to ascending
-                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+                order_clause = f"ORDER BY ct.{sort_by} {order.upper()}"
+            else:
+                # Provide a fallback default sort column if `sort_by` is not given
+                order_clause = "ORDER BY ct.season_team_id ASC"
 
             # Final query with LIMIT and OFFSET
             query = f"""
-                SELECT {selected_columns} FROM CUP_TEAMS
+                SELECT 
+                    ct.*, 
+                    cp.player AS best_player_name
+                FROM CUP_TEAMS ct
+                LEFT JOIN (
+                    SELECT 
+                        season_team_id,
+                        player,
+                        valuation_per_game
+                    FROM CUP_PLAYERS cp1
+                    WHERE cp1.valuation_per_game = (
+                        SELECT MAX(cp2.valuation_per_game)
+                        FROM CUP_PLAYERS cp2
+                        WHERE cp1.season_team_id = cp2.season_team_id
+                    )
+                ) cp
+                ON ct.season_team_id = cp.season_team_id
                 {where_clause}
                 {order_clause}
-                LIMIT %s OFFSET %s
+                LIMIT %s OFFSET %s;
             """
-            
+
             # Append limit and offset to the params
             params.extend([limit, offset])
-            
-            cursor = connection.cursor()
-            cursor.execute(query, params)
-            teams = cursor.fetchall()
 
-            if teams is None:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, params)
+            teams_with_best_players = cursor.fetchall()
+
+            if teams_with_best_players is None:
                 return None
 
-            # Map fetched rows to Cup_Teams objects or dicts
-            if columns:
-                return [dict(zip(columns, team)) for team in teams]
-            else:
-                return [Cup_Teams(*team) for team in teams]
+            return teams_with_best_players
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -552,6 +566,7 @@ class Cup_TeamsDAO():
         finally:
             cursor.close()
             connection.close()
+
 
 
     @staticmethod

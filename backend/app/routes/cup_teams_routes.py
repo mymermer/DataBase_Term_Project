@@ -133,7 +133,6 @@ def get_average_values(season):
 
 @cup_teams_bp.route('/cup_teams/with_year_like', methods=['GET'])
 def get_paginated_teams_with_like():
-
     try:
         # Retrieve query parameters
         like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
@@ -174,6 +173,7 @@ def get_paginated_teams_with_like():
         return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
     
 
 @cup_teams_bp.route('/cup_teams/by_team_abbrs', methods=['GET'])
