@@ -151,6 +151,7 @@
   border-top: none;
   max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 10;
   width: 100%;
   animation: fadeIn 0.3s ease-out;
@@ -410,4 +411,9 @@
   ); /* Adjust width dynamically to prevent overflow over 'vs' */
   display: inline-block; /* Ensure ellipsis works */
   text-align: left; /* Optional: Align text neatly */
+}
+
+.comparisonTable th {
+  width: 33%; /* Or any value that ensures equal distribution */
+  text-align: center; /* Keeps text and logos aligned */
 }

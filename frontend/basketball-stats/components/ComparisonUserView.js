@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import styles from "../styles/ComparisonUserView.module.css";
 
@@ -20,6 +20,8 @@ const ComparisonUserView = ({ league }) => {
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
 
+  const gameDropdownRef = useRef(null);
+
   useEffect(() => {
     if (selectedSeason) {
       // Reset the selected game, current game teams, and comparison data
@@ -35,6 +37,22 @@ const ComparisonUserView = ({ league }) => {
       fetchComparisonData();
     }
   }, [selectedGame]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        gameDropdownRef.current &&
+        !gameDropdownRef.current.contains(event.target)
+      ) {
+        setShowGameDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchGames = async () => {
     setLoading(true);
@@ -212,6 +230,7 @@ const ComparisonUserView = ({ league }) => {
                 value={selectedSeason}
                 onChange={(e) => setSelectedSeason(e.target.value)}
                 className={selectedSeason ? styles.filled : ""}
+                onMouseLeave={() => setShowGameDropdown(false)}
               >
                 <option value="">Select a Season</option>
                 {seasons.map((season) => (
@@ -222,7 +241,7 @@ const ComparisonUserView = ({ league }) => {
               </select>
               <span className={styles.selectLabel}>Season</span>
             </div>
-            <div className={styles.customSelect}>
+            <div className={styles.customSelect} ref={gameDropdownRef}>
               <div
                 className={`${styles.selectedGame} ${
                   selectedGame ? styles.filled : ""
@@ -266,7 +285,12 @@ const ComparisonUserView = ({ league }) => {
 
               <span className={styles.selectLabel}>Game</span>
               {showGameDropdown && (
-                <div className={styles.gameDropdown}>{renderGameOptions()}</div>
+                <div
+                  className={styles.gameDropdown}
+                  // onMouseLeave={() => setShowGameDropdown(false)} // Optional: Hide dropdown on mouse leave
+                >
+                  {renderGameOptions()}
+                </div>
               )}
             </div>
           </div>
@@ -303,7 +327,7 @@ const ComparisonUserView = ({ league }) => {
                   </div>
 
                   <h3>
-                    Comparison between {currentGameTeams.team1.fullName} and{" "}
+                    Comparison between {currentGameTeams.team1.fullName} &{" "}
                     {currentGameTeams.team2.fullName}
                   </h3>
                   <table className={styles.comparisonTable}>
