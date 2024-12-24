@@ -1,21 +1,110 @@
+/* General wrapper for the date-time input component */
 .dateTimeInputWrapper {
-    position: relative;
-    width: 100%;
-  }
-  
-  .dateTimeInput {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .dateTimeInput:focus {
-    outline: none;
-    border-color: #000080;
-    box-shadow: 0 0 0 2px rgba(0, 0, 128, 0.1);
-  }
-  
-  
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styles for the input field */
+.dateTimeInput {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  appearance: none;
+}
+
+.dateTimeInput:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Custom date picker popper styles */
+.datePickerPopper {
+  z-index: 1050;
+}
+
+/* Custom calendar styles */
+.datePickerCalendar {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  padding: 10px;
+}
+
+/* Header styles */
+.datePickerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.datePickerHeader button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.datePickerHeader select {
+  margin: 0 5px;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+/* Day, month, and time styles */
+.datePickerDay {
+  font-size: 14px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.datePickerDay:hover {
+  background-color: #f0f0f0;
+}
+
+.datePickerMonth, .datePickerTime {
+  font-size: 14px;
+  padding: 5px;
+}
+
+/* Highlight current selection */
+.datePickerDay--selected {
+  background-color: #007bff;
+  color: white;
+}
+
+.datePickerDay--selected:hover {
+  background-color: #0056b3;
+}
+
+/* Wrapper styles */
+.datePickerWrapper {
+  display: inline-block;
+  width: 100%;
+}
+
+/* Adjustments for the input field inside the wrapper */
+.datePicker {
+  font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: inherit; /* Prevent changes to the input field shape or placement */
+}
+
+.datePicker:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}

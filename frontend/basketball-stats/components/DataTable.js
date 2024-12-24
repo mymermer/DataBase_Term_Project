@@ -469,7 +469,7 @@ const DataTable = ({
       </div>
       {showPopup && (
         <div className={styles.popupOverlay} onClick={handlePopupClose}>
-          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.popup} onClick={(e) => e.stopPropagation()} style={{ overflow: 'visible' }}>
             <button className={styles.closeButton} onClick={handlePopupClose}>
               <X size={24} />
             </button>
