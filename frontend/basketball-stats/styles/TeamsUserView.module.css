@@ -139,21 +139,45 @@
   display: flex;
   flex-grow: 1;
   gap: 1rem;
+  justify-content: space-between;
 }
 
-.performanceChart,
-.spiderChart {
+.performanceChart {
   flex: 1;
   min-width: 300px;
   height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.performanceChart h4,
-.spiderChart h4 {
+.performanceChart h4 {
   margin-bottom: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
+}
+
+.spiderChartWrapper {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spiderChartWrapper h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.spiderChart {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
 }
 
 
@@ -192,5 +216,20 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.bestPlayer {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.bestPlayerLabel {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.bestPlayerName {
+  color: #000080;
 }
 
