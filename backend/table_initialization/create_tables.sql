@@ -228,8 +228,6 @@ CREATE TABLE CUP_HEADER(
     season_team_id_b VARCHAR(50),
     score_a INT,
     score_b INT,
-    team_a VARCHAR(50),
-    team_b VARCHAR(50),
     coach_a VARCHAR(50),
     coach_b VARCHAR(50),
     game_time VARCHAR(50),

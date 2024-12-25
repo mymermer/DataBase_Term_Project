@@ -49,7 +49,7 @@ const ComparisonUserView = ({ league }) => {
     PERFORMANCE: ["minute_max_lead", "max_lead"],
   };
 
-  const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
+  const seasons = Array.from({ length: 2023 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   const gameDropdownRef = useRef(null);

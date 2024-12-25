@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(65vh);
+  min-height: calc(65vh); /* Assuming a 60px header */
   padding: 0;
   margin: 0;
 }
@@ -123,7 +123,7 @@
   background-color: white;
   min-height: 60px;
   height: auto;
-  overflow: hidden;
+  overflow: hidden; /* Prevent any child from overflowing */
 }
 
 .selectedGame.filled {
@@ -182,11 +182,11 @@
 
 /* Text and images inside game dropdown */
 .vsText {
-  margin: 0 auto;
+  margin: 0 auto; /* Centers the text */
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1rem; /* Adjust font size as needed */
   display: flex;
-  align-items: center;
+  align-items: center; /* Aligns "vs" with the logos and names */
 }
 
 .teamLogo {
@@ -236,17 +236,151 @@
   animation: fadeIn 0.5s ease-in;
 }
 
-/* Game details */
-.detailsView {
-  margin-top: 20px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.initialView h2 {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.customSelect {
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+}
+
+/* Styles for the Comparison View */
+.headerView {
+  margin-top: 30px;
   padding: 20px;
-  background-color: #ffffff;
+  background-color: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.5s ease-in-out;
 }
 
-.detailsView h3 {
+/* Header for Game Details */
+.headerView h3 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid #000080;
+  padding-bottom: 10px;
+}
+
+.headerView .gameInfo {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.headerView .gameInfo p {
+  font-size: 1rem;
+  color: #555;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.headerView .gameInfo strong {
+  font-weight: bold;
+  color: #000080;
+}
+
+/* Header Table */
+.headerTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.headerTable th,
+.headerTable td {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.headerTable th {
+  background-color: #000080;
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.headerTable tbody tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+
+.headerTable tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.headerTable td {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.headerTable tr:hover {
+  background-color: #e6e6fa;
+  cursor: default;
+}
+
+/* Highlight headers for Team Names */
+.headerTable th:first-child {
+  text-align: left;
+}
+
+.headerTable td:first-child {
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+  .headerView {
+    padding: 15px;
+  }
+
+  .headerView h3 {
+    font-size: 1.5rem;
+  }
+
+  .headerTable th,
+  .headerTable td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+}
+
+.gameInfo {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.gameInfo h3 {
   font-size: 1.8rem;
   color: #000080;
   margin-bottom: 20px;
@@ -256,63 +390,91 @@
   padding-bottom: 10px;
 }
 
-.detailsTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  background-color: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Four equally spaced columns */
+  gap: 15px; /* Space between the grid items */
+  margin-top: 10px; /* Optional: Add spacing above the grid */
+  justify-content: center;
+  text-align: left;
+  margin-left: 40px;
+  margin-bottom: 10px;
 }
 
-.detailsTable th,
-.detailsTable td {
-  padding: 12px 15px;
-  text-align: center;
-  font-size: 1rem;
-  border: 1px solid #ddd; /* Subtle border between rows and columns */
+.detailsRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 120px; /* Add spacing between ROUND and PHASE */
+  margin-top: 10px;
 }
 
-.detailsTable th {
-  background-color: #000080; /* Dark blue for table header */
-  color: #ffffff; /* White text for contrast */
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.detailsTable td {
-  background-color: #f9f9f9; /* Light gray for table rows */
+.detail {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
   color: #333;
 }
 
-.detailsTable tr:nth-child(odd) td {
-  background-color: #ffffff; /* Alternating row colors for readability */
-}
-
-.detailsTable .keyCell {
+.detail strong {
   font-weight: bold;
-  background-color: #e6e6fa; /* Slightly tinted background for keys */
-  color: #000080; /* Dark blue for keys */
-  text-align: left;
+  color: #000080;
+  margin-bottom: 5px;
+  font-size: 1.3rem;
 }
 
-.detailsTable .valueCell {
+.detail span {
+  color: #000;
+  font-size: 1.2rem;
+}
+
+.refereeList {
+  display: flex;
+  flex-direction: column; /* Referees stacked vertically */
+  gap: 5px; /* Optional: Add spacing between referees */
+}
+
+.refereeList div {
+  line-height: 1.5; /* Optional: Adjust line height for readability */
+}
+
+.headerView .detailsRow .detail {
+  font-size: 1.3rem; /* Larger font size */
+  color: #000080; /* Dark blue */
+  font-weight: bold;
   text-align: center;
+  text-transform: uppercase; /* Optional: Uppercase text */
+}
+
+.selectedGame .teamName {
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Add dots when text overflows */
+  max-width: calc(
+    100%
+  ); /* Adjust width dynamically to prevent overflow over 'vs' */
+  display: inline-block; /* Ensure ellipsis works */
+  text-align: left; /* Optional: Align text neatly */
+}
+
+.headerTable th {
+  width: 33%; /* Or any value that ensures equal distribution */
+  text-align: center; /* Keeps text and logos aligned */
 }
 
 .categoryHeader {
   font-weight: bold;
-  text-align: left;
-  background-color: #000080; /* Dark blue for category headers */
-  color: #ffffff;
-  padding: 12px 15px;
-  font-size: 1.15rem;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #ddd;
-  text-transform: capitalize;
-  border-radius: 5px;
-  margin-top: 15px;
+  text-align: left; /* Align to the left for a cleaner, modern look */
+  background-color: #000000; /* Black background for contrast */
+  color: #ffffff !important; /* White font for better readability */
+  padding: 12px 15px; /* Consistent padding for a balanced look */
+  font-size: 1.15rem !important; /* Slightly larger font for emphasis */
+  letter-spacing: 0.5px; /* Add slight spacing for a refined appearance */
+  border-bottom: 2px solid #ddd; /* A subtle bottom border to separate the header */
+  text-transform: capitalize; /* Make the category names appear elegant */
+  border-radius: 5px; /* Soft rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  margin-top: 15px; /* Add space above each category */
 }
 
 .chartContainer {
@@ -329,24 +491,4 @@
   color: #333;
   margin-bottom: 10px;
   text-align: center;
-}
-
-@media (max-width: 768px) {
-  .detailsView {
-    padding: 15px;
-  }
-
-  .detailsTable th,
-  .detailsTable td {
-    font-size: 0.9rem;
-    padding: 10px;
-  }
-
-  .detailsView h3 {
-    font-size: 1.5rem;
-  }
-
-  .chartContainer h4 {
-    font-size: 1rem;
-  }
 }
