@@ -162,6 +162,7 @@ const HeaderUserView = ({ league }) => {
       }
 
       const data = await response.json();
+      console.log("API Response Data:", data); // Log the API response
       setHeaderData(data);
     } catch (error) {
       console.error("Error fetching header data:", error);
@@ -469,22 +470,28 @@ const HeaderUserView = ({ league }) => {
                             {keys.map((key) => {
                               const baseKey = key;
 
+                              // Log the current HeaderData and key being processed
+                              console.log("HeaderData:", HeaderData);
+                              console.log(`Processing key: ${baseKey}`);
+
                               // Enhanced formatValue function with debug logs
-                              const formatValue = (val, key) => {
+                              const formatValue = (val) => {
                                 if (
                                   [
                                     "score_extra_time_1",
                                     "score_extra_time_2",
                                     "score_extra_time_3",
                                     "score_extra_time_4",
-                                  ].includes(key)
+                                  ].includes(baseKey)
                                 ) {
                                   console.log(
-                                    `Processing key: ${key}, Value:`,
-                                    val
+                                    `Processing key: ${baseKey}, Value A:`,
+                                    HeaderData[`${baseKey}_a`],
+                                    "Value B:",
+                                    HeaderData[`${baseKey}_b`]
                                   );
                                   // Check specifically for null or undefined, return "None" only if invalid
-                                  return val === null || val === undefined
+                                  return val === null || val === undefined || isNaN(val) || (typeof val === "string" && val.trim() === "")
                                     ? "None"
                                     : val;
                                 }
@@ -524,17 +531,14 @@ const HeaderUserView = ({ league }) => {
                               const totalScoreB = HeaderData?.score_b ?? 0; // Team B total score
 
                               const isScoreKey =
-                                key.startsWith("score_quarter_") ||
-                                key.startsWith("score_extra_time_");
+                                baseKey.startsWith("score_quarter_") ||
+                                baseKey.startsWith("score_extra_time_");
 
                               return (
                                 <tr key={`row-${category}-${baseKey}`}>
                                   <td>{baseKey.replace(/_/g, " ")}</td>
                                   <td>
-                                    {formatValue(
-                                      HeaderData[`${baseKey}_a`],
-                                      baseKey
-                                    )}
+                                    {formatValue(HeaderData?.[`${baseKey}_a`])}
                                     {isScoreKey &&
                                       HeaderData[`${baseKey}_a`] !== null &&
                                       HeaderData[`${baseKey}_a`] !==
@@ -545,10 +549,7 @@ const HeaderUserView = ({ league }) => {
                                       )}
                                   </td>
                                   <td>
-                                    {formatValue(
-                                      HeaderData[`${baseKey}_b`],
-                                      baseKey
-                                    )}
+                                    {formatValue(HeaderData?.[`${baseKey}_b`])}
                                     {isScoreKey &&
                                       HeaderData[`${baseKey}_b`] !== null &&
                                       HeaderData[`${baseKey}_b`] !==
