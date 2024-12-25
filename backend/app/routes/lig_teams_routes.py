@@ -156,13 +156,7 @@ def get_paginated_teams_with_like():
         # Call the DAO method with the like_pattern
         lig_teams = Lig_TeamsDAO.get_paginated_lig_teams_with_like(
             db,
-            like_pattern=like_pattern,
-            offset=offset,
-            limit=limit,
-            columns=columns,
-            filters=filters,
-            sort_by=sort_by,
-            order=order
+            like_pattern=like_pattern
         )
         if lig_teams is None:
             return jsonify([]), 200

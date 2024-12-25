@@ -40,9 +40,23 @@ const TeamsUserView = ({ league }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setTeamsData(data);
+    
+      // Filter out duplicate team entries
+      const uniqueTeamsData = data.reduce((acc, current) => {
+        const x = acc.find(item => item.season_team_id === current.season_team_id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
 
-      const teamAbbrs = data.map(team => team.season_team_id.split('_')[1]);
+      setTeamsData(uniqueTeamsData.map(team => ({
+        ...team,
+        best_player: formatPlayerName(team.best_player)
+      })));
+
+      const teamAbbrs = uniqueTeamsData.map(team => team.season_team_id.split('_')[1]);
       await fetchTeamInfo(teamAbbrs);
       await fetchPerformanceData(teamAbbrs);
       await fetchAverageValues(selectedSeason);
@@ -52,6 +66,12 @@ const TeamsUserView = ({ league }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatPlayerName = (playerName) => {
+    if (!playerName) return '';
+    const [surname, firstName] = playerName.split(', ');
+    return `${firstName} ${surname}`;
   };
 
   const fetchTeamInfo = async (abbreviations) => {
@@ -176,9 +196,11 @@ const TeamsUserView = ({ league }) => {
     };
 
     return (
-      <div className={styles.spiderChart}>
+      <div className={styles.spiderChartWrapper}>
         <h4>Team Stats vs League Average</h4>
-        <Radar data={data} options={options} />
+        <div className={styles.spiderChart}>
+          <Radar data={data} options={options} />
+        </div>
       </div>
     );
   };
@@ -264,6 +286,10 @@ const TeamsUserView = ({ league }) => {
                             <span className={styles.statLabel}>Valuation</span>
                             <span className={styles.statValue}>{team.valuation}</span>
                           </div>
+                        </div>
+                        <div className={styles.bestPlayer}>
+                          <span className={styles.bestPlayerLabel}>Best Player:</span>
+                          <span className={styles.bestPlayerName}>{team.best_player}</span>
                         </div>
                       </div>
                     </div>

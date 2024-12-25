@@ -485,12 +485,6 @@ class Lig_TeamsDAO():
     def get_paginated_lig_teams_with_like(
         db: db,
         like_pattern: str,
-        offset: int = 0,
-        limit: int = 25,
-        columns: list = None,
-        filters: dict = None,
-        sort_by: str = None,
-        order: str = 'asc'
     ) -> list:
         try:
             connection = db.get_connection()
@@ -498,56 +492,32 @@ class Lig_TeamsDAO():
             # Add `%` wildcard to the LIKE pattern
             like_pattern = f"{like_pattern}%"
 
-            # Build the SELECT part of the query
-            selected_columns = ", ".join(columns) if columns else "lt.*, cp.player AS best_player_name"
-
-            # Build the WHERE clause dynamically based on filters
-            where_clauses = [f"lt.season_team_id LIKE %s"]
             params = [like_pattern]
 
-            if filters:
-                for column, value in filters.items():
-                    where_clauses.append(f"{column} = %s")
-                    params.append(value)
-
-            where_clause = f"WHERE {' AND '.join(where_clauses)}"
-
-            # Add ORDER BY clause
-            order_clause = ""
-            if sort_by:
-                if order.lower() not in ['asc', 'desc']:
-                    order = 'asc'  # Default to ascending
-                order_clause = f"ORDER BY lt.{sort_by} {order.upper()}"
-            else:
-                # Provide a fallback default sort column if `sort_by` is not given
-                order_clause = "ORDER BY lt.season_team_id ASC"
 
             # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT 
-                    lt.*, 
-                    lp.player AS best_player_name
-                FROM LIG_TEAMS lt
-                LEFT JOIN (
-                    SELECT 
-                        season_team_id,
-                        player,
-                        valuation_per_game
-                    FROM LIG_PLAYERS lp1
-                    WHERE lp1.valuation_per_game = (
-                        SELECT MAX(lp2.valuation_per_game)
-                        FROM LIG_PLAYERS lp2
-                        WHERE lp1.season_team_id = lp2.season_team_id
-                    )
-                ) lp
-                ON lt.season_team_id = lp.season_team_id
-                {where_clause}
-                {order_clause}
-                LIMIT %s OFFSET %s;
+                        ct.*,  -- Select all columns from LIG_TEAMS
+                        cp.season_player_id AS best_player_id, 
+                        cp.player AS best_player, 
+                        cp.points AS best_player_valuation
+                    FROM 
+                        LIG_TEAMS ct
+                    LEFT JOIN 
+                        LIG_PLAYERS cp 
+                    ON 
+                        ct.season_team_id = cp.season_team_id
+                    WHERE 
+                        ct.season_team_id LIKE %s
+                        AND cp.points = (
+                            SELECT MAX(inner_cp.points)
+                            FROM LIG_PLAYERS inner_cp
+                            WHERE inner_cp.season_team_id = cp.season_team_id
+                        )
+                    ORDER BY 
+                        ct.valuation DESC
             """
-
-            # Append limit and offset to the params
-            params.extend([limit, offset])
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, params)
