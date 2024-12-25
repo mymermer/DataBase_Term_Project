@@ -45,10 +45,7 @@ const allColumns = [
   "minute_max_lead_b",
 ];
 
-const foreignKeyColumns = [
-  "season_team_id",
-  "game_id",
-];
+const foreignKeyColumns = ["season_team_id", "game_id"];
 
 export default function ComparisonPage({ params }) {
   const { league } = React.use(params);
@@ -228,10 +225,15 @@ export default function ComparisonPage({ params }) {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <StatPageTemplate league={league} stat="Comparison" UserView={ComparisonUserView}>
+    <StatPageTemplate
+      league={league}
+      stat="Comparison"
+      UserView={ComparisonUserView}
+    >
       <div className={styles.PageContent}>
         <h2>
-          {league.charAt(0).toUpperCase() + league.slice(1)} Comparison Statistics
+          {league.charAt(0).toUpperCase() + league.slice(1)} Comparison
+          Statistics
         </h2>
         <div className={styles.tableContainer}>
           <DataTable

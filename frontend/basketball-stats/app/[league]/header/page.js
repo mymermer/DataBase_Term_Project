@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
-// import HeaderUserView from "../../../components/HeaderUserView";
+import HeaderUserView from "../../../components/HeaderUserView";
 
 const allColumns = [
   "game_id",
@@ -230,7 +230,7 @@ export default function HeaderPage({ params }) {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <StatPageTemplate league={league} stat="Header">
+    <StatPageTemplate league={league} stat="Header" UserView={HeaderUserView}>
       <div className={styles.PageContent}>
         <h2>
           {league.charAt(0).toUpperCase() + league.slice(1)} Header Statistics
