@@ -38,9 +38,7 @@ from typing import Optional
 # max_lead_a INT,
 # max_lead_b INT,
 # minute_max_lead_a INT,
-# minute_max_lead_b INT,
-# points_max_lead_a VARCHAR(50),
-# points_max_lead_b VARCHAR(50)
+# minute_max_lead_b INT
 
 @dataclass
 class Cup_Comparison:
@@ -80,9 +78,6 @@ class Cup_Comparison:
     max_lead_b: Optional[int] = None
     minute_max_lead_a: Optional[int] = None
     minute_max_lead_b: Optional[int] = None
-    points_max_lead_a: Optional[str] = None
-    points_max_lead_b: Optional[str] = None
-
 
 class Cup_ComparisonDAO():
     @staticmethod
@@ -248,10 +243,6 @@ class Cup_ComparisonDAO():
                 fields_to_update['minute_max_lead_a'] = comparison.minute_max_lead_a
             if comparison.minute_max_lead_b is not None:
                 fields_to_update['minute_max_lead_b'] = comparison.minute_max_lead_b
-            if comparison.points_max_lead_a is not None:
-                fields_to_update['points_max_lead_a'] = comparison.points_max_lead_a
-            if comparison.points_max_lead_b is not None:
-                fields_to_update['points_max_lead_b'] = comparison.points_max_lead_b
 
             # Construct dynamic SQL query
             if not fields_to_update:

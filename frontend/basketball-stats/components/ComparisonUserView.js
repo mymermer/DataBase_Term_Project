@@ -30,22 +30,23 @@ const ComparisonUserView = ({ league }) => {
   // Define categories for dividing the stats
   const categories = {
     OFFENSIVE: [
-      "points_bench",
       "points_starters",
+      "points_bench",
+      "fast_break_points",
+      "second_chance_points",
       "offensive_rebounds",
       "assists_bench",
       "assists_starters",
-      "fast_break_points",
     ],
     DEFENSIVE: [
       "defensive_rebounds",
-      "steals_bench",
       "steals_starters",
-      "turnovers_bench",
+      "steals_bench",
       "turnovers_starters",
+      "turnovers_bench",
+      "turnover_points",
     ],
-    PERFORMANCE: ["max_lead", "points_max_lead", "minute_max_lead"],
-    MISCELLANEOUS: ["second_chance_points", "turnover_points"],
+    PERFORMANCE: ["minute_max_lead", "max_lead"],
   };
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
@@ -63,7 +64,7 @@ const ComparisonUserView = ({ league }) => {
         TeamB: comparisonData[`${key}_b`] || 0,
       };
     });
-  
+
     return (
       <div key={`chart-${category}`} className={styles.chartContainer}>
         <h4>{category} Stats Chart</h4>
@@ -406,7 +407,7 @@ const ComparisonUserView = ({ league }) => {
                   <table className={styles.comparisonTable}>
                     <thead>
                       <tr>
-                        <th style={{fontSize: "18px"}}>Statistic</th>
+                        <th style={{ fontSize: "18px" }}>Statistic</th>
                         <th>
                           <div className={styles.teamHeader}>
                             <div className={styles.teamLogoWrapper}>

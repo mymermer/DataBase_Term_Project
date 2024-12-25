@@ -43,8 +43,6 @@ const allColumns = [
   "max_lead_b",
   "minute_max_lead_a",
   "minute_max_lead_b",
-  "points_max_lead_a",
-  "points_max_lead_b",
 ];
 
 const foreignKeyColumns = [

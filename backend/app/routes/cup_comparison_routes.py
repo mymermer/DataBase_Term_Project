@@ -39,9 +39,7 @@ cup_comparison_bp = Blueprint('cup_comparison', __name__)
 # max_lead_a INT,
 # max_lead_b INT,
 # minute_max_lead_a INT,
-# minute_max_lead_b INT,
-# points_max_lead_a VARCHAR(50),
-# points_max_lead_b VARCHAR(50)
+# minute_max_lead_b INT
 
 @cup_comparison_bp.route('/cup_comparison/<string:game_id>', methods=['GET'])
 def get_cup_comparison(game_id):
@@ -87,9 +85,7 @@ def get_cup_comparison(game_id):
         "max_lead_a": comparison.max_lead_a,
         "max_lead_b": comparison.max_lead_b,
         "minute_max_lead_a": comparison.minute_max_lead_a,
-        "minute_max_lead_b": comparison.minute_max_lead_b,
-        "points_max_lead_a": comparison.points_max_lead_a,
-        "points_max_lead_b": comparison.points_max_lead_b
+        "minute_max_lead_b": comparison.minute_max_lead_b
     }
     return jsonify(response), 200
 

@@ -181,9 +181,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_COMPARISON.c
     max_lead_a,
     max_lead_b,
     minute_max_lead_a,
-    minute_max_lead_b,
-    points_max_lead_a,
-    points_max_lead_b
+    minute_max_lead_b
 );
 
 -- End of load table for CUP_COMPARISON
@@ -224,9 +222,7 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_COMPARISON.c
     max_lead_a,
     max_lead_b,
     minute_max_lead_a,
-    minute_max_lead_b,
-    points_max_lead_a,
-    points_max_lead_b
+    minute_max_lead_b
 );
 
 -- End of load table for LIG_COMPARISON
