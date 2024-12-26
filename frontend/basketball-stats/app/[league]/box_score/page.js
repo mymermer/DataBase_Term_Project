@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
-// import BoxScoreUserView from "../../../components/BoxScoreUserView";
+import BoxScoreUserView from "../../../components/BoxScoreUserView";
 
 const allColumns = [
   'game_player_id', 'game_id', 'game', 'round_of_game', 'phase', 'season_player_id', 'season_team_id',
@@ -202,7 +202,7 @@ export default function BoxScorePage({ params }) {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <StatPageTemplate league={league} stat="Box Score">
+    <StatPageTemplate league={league} stat="Box Score" UserView={BoxScoreUserView}>
       <div className={styles.PageContent}>
         <h2>
           {league.charAt(0).toUpperCase() + league.slice(1)} Box Score Statistics
