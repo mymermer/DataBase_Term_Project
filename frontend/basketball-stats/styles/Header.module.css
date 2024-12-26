@@ -36,7 +36,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: -12rem; /* Move logo and title further to the left */
+  margin-left: -6rem; /* Move logo and title further to the left */
 }
 
 .logo {
@@ -49,6 +49,10 @@
   letter-spacing: 1.2px; /* Adds elegance */
   color: white;
   margin-left: 10px;
+}
+
+.nav {
+  margin-right: -6rem;
 }
 
 .nav ul {
@@ -109,5 +113,3 @@
   vertical-align: middle;
   font-size: 1.2rem; /* Adjust icon size */
 }
-
-
