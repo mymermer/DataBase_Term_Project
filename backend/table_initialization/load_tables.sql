@@ -583,7 +583,7 @@ UPDATE LIG_PLAYERS
 
 -- End of load table for LIG_PLAYERS
 
-LOAD DATA INFILE "C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/unique_teams_with_logos.csv" INTO TABLE teams FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
+LOAD DATA INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/unique_teams_with_logos.csv" INTO TABLE teams FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     abbreviation,
     full_name,
     logo_url

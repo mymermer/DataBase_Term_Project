@@ -483,6 +483,7 @@ class Cup_TeamsDAO():
 
 
     @staticmethod
+    # this guy is the one responsible for mermer api (remove this comment later when pushing)
     def get_paginated_cup_teams_with_like(
         db: db,
         like_pattern: str,
@@ -554,7 +555,7 @@ class Cup_TeamsDAO():
             connection.close()
 
 
-    @staticmethod
+    @staticmethod # this is for the progress graphs
     def get_paginated_cup_teams_by_abbrs(
         db: db,
         team_abbrs: list,

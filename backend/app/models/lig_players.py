@@ -407,3 +407,39 @@ class Lig_PlayersDAO():
             if connection:
                 connection.close()
 
+    # special to players
+    
+    @staticmethod
+    def get_players_point_percentage_by_season(db, season: str) :
+        try:
+            connection = db.get_connection()
+            # ? why is this a dictionary
+            cursor = connection.cursor(dictionary=True)
+
+            query = f"""
+            SELECT LIG_PLAYERS.points as player_points
+            , LIG_PLAYERS.player as player_name
+            , SUBSTRING_INDEX(LIG_TEAMS.season_team_id, '_', -1) AS team_name
+            , LIG_TEAMS.points as team_points
+            , LIG_PLAYERS.points/LIG_TEAMS.points as point_percentage
+            FROM LIG_PLAYERS
+            JOIN LIG_TEAMS
+            ON LIG_PLAYERS.season_team_id = LIG_TEAMS.season_team_id
+            WHERE LIG_PLAYERS.season_team_id LIKE %s
+            """
+
+            cursor.execute(query, (season + '%',))
+            result = cursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
+
+    
+
+

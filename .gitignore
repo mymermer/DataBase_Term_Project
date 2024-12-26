@@ -3,5 +3,7 @@
 *.venv
 __pycache__
 backend/dataset
+.gitigonre
+backend/table_initialization
 
 backend/app/config.py
