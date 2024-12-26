@@ -1,0 +1,25 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 80px; /* Adjust based on your header height */
+  }
+  
+  .main h1 {
+    color: #000080;
+    margin-bottom: 1rem;
+  }
+  
+  .main p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  
+  

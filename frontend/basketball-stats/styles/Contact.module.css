@@ -1,0 +1,60 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 80px; /* Adjust based on your header height */
+  }
+  
+  .main h1 {
+    color: #000080;
+    margin-bottom: 1rem;
+  }
+  
+  .main p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  
+  .contactInfo {
+    margin-bottom: 2rem;
+  }
+  
+  .contactForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .contactForm input,
+  .contactForm textarea {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .contactForm textarea {
+    min-height: 150px;
+  }
+  
+  .contactForm button {
+    padding: 0.5rem 1rem;
+    background-color: #000080;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .contactForm button:hover {
+    background-color: #0000b3;
+  }
+  
+  
