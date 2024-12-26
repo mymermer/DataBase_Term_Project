@@ -7,6 +7,7 @@ import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import styles from '../styles/TeamsUserView.module.css';
 import LoadingSkeleton from './LoadingSkeleton';
+import ErrorDisplay from './ErrorDisplay';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, ChartTooltip, Legend);
 
@@ -14,6 +15,7 @@ const TeamsUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState('');
   const [teamsData, setTeamsData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [teamInfo, setTeamInfo] = useState({});
   const [performanceData, setPerformanceData] = useState({});
   const [averageValues, setAverageValues] = useState({});
@@ -29,6 +31,7 @@ const TeamsUserView = ({ league }) => {
 
   const fetchTeamsData = async () => {
     setLoading(true);
+    setError(null);
     const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
@@ -37,20 +40,42 @@ const TeamsUserView = ({ league }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setTeamsData(data);
+    
+      // Filter out duplicate team entries
+      const uniqueTeamsData = data.reduce((acc, current) => {
+        const x = acc.find(item => item.season_team_id === current.season_team_id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
 
-      const teamAbbrs = data.map(team => team.season_team_id.split('_')[1]);
+      setTeamsData(uniqueTeamsData.map(team => ({
+        ...team,
+        best_player: formatPlayerName(team.best_player)
+      })));
+
+      const teamAbbrs = uniqueTeamsData.map(team => team.season_team_id.split('_')[1]);
       await fetchTeamInfo(teamAbbrs);
       await fetchPerformanceData(teamAbbrs);
       await fetchAverageValues(selectedSeason);
     } catch (error) {
       console.error('Error fetching teams data:', error);
+      setError('Unable to fetch teams data. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
+  const formatPlayerName = (playerName) => {
+    if (!playerName) return '';
+    const [surname, firstName] = playerName.split(', ');
+    return `${firstName} ${surname}`;
+  };
+
   const fetchTeamInfo = async (abbreviations) => {
+    setError(null);
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/team?abbreviation=${abbreviations.join(',')}`);
       if (!response.ok) {
@@ -69,6 +94,7 @@ const TeamsUserView = ({ league }) => {
       setTeamInfo(teamInfoMap);
     } catch (error) {
       console.error('Error fetching team info:', error);
+      setError('Unable to fetch score attempts. Please try again later.');
     }
   };
 
@@ -170,9 +196,11 @@ const TeamsUserView = ({ league }) => {
     };
 
     return (
-      <div className={styles.spiderChart}>
+      <div className={styles.spiderChartWrapper}>
         <h4>Team Stats vs League Average</h4>
-        <Radar data={data} options={options} />
+        <div className={styles.spiderChart}>
+          <Radar data={data} options={options} />
+        </div>
       </div>
     );
   };
@@ -217,9 +245,11 @@ const TeamsUserView = ({ league }) => {
           </select>
         </div>
         <div className={styles.teamsGrid}>
-          {loading ? (
+          {error ? (
+            <ErrorDisplay message={error} onRetry={fetchTeamsData} />
+          ) : loading ? (
             <LoadingSkeleton rows={5} columns={4} />
-          ) : (
+          ) : teamsData.length > 0 ? (
             teamsData.map((team) => {
               const teamAbbr = team.season_team_id.split('_')[1];
               return (
@@ -257,6 +287,10 @@ const TeamsUserView = ({ league }) => {
                             <span className={styles.statValue}>{team.valuation}</span>
                           </div>
                         </div>
+                        <div className={styles.bestPlayer}>
+                          <span className={styles.bestPlayerLabel}>Best Player:</span>
+                          <span className={styles.bestPlayerName}>{team.best_player}</span>
+                        </div>
                       </div>
                     </div>
                     <div className={styles.charts}>
@@ -267,6 +301,8 @@ const TeamsUserView = ({ league }) => {
                 </div>
               );
             })
+          ) : (
+            <div className={styles.noDataMessage}>No team data available</div>
           )}
         </div>
       </div>

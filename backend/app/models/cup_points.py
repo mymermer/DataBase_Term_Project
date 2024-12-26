@@ -407,15 +407,20 @@ class Cup_PointsDAO():
             like_pattern = f"{like_pattern}%"
 
             # Default columns to return
-            selected_columns = ", ".join(columns) if columns else "game"
+            selected_columns = ", ".join(columns) if columns else "CUP_POINTS.game"
+
+            # Add score columns from CUP_HEADER
+            selected_columns += ", CUP_HEADER.score_a, CUP_HEADER.score_b"
 
             # WHERE clause for the LIKE filter
-            where_clause = "WHERE game_point_id LIKE %s"
+            where_clause = "WHERE CUP_POINTS.game_point_id LIKE %s"
             params = [like_pattern]
 
-            # Query to fetch distinct games
+            # Join CUP_POINTS with CUP_HEADER on game_id
             query = f"""
-                SELECT DISTINCT {selected_columns} FROM CUP_POINTS
+                SELECT DISTINCT {selected_columns} 
+                FROM CUP_POINTS
+                JOIN CUP_HEADER ON CUP_POINTS.game_id = CUP_HEADER.game_id
                 {where_clause}
             """
 
@@ -428,9 +433,12 @@ class Cup_PointsDAO():
 
             # Map fetched rows to dicts or raw values if only one column is selected
             if columns:
-                return [dict(zip(columns, row)) for row in distinct_games]
+                # Include score_a and score_b in the result
+                extended_columns = columns + ["score_a", "score_b"]
+                return [dict(zip(extended_columns, row)) for row in distinct_games]
             else:
-                return [row[0] for row in distinct_games]  # Only return 'game' column
+                # Return 'game' with scores as tuples
+                return [{"game": row[0], "score_a": row[-2], "score_b": row[-1]} for row in distinct_games]
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -438,3 +446,4 @@ class Cup_PointsDAO():
         finally:
             cursor.close()
             connection.close()
+

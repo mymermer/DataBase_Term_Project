@@ -77,3 +77,15 @@
   }
 }
 
+.footerCredits {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px 0;
+  font-size: 0.85rem;
+  color: #666; /* Subtle text color */
+  border-top: 1px solid #ddd; /* Optional: adds a line separating credits */
+}
+
+.footerCredits p {
+  margin: 0;
+}

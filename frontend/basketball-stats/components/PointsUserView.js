@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '../styles/PointsUserView.module.css';
 import LoadingSkeleton from './LoadingSkeleton';
+import ErrorDisplay from './ErrorDisplay';
+
 
 const PointsUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState('');
   const [games, setGames] = useState([]);
-  const [selectedGame, setSelectedGame] = useState('');
+  const [selectedGame, setSelectedGame] = useState(null); 
   const [scoreAttempts, setScoreAttempts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -16,6 +18,8 @@ const PointsUserView = ({ league }) => {
   const [teamInfo, setTeamInfo] = useState({});
   const [showGameDropdown, setShowGameDropdown] = useState(false);
   const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null, team2: null });
+  const [error, setError] = useState(null);
+  
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
@@ -35,7 +39,8 @@ const PointsUserView = ({ league }) => {
 
   const fetchGames = async () => {
     setLoading(true);
-    const yearPrefix = tournament === 'cup' ? 'U' : 'e';
+    setError(null);
+    const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/year_distinct_games?likePattern=${year}`);
@@ -43,11 +48,23 @@ const PointsUserView = ({ league }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setGames(data);
+      
+      // Filter out duplicate game entries
+      const uniqueGames = data.reduce((acc, current) => {
+        const x = acc.find(item => item.game === current.game);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
+      
+      setGames(uniqueGames);
 
-      const allTeams = new Set(data.flatMap(game => game.split('-')));
+      const allTeams = new Set(uniqueGames.map(game => game.game.split('-')).flat());
       await fetchTeamInfo(Array.from(allTeams));
     } catch (error) {
+      setError('Unable to fetch teams data. Please try again later.');
       console.error('Error fetching games:', error);
     } finally {
       setLoading(false);
@@ -56,10 +73,11 @@ const PointsUserView = ({ league }) => {
 
   const fetchScoreAttempts = async () => {
     setLoading(true);
+    setError(null);
     const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/with_year_like?likePattern=${year}%&offset=${offset}&limit=${rowsPerPage}&columns=game_point_id,points,coord_x,coord_y,season_team_id,player,action_of_play,points_a,points_b,game,minute&filters=game:${selectedGame}&sortBy=minute&order=asc`);
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/with_year_like?likePattern=${year}%&offset=${offset}&limit=${rowsPerPage}&columns=game_point_id,points,coord_x,coord_y,season_team_id,player,action_of_play,points_a,points_b,game,minute&filters=game:${selectedGame.game}&sortBy=minute&order=asc`); 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -67,12 +85,14 @@ const PointsUserView = ({ league }) => {
       setScoreAttempts(data);
     } catch (error) {
       console.error('Error fetching score attempts:', error);
+      setError('Unable to fetch teams data. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
   const fetchTeamInfo = async (abbreviations) => {
+    setError(null);
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/v1/team?abbreviation=${abbreviations.join(',')}`);
       if (!response.ok) {
@@ -91,12 +111,13 @@ const PointsUserView = ({ league }) => {
       setTeamInfo(prevTeamInfo => ({...prevTeamInfo, ...teamInfoMap}));
     } catch (error) {
       console.error('Error fetching team info:', error);
+      setError('Unable to fetch teams data. Please try again later.');
     }
   };
 
   const updateCurrentGameTeams = () => {
     if (selectedGame) {
-      const [team1, team2] = selectedGame.split('-');
+      const [team1, team2] = selectedGame.game.split('-'); 
       setCurrentGameTeams({
         team1: teamInfo[team1] || { fullName: team1, logoUrl: '/teams_icons/default_team_icon.png' },
         team2: teamInfo[team2] || { fullName: team2, logoUrl: '/teams_icons/default_team_icon.png' }
@@ -125,38 +146,44 @@ const PointsUserView = ({ league }) => {
 
   const renderGameOptions = () => {
     return games.map(game => {
-      const [team1, team2] = game.split('-');
+      const [team1, team2] = game.game.split('-');
       const fullName1 = teamInfo[team1]?.fullName || team1;
       const fullName2 = teamInfo[team2]?.fullName || team2;
       return (
         <div 
-          key={game} 
-          className={`${styles.gameOption} ${selectedGame === game ? styles.selectedGame : ''}`}
+          key={game.game}
+          className={`${styles.gameOption} ${selectedGame === game ? styles.selectedGameOption : ''}`}
           onClick={() => {
             setSelectedGame(game);
             setShowGameDropdown(false);
           }}
         >
-          <div className={styles.teamInfo}>
-            <Image 
-              src={teamInfo[team1]?.logoUrl || '/teams_icons/default_team_icon.png'} 
-              alt={`${fullName1} logo`} 
-              width={30} 
-              height={30} 
-              className={styles.teamLogo}
-            />
-            <span className={styles.teamName}>{fullName1}</span>
-          </div>
-          <span className={styles.vsText}>vs</span>
-          <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
-            <span className={styles.teamName}>{fullName2}</span>
-            <Image 
-              src={teamInfo[team2]?.logoUrl || '/teams_icons/default_team_icon.png'} 
-              alt={`${fullName2} logo`} 
-              width={30} 
-              height={30} 
-              className={styles.teamLogo}
-            />
+          <div className={styles.gameOptionContent}>
+            <div className={styles.teamInfo}>
+              <Image 
+                src={teamInfo[team1]?.logoUrl || '/teams_icons/default_team_icon.png'} 
+                alt={`${fullName1} logo`} 
+                width={30} 
+                height={30} 
+                className={styles.teamLogo}
+              />
+              <span className={styles.teamName}>{fullName1}</span>
+            </div>
+            <span className={styles.scoreVs}>
+              <span className={styles.score}>{game.score_a}</span>
+              <span className={styles.vsText}>vs</span>
+              <span className={styles.score}>{game.score_b}</span>
+            </span>
+            <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
+              <span className={styles.teamName}>{fullName2}</span>
+              <Image 
+                src={teamInfo[team2]?.logoUrl || '/teams_icons/default_team_icon.png'} 
+                alt={`${fullName2} logo`} 
+                width={30} 
+                height={30} 
+                className={styles.teamLogo}
+              />
+            </div>
           </div>
         </div>
       );
@@ -199,7 +226,11 @@ const PointsUserView = ({ league }) => {
                       />
                       <span className={styles.teamName}>{currentGameTeams.team1?.fullName}</span>
                     </div>
-                    <span className={styles.vsText}>vs</span>
+                    <span className={styles.scoreVs}> 
+                      <span className={styles.score}>{selectedGame.score_a}</span> 
+                      <span className={styles.vsText}>vs</span>
+                      <span className={styles.score}>{selectedGame.score_b}</span> 
+                    </span> 
                     <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
                       <span className={styles.teamName}>{currentGameTeams.team2?.fullName}</span>
                       <Image 
@@ -224,6 +255,7 @@ const PointsUserView = ({ league }) => {
             </div>
           </div>
         </div>
+        {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
         {selectedGame && (
           <>
             {loading ? (

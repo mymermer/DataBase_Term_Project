@@ -175,9 +175,7 @@ CREATE TABLE CUP_COMPARISON(
     max_lead_a INT,
     max_lead_b INT,
     minute_max_lead_a INT,
-    minute_max_lead_b INT,
-    points_max_lead_a VARCHAR(50),
-    points_max_lead_b VARCHAR(50)
+    minute_max_lead_b INT
 );
 
 CREATE TABLE LIG_COMPARISON(
@@ -216,9 +214,7 @@ CREATE TABLE LIG_COMPARISON(
     max_lead_a INT,
     max_lead_b INT,
     minute_max_lead_a INT,
-    minute_max_lead_b INT,
-    points_max_lead_a VARCHAR(50),
-    points_max_lead_b VARCHAR(50)
+    minute_max_lead_b INT
 );
 
 CREATE TABLE CUP_HEADER(
@@ -232,8 +228,6 @@ CREATE TABLE CUP_HEADER(
     season_team_id_b VARCHAR(50),
     score_a INT,
     score_b INT,
-    team_a VARCHAR(50),
-    team_b VARCHAR(50),
     coach_a VARCHAR(50),
     coach_b VARCHAR(50),
     game_time VARCHAR(50),

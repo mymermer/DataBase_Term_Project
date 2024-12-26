@@ -6,6 +6,7 @@ import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
 import PointsUserView from "../../../components/PointsUserView";
 
+
 const allColumns = [
   "game_point_id",
   "game_player_id",
@@ -36,6 +37,30 @@ const foreignKeyColumns = [
   "game_player_id",
   "season_player_id",
 ];
+
+const primaryKey = 'game_point_id';
+const columnTypes = {
+  game_point_id: 'string',
+  game_player_id: 'string',
+  game_play_id: 'string',
+  game_id: 'string',
+  game: 'string',
+  round_of_game: 'integer',
+  phase: 'string',
+  season_player_id: 'string',
+  season_team_id: 'string',
+  player: 'string',
+  action_id: 'integer',
+  action_of_play: 'string',
+  points: 'integer',
+  coord_x: 'float',
+  coord_y: 'float',
+  zone_of_play: 'string',
+  minute: 'integer',
+  points_a: 'integer',
+  points_b: 'integer',
+  date_time_stp: 'date'
+};
 
 export default function PointsPage({ params }) {
   const { league } = React.use(params);
@@ -69,6 +94,7 @@ export default function PointsPage({ params }) {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const offset = currentPage * rowsPerPage;
     const columnsParam = selectedColumns.join(",");
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_points?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
@@ -108,7 +134,6 @@ export default function PointsPage({ params }) {
       setTotalRows(countResult.total);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
       setError(error.message);
       setLoading(false);
     }
@@ -142,6 +167,7 @@ export default function PointsPage({ params }) {
   };
 
   const handleAdd = async (newRowData) => {
+    setError(null)
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_points`,
@@ -162,11 +188,13 @@ export default function PointsPage({ params }) {
       return true;
     } catch (error) {
       console.error("Error adding new row:", error);
+      setError(error.message);
       throw error;
     }
   };
 
   const handleDelete = async (gamePointId) => {
+    setError(null)
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`,
@@ -183,11 +211,13 @@ export default function PointsPage({ params }) {
       return true;
     } catch (error) {
       console.error("Error deleting row:", error);
+      setError(error.message);
       throw error;
     }
   };
 
   const handleUpdate = async (gamePointId, column, value) => {
+    setError(null)
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_points/${gamePointId}`,
@@ -208,11 +238,12 @@ export default function PointsPage({ params }) {
       return true;
     } catch (error) {
       console.error("Error updating row:", error);
+      setError(error.message);
+
       throw error;
     }
   };
 
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <StatPageTemplate league={league} stat="Points" UserView={PointsUserView}>
@@ -240,9 +271,15 @@ export default function PointsPage({ params }) {
             onDelete={handleDelete}
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
+            league={league}
+            onFetchData={fetchData}
+            error={error}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>
     </StatPageTemplate>
   );
 }
+

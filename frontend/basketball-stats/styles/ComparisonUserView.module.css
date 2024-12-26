@@ -1,0 +1,450 @@
+.containerWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(65vh); /* Assuming a 60px header */
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.initialView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.initialView h2 {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.selectors {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.selectWrapper,
+.customSelect {
+  position: relative;
+  width: 100%;
+}
+
+/* Select inputs */
+.selectWrapper select,
+.selectedGame {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  appearance: none;
+  background-color: white;
+  transition: all 0.3s ease;
+  height: 60px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.selectWrapper select:focus,
+.selectedGame:focus {
+  outline: none;
+  border-color: #000080;
+}
+
+.selectWrapper select:hover,
+.selectedGame:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 128, 0.2);
+  transform: translateY(-2px);
+}
+
+.selectWrapper select:active,
+.selectedGame:active {
+  transform: translateY(1px);
+}
+
+.selectLabel {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  background-color: white;
+  padding: 0 5px;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.selectWrapper select.filled + .selectLabel,
+.selectWrapper select:focus + .selectLabel,
+.customSelect .selectedGame.filled + .selectLabel,
+.customSelect:focus-within .selectLabel {
+  top: -10px;
+  font-size: 12px;
+  color: #000080;
+}
+
+/* Disabled dropdown styling */
+.disabledGame {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f5f5f5;
+  color: #999;
+  border-color: #ccc !important;
+}
+
+/* Dropdown for games */
+.customSelect {
+  position: relative;
+  width: 100%;
+}
+
+.selectedGame {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  min-height: 60px;
+  height: auto;
+  overflow: hidden; /* Prevent any child from overflowing */
+}
+
+.selectedGame.filled {
+  border-color: #000080;
+}
+
+.selectedGame .teamInfo:last-child {
+  justify-content: flex-end;
+}
+
+.teamInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(50% - 30px);
+}
+
+.gameDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10;
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.gameOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.gameOption:hover {
+  background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.gameOption:active {
+  transform: translateX(2px);
+}
+
+.gameOption.selectedGame {
+  background-color: #e6e6fa;
+}
+
+/* Text and images inside game dropdown */
+.vsText {
+  margin: 0 auto; /* Centers the text */
+  font-weight: bold;
+  font-size: 1rem; /* Adjust font size as needed */
+  display: flex;
+  align-items: center; /* Aligns "vs" with the logos and names */
+}
+
+.teamLogo {
+  object-fit: contain;
+  height: 30px;
+  width: auto;
+}
+
+.teamLogo[src*="default_team_icon.png"] {
+  filter: grayscale(100%) brightness(1);
+}
+
+.teamName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rightTeam {
+  justify-content: flex-end;
+}
+
+/* Fade-in animation for dropdown */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .selectors {
+    flex-direction: column;
+  }
+
+  .selectWrapper,
+  .customSelect {
+    width: 100%;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.initialView h2 {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.customSelect {
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+}
+
+/* Styles for the Comparison View */
+.comparisonView {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Header for Game Details */
+.comparisonView h3 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid #000080;
+  padding-bottom: 10px;
+}
+
+.comparisonView .gameInfo {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comparisonView .gameInfo p {
+  font-size: 1rem;
+  color: #555;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.comparisonView .gameInfo strong {
+  font-weight: bold;
+  color: #000080;
+}
+
+/* Comparison Table */
+.comparisonTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.comparisonTable th {
+  background-color: #000080;
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.comparisonTable tbody tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+
+.comparisonTable tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.comparisonTable td {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.comparisonTable tr:hover {
+  background-color: #e6e6fa;
+  cursor: default;
+}
+
+/* Highlight headers for Team Names */
+.comparisonTable th:first-child {
+  text-align: left;
+}
+
+.comparisonTable td:first-child {
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+  .comparisonView {
+    padding: 15px;
+  }
+
+  .comparisonView h3 {
+    font-size: 1.5rem;
+  }
+
+  .comparisonTable th,
+  .comparisonTable td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+}
+
+.gameInfo h3 {
+  font-size: 1.8rem;
+  color: #000080; /* Dark blue */
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.detailsRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 120px; /* Add spacing between ROUND and PHASE */
+  margin-top: 10px;
+}
+
+.detail {
+  font-size: 1.6rem; /* Bigger font for details */
+  color: #000080; /* Dark blue */
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.comparisonView .detailsRow .detail {
+  font-size: 1.3rem; /* Larger font size */
+  color: #000080; /* Dark blue */
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase; /* Optional: Uppercase text */
+}
+
+.selectedGame .teamName {
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Add dots when text overflows */
+  max-width: calc(
+    100%
+  ); /* Adjust width dynamically to prevent overflow over 'vs' */
+  display: inline-block; /* Ensure ellipsis works */
+  text-align: left; /* Optional: Align text neatly */
+}
+
+.comparisonTable th {
+  width: 33%; /* Or any value that ensures equal distribution */
+  text-align: center; /* Keeps text and logos aligned */
+}
+
+.categoryHeader {
+  font-weight: bold;
+  text-align: left; /* Align to the left for a cleaner, modern look */
+  background-color: #000000; /* Black background for contrast */
+  color: #ffffff !important; /* White font for better readability */
+  padding: 12px 15px; /* Consistent padding for a balanced look */
+  font-size: 1.15rem !important; /* Slightly larger font for emphasis */
+  letter-spacing: 0.5px; /* Add slight spacing for a refined appearance */
+  border-bottom: 2px solid #ddd; /* A subtle bottom border to separate the header */
+  text-transform: capitalize; /* Make the category names appear elegant */
+  border-radius: 5px; /* Soft rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  margin-top: 15px; /* Add space above each category */
+}
+
+.chartContainer {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.chartContainer h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}

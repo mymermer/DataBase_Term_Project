@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/DataTable.module.css';
 import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingOverlay from './LoadingOverlay';
+import ErrorDisplay from './ErrorDisplay';
+import DateTimeInput from './DateTimeInput';
 
 const DataTable = ({ 
   initialData, 
@@ -23,7 +25,12 @@ const DataTable = ({
   onAdd,
   onDelete,
   onUpdate,
-  foreignKeyColumns
+  foreignKeyColumns,
+  league,
+  onFetchData,
+  error,
+  primaryKey,
+  columnTypes
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
@@ -148,6 +155,51 @@ const DataTable = ({
     setUpdateId('');
     setUpdateColumn('');
     setUpdateValue('');
+    setMessage(null); //Added to clear message on close
+  };
+
+  const handleDelete = async () => {
+    try {
+      await onDelete(deleteId);
+      setMessage({ type: 'success', text: 'Row deleted successfully' });
+      handlePopupClose();
+      onFetchData();
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      let formattedUpdateValue = updateValue;
+      if (columnTypes[updateColumn] === 'date') {
+        formattedUpdateValue = formatDateInput(updateValue);
+      }
+      await onUpdate(updateId, updateColumn, formattedUpdateValue);
+      setMessage({ type: 'success', text: 'Row updated successfully' });
+      handlePopupClose();
+      onFetchData();
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    }
+  };
+
+  const validateInput = (value, type) => {
+    switch (type) {
+      case 'integer':
+        return Number.isInteger(Number(value));
+      case 'float':
+        return !isNaN(parseFloat(value)) && isFinite(value);
+      case 'date':
+        const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
+        return dateRegex.test(value);
+      default:
+        return true;
+    }
+  };
+
+  const formatDateInput = (value) => {
+    return value; // The DatePicker now returns the correct format
   };
 
   const handleApply = async () => {
@@ -155,17 +207,29 @@ const DataTable = ({
       let result;
       switch (popupType) {
         case 'add':
+          for (const [column, value] of Object.entries(newRowData)) {
+            if (!validateInput(value, columnTypes[column])) {
+              throw new Error(`Invalid input for ${column}`);
+            }
+            if (columnTypes[column] === 'date') {
+              newRowData[column] = formatDateInput(value);
+            }
+          }
           result = await onAdd(newRowData);
           break;
         case 'delete':
-          result = await onDelete(deleteId);
+          result = await handleDelete();
           break;
         case 'update':
-          result = await onUpdate(updateId, updateColumn, updateValue);
+          if (!validateInput(updateValue, columnTypes[updateColumn])) {
+            throw new Error(`Invalid input for ${updateColumn}`);
+          }
+          result = await handleUpdate();
           break;
       }
       setMessage({ type: 'success', text: 'Operation successful' });
       handlePopupClose();
+      onFetchData();
     } catch (error) {
       setMessage({ type: 'error', text: error.message });
     }
@@ -184,6 +248,32 @@ const DataTable = ({
       window.removeEventListener('keydown', handleEsc);
     };
   }, []);
+
+  const fetchData = async () => { 
+
+    try {
+
+      setError(null);
+
+      setIsLoading(true);
+
+      await onFetchData();
+
+    } catch (err) {
+
+      setError("Unable to fetch data. Please try again later.");
+
+    } finally {
+
+      setIsLoading(false);
+
+    }
+
+  };
+
+
+
+
 
   return (
     <div className={styles.fullWidthWrapper}>
@@ -346,6 +436,7 @@ const DataTable = ({
             </tbody>
           </table>
         </div>
+        {error && <ErrorDisplay message={error} onRetry={onFetchData} />}
         <div className={styles.pagination}>
           <div className={styles.bottomButtons}>
             <button 
@@ -378,7 +469,7 @@ const DataTable = ({
       </div>
       {showPopup && (
         <div className={styles.popupOverlay} onClick={handlePopupClose}>
-          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.popup} onClick={(e) => e.stopPropagation()} style={{ overflow: 'visible' }}>
             <button className={styles.closeButton} onClick={handlePopupClose}>
               <X size={24} />
             </button>
@@ -392,12 +483,34 @@ const DataTable = ({
                   {allColumns.map(column => (
                     <div key={column} className={styles.formGroup}>
                       <label htmlFor={column}>{column}</label>
-                      <input
-                        type="text"
-                        id={column}
-                        value={newRowData[column] || ''}
-                        onChange={(e) => setNewRowData({...newRowData, [column]: e.target.value})}
-                      />
+                      {columnTypes[column] === 'date' ? (
+                        <DateTimeInput
+                          value={newRowData[column] || ''}
+                          onChange={(value) => {
+                            if (validateInput(value, columnTypes[column])) {
+                              setNewRowData({...newRowData, [column]: value});
+                            }
+                          }}
+                          placeholder="MM/DD/YYYY HH:MM"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          id={column}
+                          value={newRowData[column] || ''}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (validateInput(value, columnTypes[column])) {
+                              setNewRowData({...newRowData, [column]: value});
+                              e.target.classList.remove(styles.invalidInput);
+                            } else {
+                              e.target.classList.add(styles.invalidInput);
+                            }
+                          }}
+                          placeholder={`Enter ${columnTypes[column]}`}
+                          className={styles.input}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -405,12 +518,14 @@ const DataTable = ({
               {popupType === 'delete' && (
                 <div className={styles.deleteForm}>
                   <div className={styles.formGroup}>
-                    <label htmlFor="deleteId">game_point_id</label>
+                    <label htmlFor="deleteId">{primaryKey}</label>
                     <input
                       type="text"
                       id="deleteId"
                       value={deleteId}
                       onChange={(e) => setDeleteId(e.target.value)}
+                      placeholder={`Enter ${primaryKey}`}
+                      className={styles.input}
                     />
                   </div>
                 </div>
@@ -418,12 +533,14 @@ const DataTable = ({
               {popupType === 'update' && (
                 <div className={styles.updateForm}>
                   <div className={styles.formGroup}>
-                    <label htmlFor="updateId">game_point_id</label>
+                    <label htmlFor="updateId">{primaryKey}</label>
                     <input
                       type="text"
                       id="updateId"
                       value={updateId}
                       onChange={(e) => setUpdateId(e.target.value)}
+                      placeholder={`Enter ${primaryKey}`}
+                      className={styles.input}
                     />
                   </div>
                   <div className={styles.formGroup}>
@@ -432,6 +549,7 @@ const DataTable = ({
                       id="updateColumn"
                       value={updateColumn}
                       onChange={(e) => setUpdateColumn(e.target.value)}
+                      className={styles.input}
                     >
                       <option value="">Select a column</option>
                       {allColumns.map(column => (
@@ -441,12 +559,35 @@ const DataTable = ({
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="updateValue">New Value</label>
-                    <input
-                      type="text"
-                      id="updateValue"
-                      value={updateValue}
-                      onChange={(e) => setUpdateValue(e.target.value)}
-                    />
+                    {updateColumn && columnTypes[updateColumn] === 'date' ? (
+                      <DateTimeInput
+                        value={updateValue}
+                        onChange={(value) => {
+                          if (validateInput(value, columnTypes[updateColumn])) {
+                            setUpdateValue(value);
+                          }
+                        }}
+                        placeholder="MM/DD/YYYY HH:MM"
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        id="updateValue"
+                        value={updateValue}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (validateInput(value, columnTypes[updateColumn])) {
+                            setUpdateValue(value);
+                            e.target.classList.remove(styles.invalidInput);
+                          } else {
+                            e.target.classList.add(styles.invalidInput);
+                          }
+                        }}
+                        placeholder={updateColumn ? `Enter ${columnTypes[updateColumn]}` : 'Select a column first'}
+                        className={styles.input}
+                        disabled={!updateColumn}
+                      />
+                    )}
                   </div>
                 </div>
               )}

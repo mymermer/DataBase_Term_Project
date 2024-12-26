@@ -485,64 +485,48 @@ class Lig_TeamsDAO():
     def get_paginated_lig_teams_with_like(
         db: db,
         like_pattern: str,
-        offset: int = 0,
-        limit: int = 25,
-        columns: list = None,
-        filters: dict = None,
-        sort_by: str = None,
-        order: str = 'asc'
     ) -> list:
-        
         try:
             connection = db.get_connection()
 
             # Add `%` wildcard to the LIKE pattern
             like_pattern = f"{like_pattern}%"
 
-            # Build the SELECT part of the query
-            selected_columns = ", ".join(columns) if columns else "*"
-
-            # Build the WHERE clause dynamically based on filters
-            where_clauses = [f"season_team_id LIKE %s"]
             params = [like_pattern]
 
-            if filters:
-                for column, value in filters.items():
-                    where_clauses.append(f"{column} = %s")
-                    params.append(value)
-
-            where_clause = f"WHERE {' AND '.join(where_clauses)}"
-
-            # Add ORDER BY clause
-            order_clause = ""
-            if sort_by:
-                if order.lower() not in ['asc', 'desc']:
-                    order = 'asc'  # Default to ascending
-                order_clause = f"ORDER BY {sort_by} {order.upper()}"
 
             # Final query with LIMIT and OFFSET
             query = f"""
-                SELECT {selected_columns} FROM LIG_TEAMS
-                {where_clause}
-                {order_clause}
-                LIMIT %s OFFSET %s
+                SELECT 
+                        ct.*,  -- Select all columns from LIG_TEAMS
+                        cp.season_player_id AS best_player_id, 
+                        cp.player AS best_player, 
+                        cp.points AS best_player_valuation
+                    FROM 
+                        LIG_TEAMS ct
+                    LEFT JOIN 
+                        LIG_PLAYERS cp 
+                    ON 
+                        ct.season_team_id = cp.season_team_id
+                    WHERE 
+                        ct.season_team_id LIKE %s
+                        AND cp.points = (
+                            SELECT MAX(inner_cp.points)
+                            FROM LIG_PLAYERS inner_cp
+                            WHERE inner_cp.season_team_id = cp.season_team_id
+                        )
+                    ORDER BY 
+                        ct.valuation DESC
             """
-            
-            # Append limit and offset to the params
-            params.extend([limit, offset])
-            
-            cursor = connection.cursor()
-            cursor.execute(query, params)
-            teams = cursor.fetchall()
 
-            if teams is None:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, params)
+            teams_with_best_players = cursor.fetchall()
+
+            if teams_with_best_players is None:
                 return None
 
-            # Map fetched rows to Lig_Teams objects or dicts
-            if columns:
-                return [dict(zip(columns, team)) for team in teams]
-            else:
-                return [Lig_Teams(*team) for team in teams]
+            return teams_with_best_players
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")
