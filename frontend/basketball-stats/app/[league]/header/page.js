@@ -17,8 +17,6 @@ const allColumns = [
   "season_team_id_b",
   "score_a",
   "score_b",
-  "team_a",
-  "team_b",
   "coach_a",
   "coach_b",
   "game_time",

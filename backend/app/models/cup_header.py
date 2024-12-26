@@ -13,8 +13,6 @@ from typing import Optional
 # season_team_id_b VARCHAR(50),
 # score_a INT,
 # score_b INT,
-# team_a VARCHAR(50),
-# team_b VARCHAR(50),
 # coach_a VARCHAR(50),
 # coach_b VARCHAR(50),
 # game_time TIME,
@@ -57,8 +55,6 @@ class Cup_Header:
     season_team_id_b: Optional[str] = None
     score_a: Optional[int] = None
     score_b: Optional[int] = None
-    team_a: Optional[str] = None
-    team_b: Optional[str] = None
     coach_a: Optional[str] = None
     coach_b: Optional[str] = None
     game_time: Optional[str] = None
@@ -201,10 +197,6 @@ class Cup_HeaderDAO():
                 fields_to_update['score_a'] = header.score_a
             if header.score_b is not None:
                 fields_to_update['score_b'] = header.score_b
-            if header.team_a is not None:
-                fields_to_update['team_a'] = header.team_a
-            if header.team_b is not None:
-                fields_to_update['team_b'] = header.team_b
             if header.coach_a is not None:
                 fields_to_update['coach_a'] = header.coach_a
             if header.coach_b is not None:

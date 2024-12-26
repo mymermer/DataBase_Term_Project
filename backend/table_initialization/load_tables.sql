@@ -238,8 +238,6 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' 
     season_team_id_b,
     score_a,
     score_b,
-    team_a,
-    team_b,
     coach_a,
     coach_b,
     game_time,
@@ -270,17 +268,6 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/CUP_HEADER.csv' 
     @score_extra_time_4_b,
     winner
 );
-
-UPDATE CUP_HEADER
-    SET
-        score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
-        score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
-        score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
-        score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
-        score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
-        score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
-        score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
-        score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
 
 -- End of load table for CUP_HEADER
 
@@ -295,8 +282,6 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' 
     season_team_id_b,
     score_a,
     score_b,
-    team_a,
-    team_b,
     coach_a,
     coach_b,
     game_time,
@@ -327,17 +312,6 @@ LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/LIG_HEADER.csv' 
     @score_extra_time_4_b,
     winner
 );
-
-UPDATE LIG_HEADER
-    SET
-        score_extra_time_1_a = NULLIF(@score_extra_time_1_a, ''),
-        score_extra_time_2_a = NULLIF(@score_extra_time_2_a, ''),
-        score_extra_time_3_a = NULLIF(@score_extra_time_3_a, ''),
-        score_extra_time_4_a = NULLIF(@score_extra_time_4_a, ''),
-        score_extra_time_1_b = NULLIF(@score_extra_time_1_b, ''),
-        score_extra_time_2_b = NULLIF(@score_extra_time_2_b, ''),
-        score_extra_time_3_b = NULLIF(@score_extra_time_3_b, ''),
-        score_extra_time_4_b = NULLIF(@score_extra_time_4_b, '');
 
 -- End of load table for LIG_HEADER
 
