@@ -35,6 +35,28 @@ const foreignKeyColumns = [
   "game_point_id",
 ];
 
+const primaryKey = "game_play_id";
+const columnTypes = {
+  game_play_id: "string",
+  game_player_id: "string",
+  game_point_id: "string",
+  game_id: "string",
+  game: "string",
+  round_of_game: "integer",
+  phase: "string",
+  season_player_id: "string",
+  season_team_id: "string",
+  quarter: "integer",
+  play_type: "string",
+  player: "string",
+  team: "string",
+  dorsal: "integer",
+  minute: "integer",
+  points_a: "integer",
+  points_b: "integer",
+  play_info: "string",
+};
+
 export default function PlayByPlayPage({ params }) {
   const { league } = React.use(params);
 
@@ -237,7 +259,11 @@ export default function PlayByPlayPage({ params }) {
             onAdd={handleAdd}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
+            league={league}
+            onFetchData={fetchData}
             foreignKeyColumns={foreignKeyColumns}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>

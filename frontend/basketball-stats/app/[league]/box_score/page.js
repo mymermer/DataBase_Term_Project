@@ -23,6 +23,39 @@ const foreignKeyColumns = [
   "season_team_id",
 ];
 
+const primaryKey = "game_player_id";
+const columnTypes = {
+  game_player_id: 'string',
+  game_id: 'string',
+  game: 'string',
+  round_of_game: 'integer',
+  phase: 'string',
+  season_player_id: 'string',
+  season_team_id: 'string',
+  is_starter: 'boolean',
+  is_playing: 'boolean',
+  dorsal: 'integer',
+  player: 'string',
+  points: 'integer',
+  two_points_made: 'integer',
+  two_points_attempted: 'integer',
+  three_points_made: 'integer',
+  three_points_attempted: 'integer',
+  free_throws_made: 'integer',
+  free_throws_attempted: 'integer',
+  offensive_rebounds: 'integer',
+  defensive_rebounds: 'integer',
+  total_rebounds: 'integer',
+  assists: 'integer',
+  steals: 'integer',
+  turnovers: 'integer',
+  blocks_favour: 'integer',
+  blocks_against: 'integer',
+  fouls_committed: 'integer',
+  fouls_received: 'integer',
+  valuation: 'integer'
+};
+
 
 export default function BoxScorePage({ params }) {
   const { league } = React.use(params);
@@ -226,7 +259,10 @@ export default function BoxScorePage({ params }) {
             onAdd={handleAdd}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
+            onFetchData={fetchData}
             foreignKeyColumns={foreignKeyColumns}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>
