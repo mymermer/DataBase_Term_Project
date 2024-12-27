@@ -408,6 +408,56 @@ class Lig_PlayersDAO():
                 connection.close()
 
     # special to players
+
+#    @staticmethod
+    @staticmethod
+    def get_distinct_teams_by_year(
+        db: db,
+        year: str
+    ) -> list:
+        """
+        Fetch distinct team identifiers (e.g., 'PAM') from the LIG_PLAYERS table
+        where the season_team_id starts with the given year.
+
+        Args:
+            db: Database connection object.
+            year: The year to filter season_team_id, prefixed with 'E' (e.g., 'E2007').
+
+        Returns:
+            A list of distinct team identifiers (e.g., ['PAM', 'XYZ']).
+        """
+        try:
+            connection = db.get_connection()
+
+            # LIKE pattern to match the year at the start of season_team_id
+            like_pattern = f"{year}_%"
+
+            # Query to select distinct teams
+            query = """
+                SELECT DISTINCT 
+                    SUBSTRING_INDEX(season_team_id, '_', -1) AS team_identifier
+                FROM LIG_PLAYERS
+                WHERE season_team_id LIKE %s
+            """
+
+            cursor = connection.cursor()
+            cursor.execute(query, (like_pattern,))
+            distinct_teams = cursor.fetchall()
+
+            # Return the distinct teams as a flat list
+            return [row[0] for row in distinct_teams]
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+
     
     @staticmethod
     def get_players_point_percentage_by_season(db, season: str) :
@@ -440,6 +490,52 @@ class Lig_PlayersDAO():
             if 'connection' in locals() and connection:
                 connection.close()
 
-    
+    @staticmethod
+    def get_players_point_percentage_by_team_and_season(db, season: str, team: str):
+        """
+        Fetch player point percentages for a specific team in a selected season.
+
+        Args:
+            db: Database connection object.
+            season: The season to filter by (e.g., '2023').
+            team: The specific team to filter by (e.g., 'PAM').
+
+        Returns:
+            A list of dictionaries containing player points, player name, team name,
+            team points, and the player's point percentage of the team.
+        """
+        try:
+            connection = db.get_connection()
+            cursor = connection.cursor(dictionary=True)
+
+            query = f"""
+            SELECT 
+                LIG_PLAYERS.points AS player_points,
+                LIG_PLAYERS.player AS player_name,
+                SUBSTRING_INDEX(LIG_TEAMS.season_team_id, '_', -1) AS team_name,
+                LIG_TEAMS.points AS team_points,
+                LIG_PLAYERS.points / LIG_TEAMS.points AS point_percentage
+            FROM 
+                LIG_PLAYERS
+            JOIN 
+                LIG_TEAMS
+            ON 
+                LIG_PLAYERS.season_team_id = LIG_TEAMS.season_team_id
+            WHERE 
+                LIG_PLAYERS.season_team_id LIKE %s
+                AND SUBSTRING_INDEX(LIG_TEAMS.season_team_id, '_', -1) = %s
+            """
+
+            cursor.execute(query, (season + '%', team))
+            result = cursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
 
 
