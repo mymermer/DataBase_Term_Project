@@ -107,7 +107,7 @@ const ComparisonUserView = ({ league }) => {
 
     return (
       <div key={`chart-${category}`} className={styles.chartContainer}>
-        <h4>{category} Stats Chart</h4>
+        <h4 className={styles.chartHeader}>{category} STATS CHART</h4>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={chartData}

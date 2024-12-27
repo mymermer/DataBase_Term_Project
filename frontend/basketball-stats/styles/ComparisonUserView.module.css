@@ -429,6 +429,7 @@
   border-radius: 5px; /* Soft rounded corners */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   margin-top: 15px; /* Add space above each category */
+  text-decoration: underline;
 }
 
 .chartContainer {
@@ -438,6 +439,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  padding-right: 40px;
 }
 
 .chartContainer h4 {
@@ -445,4 +447,8 @@
   color: #333;
   margin-bottom: 10px;
   text-align: center;
+}
+
+.chartHeader {
+  text-decoration: underline;
 }
