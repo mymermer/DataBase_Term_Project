@@ -1,0 +1,503 @@
+/******************************
+  Container & Layout
+*******************************/
+.containerWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    background: #f9f9fc; /* Subtle background color */
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem; /* Increased padding for more spacious layout */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/******************************
+  Initial View & Headings
+*******************************/
+.initialView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem; /* Increased gap for better spacing */
+    margin-bottom: 1.5rem; /* Increased margin for better separation */
+}
+
+.initialView h2 {
+    font-size: 2rem; /* Increased font size for better visibility */
+    color: #333;
+    text-align: center;
+    font-weight: 600;
+}
+
+/******************************
+  Selectors (Season / Game)
+*******************************/
+.selectors {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 30px; /* Increased bottom margin for spacing */
+    max-width: 1000px; /* Increased max-width to accommodate larger buttons */
+}
+
+.selectWrapper,
+.customSelect {
+    position: relative;
+    width: 100%;
+    max-width: 500px; /* Increased max-width for larger buttons */
+    flex: 1 1 300px; /* Flex properties for responsiveness */
+    margin: 0 10px; /* Horizontal margin for spacing */
+}
+
+/* Shared styles for <select> and .selectedGame */
+.selectWrapper select,
+.selectedGame {
+    width: 100%;
+    height: 70px; /* Increased height for larger buttons */
+    padding: 18px 20px; /* Increased padding for better clickable area */
+    font-size: 20px; /* Increased font size for readability */
+    border: 1px solid #ccc;
+    border-radius: 6px; /* Slightly more rounded corners */
+    appearance: none;
+    background-color: white;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.selectWrapper select:focus,
+.selectedGame:focus {
+    outline: none;
+    border-color: #000080; /* Darker border on focus */
+}
+
+.selectWrapper select:hover,
+.selectedGame:hover {
+    box-shadow: 0 0 10px rgba(0, 128, 192, 0.3); /* Enhanced shadow on hover */
+    transform: translateY(-2px); /* Slight upward movement on hover */
+}
+
+.selectWrapper select:active,
+.selectedGame:active {
+    transform: translateY(1px); /* Slight downward movement on active */
+}
+
+/* Floating Labels */
+.selectLabel {
+    position: absolute;
+    top: -18px; /* Adjusted position for larger inputs */
+    left: 20px;
+    background-color: white;
+    padding: 0 5px;
+    font-size: 16px; /* Increased font size for better readability */
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+/* When select has value or is focused, keep label “floating” */
+.selectWrapper select.filled + .selectLabel,
+.selectWrapper select:focus + .selectLabel,
+.customSelect .selectedGame.filled + .selectLabel {
+    top: -18px;
+    font-size: 16px;
+    color: #000080;
+}
+
+/******************************
+  Game Dropdown
+*******************************/
+.customSelect {
+    position: relative;
+}
+
+.selectedGame {
+    justify-content: space-between;
+    min-height: 70px; /* Match height of select elements */
+    padding-right: 50px; /* Space for dropdown arrow */
+}
+
+.gameDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 400px; /* Increased max-height for more options */
+    overflow-y: auto;
+    z-index: 10;
+    width: 100%;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.gameOption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px; /* Increased padding */
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s, transform 0.2s ease;
+    font-size: 18px; /* Increased font size */
+}
+
+.gameOption:hover {
+    background-color: #f3f9ff;
+    transform: translateX(5px);
+}
+
+.gameOption:active {
+    transform: translateX(2px);
+}
+
+.gameOption.selectedGame {
+    background-color: #e6f2ff;
+}
+
+.vsText {
+    margin: 0 auto;
+    font-weight: bold;
+    font-size: 1.2rem; /* Increased font size */
+}
+
+/******************************
+  Team Info / Logos
+*******************************/
+.teamInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Increased gap for better spacing */
+    overflow: hidden;
+    max-width: 160px; /* Ensures longer team names fit better */
+}
+
+.rightTeam {
+    justify-content: flex-end;
+}
+
+.teamLogo {
+    width: 40px; /* Increased size for better visibility */
+    height: auto;
+    object-fit: contain;
+}
+
+.teamLogo[src*="default_team_icon.png"] {
+    filter: grayscale(100%) brightness(1);
+}
+
+.teamName {
+    max-width: 140px; /* Increased max-width */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 16px; /* Increased font size */
+}
+
+/******************************
+  Box Score Details
+*******************************/
+.boxScoreDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Increased gap */
+    margin: 1.5rem auto 3rem; /* Increased margins */
+    max-width: 1000px; /* Increased max-width */
+    width: 100%;
+    background-color: #fff;
+    padding: 2rem; /* Increased padding for spacious layout */
+    border-radius: 8px; /* More rounded corners */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.playerStatsRow {
+    display: flex;
+    flex-direction: column;
+    background: #fdfdfd;
+    padding: 1rem 1.5rem; /* Increased padding */
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.playerStatsRow:hover {
+    background-color: #f1f9ff;
+}
+
+.playerName {
+    font-size: 1.4rem; /* Increased font size */
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.playerName span {
+    font-size: 1rem; /* Increased font size */
+    font-weight: normal;
+    color: #555;
+    margin-left: 0.5rem;
+}
+
+/* Enhanced Statistics Section */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid columns */
+    gap: 0.5rem 1.5rem; /* Consistent gaps */
+    font-size: 1rem; /* Base font size */
+    color: #444;
+    margin-top: 0.5rem; /* Increased margin for better spacing */
+}
+
+.statItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee; /* Light divider */
+    position: relative;
+}
+
+.statItem:last-child {
+    border-bottom: none; /* Remove border for the last item */
+}
+
+.statLabel {
+    font-weight: 500;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.statValue {
+    font-weight: 600;
+    color: #333;
+    background-color: #e6f2ff; /* Light blue background for values */
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.statValue:hover {
+    background-color: #d0e7ff; /* Slightly darker on hover */
+}
+
+/* Optional: Adding Icons to Stat Labels */
+.statLabel::before {
+    content: ''; /* Placeholder for icon */
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* Example Icons )
+.statItem.points .statLabel::before {
+    background-image: url('icons/points.svg');
+}
+
+.statItem.rebounds .statLabel::before {
+    background-image: url('icons/rebounds.svg');
+}
+
+.statItem.assists .statLabel::before {
+    background-image: url('icons/assists.svg');
+}
+
+.statItem.steals .statLabel::before {
+    background-image: url('icons/steals.svg');
+}
+
+.statItem.blocks .statLabel::before {
+    background-image: url('icons/blocks.svg');
+}
+*/
+/******************************
+  Pagination Controls
+*******************************/
+.paginationControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem; /* Increased top margin */
+}
+
+.paginationControls button {
+    padding: 12px 22px; /* Increased padding */
+    background-color: #0080c0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem; /* Increased font size */
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.paginationControls button:hover:not(:disabled) {
+    background-color: #0070ac;
+    transform: translateY(-2px);
+}
+
+.paginationControls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.paginationControls select {
+    padding: 10px 14px; /* Increased padding */
+    border: 1px solid #0080c0;
+    border-radius: 6px;
+    color: #0080c0;
+    font-size: 1rem; /* Increased font size */
+}
+
+/******************************
+  Utility / Animations
+*******************************/
+.fadeIn {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+    background-color: #f0f0f0;
+}
+
+/******************************
+  Responsive Adjustments
+*******************************/
+@media (max-width: 1024px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    .selectors {
+        max-width: 900px;
+    }
+
+    .boxScoreDetails {
+        max-width: 900px;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .selectors {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px; /* Adjusted gap for smaller screens */
+        margin-bottom: 25px;
+    }
+
+    .selectWrapper,
+    .customSelect {
+        max-width: 100%;
+        flex: 1 1 100%;
+        margin: 0; /* Remove horizontal margins */
+    }
+
+    .playerStatsRow {
+        padding: 1.2rem 1.5rem; /* Adjusted padding */
+    }
+
+    .stats {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjusted for smaller screens */
+        font-size: 1rem; /* Maintained font size */
+    }
+
+    .playerName {
+        font-size: 1.3rem; /* Adjusted font size */
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .initialView h2 {
+        font-size: 1.6rem;
+    }
+
+    .selectWrapper select,
+    .selectedGame {
+        font-size: 18px; /* Adjusted font size for smaller screens */
+        height: 60px; /* Reduced height */
+        padding: 16px 18px; /* Adjusted padding */
+    }
+
+    .selectLabel {
+        font-size: 14px; /* Adjusted font size */
+        top: -16px; /* Adjusted position */
+    }
+
+    .gameOption {
+        padding: 12px 16px; /* Adjusted padding */
+        font-size: 16px; /* Adjusted font size */
+    }
+
+    .boxScoreDetails {
+        padding: 1rem;
+    }
+
+    .playerStatsRow {
+        padding: 0.8rem 1rem;
+    }
+
+    .playerName {
+        font-size: 1.2rem;
+    }
+
+    .playerName span {
+        font-size: 0.9rem;
+    }
+
+    .stats {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Further adjustment for small screens */
+        font-size: 0.95rem;
+    }
+
+    .teamLogo {
+        width: 35px;
+    }
+
+    .teamName {
+        max-width: 120px;
+        font-size: 14px;
+    }
+
+    .paginationControls button {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+
+    .paginationControls select {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
