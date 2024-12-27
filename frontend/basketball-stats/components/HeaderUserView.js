@@ -43,14 +43,14 @@ const HeaderUserView = ({ league }) => {
     timeouts: "⏱️ Timeouts",
     fouls: "🚫 Fouls",
     score: "🏀 Score",
-    score_quarter_1: "1️⃣ Score Quarter 1",
-    score_quarter_2: "2️⃣ Score Quarter 2",
-    score_quarter_3: "3️⃣ Score Quarter 3",
-    score_quarter_4: "4️⃣ Score Quarter 4",
-    score_extra_time_1: "🕒 Score Extra Time 1",
-    score_extra_time_2: "🕕 Score Extra Time 2",
-    score_extra_time_3: "🕘 Score Extra Time 3",
-    score_extra_time_4: "🕛 Score Extra Time 4",
+    score_quarter_1: "1️⃣ Score (Quarter 1)",
+    score_quarter_2: "2️⃣ Score (Quarter 2)",
+    score_quarter_3: "3️⃣ Score (Quarter 3)",
+    score_quarter_4: "4️⃣ Score (Quarter 4)",
+    score_extra_time_1: "🕒 Score (Extra Time 1)",
+    score_extra_time_2: "🕕 Score (Extra Time 2)",
+    score_extra_time_3: "🕘 Score (Extra Time 3)",
+    score_extra_time_4: "🕛 Score (Extra Time 4)",
   };
 
   const seasons = Array.from({ length: 2023 - 2007 + 1 }, (_, i) => 2007 + i);
@@ -427,7 +427,7 @@ const HeaderUserView = ({ league }) => {
               HeaderData ? (
                 <div>
                   <div className={styles.gameInfo}>
-                    <h3>GENERAL INFO</h3>
+                    <h3>GAME DETAILS</h3>
                     <div className={styles.detailsGrid}>
                       <div className={styles.detail}>
                         <strong>📅 Date:</strong>
