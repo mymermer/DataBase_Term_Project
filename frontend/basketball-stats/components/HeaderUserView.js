@@ -701,7 +701,7 @@ const HeaderUserView = ({ league }) => {
                       )}
                     </tbody>
                   </table>
-                  <div ref={winnerSectionRef} className={styles.winnerSection}>
+                  <div ref={winnerSectionRef} className={styles.winnerSection} onClick={() => triggerFireworks()}>
                     {HeaderData?.winner === "team_a" && (
                       <div className={styles.winner}>
                         <Image

@@ -18,14 +18,16 @@ put "setError(error.message);" to their catch statment.
 
 
 Then we need to put the error box. Determine file that you need to put error to. DataTable already puts. If you need to put to another file, put this code to the file that you need to put error to:
+```javascript
     {error && <ErrorDisplay message={error} onRetry={onFetchData} />}
+```
 
 you need to put ErrorDisplay to your path as:
     import ErrorDisplay from 'place_of_error_display/ErrorDisplay';
 
-"onFetchData" is const variable that you are saving your request to. Just put your the varaible at the beggining of your api's call
+"onFetchData" is const variable that you are saving your request to. Just put your the variable at the beginning of your api's call
 
-If you need to handle error from other files, please also add them as paramter you are sending. like:
+If you need to handle error from other files, please also add them as parameter you are sending. like:
 <DataTable error={error} />
 
 Besides of your user view, you need to also send your errors to DataTable as well as parmater. DataTable will handle the rest.

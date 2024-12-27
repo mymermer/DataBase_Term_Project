@@ -47,6 +47,46 @@ const allColumns = [
 
 const foreignKeyColumns = ["season_team_id", "game_id"];
 
+const primaryKey = "game_id";
+const columnTypes = {
+  game_id: "string",
+  game: "string",
+  round_of_game: "integer",
+  phase: "string",
+  season_team_id_a: "string",
+  season_team_id_b: "string",
+  fast_break_points_a: "integer",
+  fast_break_points_b: "integer",
+  turnover_points_a: "integer",
+  turnover_points_b: "integer",
+  second_chance_points_a: "integer",
+  second_chance_points_b: "integer",
+  defensive_rebounds_a: "integer",
+  offensive_rebounds_b: "integer",
+  offensive_rebounds_a: "integer",
+  defensive_rebounds_b: "integer",
+  turnovers_starters_a: "integer",
+  turnovers_bench_a: "integer",
+  turnovers_starters_b: "integer",
+  turnovers_bench_b: "integer",
+  steals_starters_a: "integer",
+  steals_bench_a: "integer",
+  steals_starters_b: "integer",
+  steals_bench_b: "integer",
+  assists_starters_a: "integer",
+  assists_bench_a: "integer",
+  assists_starters_b: "integer",
+  assists_bench_b: "integer",
+  points_starters_a: "integer",
+  points_bench_a: "integer",
+  points_starters_b: "integer",
+  points_bench_b: "integer",
+  max_lead_a: "integer",
+  max_lead_b: "integer",
+  minute_max_lead_a: "integer",
+  minute_max_lead_b: "integer",
+};
+
 export default function ComparisonPage({ params }) {
   const { league } = React.use(params);
 
@@ -255,6 +295,11 @@ export default function ComparisonPage({ params }) {
             onDelete={handleDelete}
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
+            league={league}
+            onFetchData={fetchData}
+            error={error}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>
