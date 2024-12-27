@@ -1,7 +1,7 @@
-import React from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import styles from '../../styles/About.module.css';
+import React from "react";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import styles from "../../styles/About.module.css";
 
 export default function Contact() {
   return (
@@ -10,12 +10,21 @@ export default function Contact() {
       <main className={styles.main}>
         <h1>Contact Us</h1>
         <p>
-          We'd love to hear from you! If you have any questions, feedback, or inquiries about European Basketball Statistics, please don't hesitate to reach out.
+          We'd love to hear from you! If you have any questions, feedback, or
+          inquiries about European Basketball Statistics, please don't hesitate
+          to reach out.
         </p>
         <div className={styles.contactInfo}>
-          <p><strong>Email:</strong> info@eurobasketstats.com</p>
-          <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-          <p><strong>Address:</strong> 123 Basketball Avenue, Sports City, EU 12345</p>
+          <p>
+            <strong>Email:</strong> info@eurobasketstats.com
+          </p>
+          <p>
+            <strong>Phone:</strong> +1 (555) 123-4567
+          </p>
+          <p>
+            <strong>Address:</strong> 123 Basketball Avenue, Sports City, EU
+            12345
+          </p>
         </div>
         <form className={styles.contactForm}>
           <input type="text" placeholder="Your Name" required />
@@ -28,4 +37,3 @@ export default function Contact() {
     </div>
   );
 }
-
