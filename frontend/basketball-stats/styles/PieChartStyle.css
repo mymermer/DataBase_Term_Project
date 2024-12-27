@@ -1,0 +1,8 @@
+    .chartContainer {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 800px;
+        user-select: text;
+    }
