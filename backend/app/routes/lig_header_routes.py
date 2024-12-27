@@ -128,7 +128,7 @@ def get_paginated_header():
             return jsonify([]), 200
         return jsonify(lig_header), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset, limit, columns, or filters'}), 400
+        return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     

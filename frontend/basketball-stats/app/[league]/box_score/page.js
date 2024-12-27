@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
-// import BoxScoreUserView from "../../../components/BoxScoreUserView";
+import BoxScoreUserView from "../../../components/BoxScoreUserView";
 
 const allColumns = [
   'game_player_id', 'game_id', 'game', 'round_of_game', 'phase', 'season_player_id', 'season_team_id',
@@ -22,6 +22,39 @@ const foreignKeyColumns = [
   "game_id",
   "season_team_id",
 ];
+
+const primaryKey = "game_player_id";
+const columnTypes = {
+  game_player_id: 'string',
+  game_id: 'string',
+  game: 'string',
+  round_of_game: 'integer',
+  phase: 'string',
+  season_player_id: 'string',
+  season_team_id: 'string',
+  is_starter: 'boolean',
+  is_playing: 'boolean',
+  dorsal: 'integer',
+  player: 'string',
+  points: 'integer',
+  two_points_made: 'integer',
+  two_points_attempted: 'integer',
+  three_points_made: 'integer',
+  three_points_attempted: 'integer',
+  free_throws_made: 'integer',
+  free_throws_attempted: 'integer',
+  offensive_rebounds: 'integer',
+  defensive_rebounds: 'integer',
+  total_rebounds: 'integer',
+  assists: 'integer',
+  steals: 'integer',
+  turnovers: 'integer',
+  blocks_favour: 'integer',
+  blocks_against: 'integer',
+  fouls_committed: 'integer',
+  fouls_received: 'integer',
+  valuation: 'integer'
+};
 
 
 export default function BoxScorePage({ params }) {
@@ -202,7 +235,7 @@ export default function BoxScorePage({ params }) {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <StatPageTemplate league={league} stat="Box Score">
+    <StatPageTemplate league={league} stat="Box Score" UserView={BoxScoreUserView}>
       <div className={styles.PageContent}>
         <h2>
           {league.charAt(0).toUpperCase() + league.slice(1)} Box Score Statistics
@@ -226,7 +259,10 @@ export default function BoxScorePage({ params }) {
             onAdd={handleAdd}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
+            onFetchData={fetchData}
             foreignKeyColumns={foreignKeyColumns}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>

@@ -35,18 +35,58 @@ const ComparisonUserView = ({ league }) => {
       "fast_break_points",
       "second_chance_points",
       "offensive_rebounds",
-      "assists_bench",
       "assists_starters",
+      "assists_bench",
     ],
     DEFENSIVE: [
-      "defensive_rebounds",
-      "steals_starters",
-      "steals_bench",
       "turnovers_starters",
       "turnovers_bench",
       "turnover_points",
+      "steals_starters",
+      "steals_bench",
+      "defensive_rebounds",
     ],
     PERFORMANCE: ["minute_max_lead", "max_lead"],
+  };
+
+  const emojiMap = {
+    points_starters: "⭐ Points (Starters)",
+    points_bench: "🌟 Points (Bench)",
+    fast_break_points: "⚡ Fast Break Points",
+    second_chance_points: "🔄 Second Chance Points",
+    offensive_rebounds: "🏀 Offensive Rebounds",
+    assists_starters: "🤝🏻 Assists (Starters)",
+    assists_bench: "🤝 Assists (Bench)",
+
+    turnovers_starters: "🔁 Turnovers (Starters)",
+    turnovers_bench: "🔃 Turnovers (Bench)",
+    turnover_points: "✨ Turnover Points",
+    steals_starters: "🥷 Steals (Starters)",
+    steals_bench: "🕵️ Steals (Bench)",
+    defensive_rebounds: "🛡️ Defensive Rebounds",
+
+    minute_max_lead: "⏳ Minutes Max Lead",
+    max_lead: "📈 Max Lead",
+  };
+
+  const chartMap = {
+    points_starters: "⭐Points (Starters)",
+    points_bench: "🌟Points (Bench)",
+    fast_break_points: "⚡F.B. Points",
+    second_chance_points: "🔄S.C. Points",
+    offensive_rebounds: "🏀Off. Rebounds",
+    assists_starters: "🤝🏻Assists (Starters)",
+    assists_bench: "🤝Assists (Bench)",
+
+    turnovers_starters: "🔁Turnovers (Starters)",
+    turnovers_bench: "🔃Turnovers (Bench)",
+    turnover_points: "✨Turnover Points",
+    steals_starters: "🥷Steals (Starters)",
+    steals_bench: "🕵️Steals (Bench)",
+    defensive_rebounds: "🛡️Defensive Rebounds",
+
+    minute_max_lead: "⏳Minutes Max Lead",
+    max_lead: "📈Max Lead",
   };
 
   const seasons = Array.from({ length: 2023 - 2007 + 1 }, (_, i) => 2007 + i);
@@ -57,7 +97,7 @@ const ComparisonUserView = ({ league }) => {
   const renderCategoryChart = (category, keys) => {
     // Prepare data for the chart
     const chartData = keys.map((key) => {
-      const statName = key.replace(/_/g, " ");
+      const statName = chartMap[key] || key.replace(/_/g, " ");
       return {
         name: statName,
         TeamA: comparisonData[`${key}_a`] || 0,
@@ -67,7 +107,7 @@ const ComparisonUserView = ({ league }) => {
 
     return (
       <div key={`chart-${category}`} className={styles.chartContainer}>
-        <h4>{category} Stats Chart</h4>
+        <h4 className={styles.chartHeader}>{category} STATS CHART</h4>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={chartData}
@@ -293,10 +333,7 @@ const ComparisonUserView = ({ league }) => {
       <div className={styles.container}>
         <div className={styles.initialView}>
           {!selectedGame && (
-            <h2>
-              Select a game to view the comparison between the 2 teams in that
-              game
-            </h2>
+            <h2>Choose a game to compare the performance of both teams!</h2>
           )}
           <div className={styles.selectors}>
             <div className={styles.selectWrapper}>
@@ -375,23 +412,23 @@ const ComparisonUserView = ({ league }) => {
               comparisonData ? (
                 <div>
                   <div className={styles.gameInfo}>
-                    <h3>Game Details</h3>
+                    <h3>GAME DETAILS</h3>
                     <div className={styles.detailsRow}>
                       <span className={styles.detail}>
-                        <strong>Round:</strong>{" "}
+                        <strong>🚩 Round:</strong>{" "}
                         <span style={{ color: "black" }}>
                           {comparisonData.round_of_game}
                         </span>
                       </span>
                       <span className={styles.detail}>
-                        <strong>Phase:</strong>{" "}
+                        <strong>📌 Phase:</strong>{" "}
                         <span style={{ color: "black" }}>
                           {comparisonData.phase}
                         </span>
                       </span>
                       {selectedSeason && ( // Conditionally render if season is selected
                         <span className={styles.detail}>
-                          <strong>Season:</strong>{" "}
+                          <strong>🏆 Season:</strong>{" "}
                           <span style={{ color: "black" }}>
                             {selectedSeason}-{parseInt(selectedSeason) + 1}
                           </span>
@@ -459,6 +496,11 @@ const ComparisonUserView = ({ league }) => {
                             </tr>
                             {keys.map((key) => {
                               const baseKey = key;
+
+                              // Use the emojiMap for the table labels
+                              const label =
+                                emojiMap[baseKey] || baseKey.replace(/_/g, " ");
+
                               const formatValue = (val) =>
                                 val === null ||
                                 val === undefined ||
@@ -470,7 +512,7 @@ const ComparisonUserView = ({ league }) => {
 
                               return (
                                 <tr key={`row-${category}-${baseKey}`}>
-                                  <td>{baseKey.replace(/_/g, " ")}</td>
+                                  <td>{label}</td>
                                   <td>
                                     {formatValue(
                                       comparisonData[`${baseKey}_a`]

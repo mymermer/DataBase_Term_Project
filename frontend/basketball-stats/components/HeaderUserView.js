@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import styles from "../styles/HeaderUserView.module.css";
+import { Fireworks } from "fireworks-js";
 
 const HeaderUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
@@ -16,6 +17,8 @@ const HeaderUserView = ({ league }) => {
     team2: null,
   });
   const [HeaderData, setHeaderData] = useState(null); // New state for fetched header data
+  const [isFireworksActive, setIsFireworksActive] = useState(false); // Declare at the top
+  const winnerSectionRef = useRef(null); // Ref for the winner section
 
   // Define categories for dividing the stats
   const categories = {
@@ -33,6 +36,21 @@ const HeaderUserView = ({ league }) => {
       "score_extra_time_3",
       "score_extra_time_4",
     ],
+  };
+
+  const emojiMap = {
+    coach: "🧑‍🎓 Coach",
+    timeouts: "⏱️ Timeouts",
+    fouls: "🚫 Fouls",
+    score: "🏀 Score",
+    score_quarter_1: "1️⃣ Score (Quarter 1)",
+    score_quarter_2: "2️⃣ Score (Quarter 2)",
+    score_quarter_3: "3️⃣ Score (Quarter 3)",
+    score_quarter_4: "4️⃣ Score (Quarter 4)",
+    score_extra_time_1: "🕒 Score (Extra Time 1)",
+    score_extra_time_2: "🕕 Score (Extra Time 2)",
+    score_extra_time_3: "🕘 Score (Extra Time 3)",
+    score_extra_time_4: "🕛 Score (Extra Time 4)",
   };
 
   const seasons = Array.from({ length: 2023 - 2007 + 1 }, (_, i) => 2007 + i);
@@ -74,13 +92,87 @@ const HeaderUserView = ({ league }) => {
 
   // Functions for manipulating header data
 
+  const triggerFireworks = () => {
+    if (isFireworksActive) return;
+
+    setIsFireworksActive(true);
+
+    const fireworksContainer = document.createElement("div");
+    fireworksContainer.style.position = "fixed";
+    fireworksContainer.style.top = "0";
+    fireworksContainer.style.left = "0";
+    fireworksContainer.style.width = "100%";
+    fireworksContainer.style.height = "100%";
+    fireworksContainer.style.pointerEvents = "none";
+    fireworksContainer.style.zIndex = "9999";
+    document.body.appendChild(fireworksContainer);
+
+    const fireworks = new Fireworks(fireworksContainer, {
+      hue: { min: 0, max: 360 },
+      acceleration: 1.05,
+      friction: 0.98,
+      gravity: 1.5,
+      particles: 50,
+      traceLength: 3,
+      explosion: 5,
+      boundaries: { top: 50, bottom: fireworksContainer.clientHeight },
+    });
+
+    fireworks.start();
+
+    setTimeout(() => {
+      fireworks.stop();
+      document.body.removeChild(fireworksContainer);
+      setIsFireworksActive(false);
+    }, 3500); // duration of fireworks = 3.5 seconds
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!winnerSectionRef.current) return;
+
+      const sectionPosition = winnerSectionRef.current.getBoundingClientRect();
+      const isVisible =
+        sectionPosition.top >= 0 && sectionPosition.top <= window.innerHeight;
+
+      if (isVisible) {
+        if (HeaderData?.winner !== "draw") {
+          triggerFireworks();
+        }
+        window.removeEventListener("scroll", handleScroll); // Fireworks only trigger once
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [HeaderData]); // Add `HeaderData` as a dependency to re-run when a new game is selected
+
   const formatRefereeName = (referee) => {
+    if (
+      referee === undefined ||
+      referee === null ||
+      referee === "N/D" ||
+      referee === "" ||
+      !referee
+    ) {
+      return "undefined"; // Fallback for invalid or missing referee names
+    }
+
     // Split the name by comma and trim whitespace
     const [lastName, firstName] = referee.split(",").map((name) => name.trim());
 
     // Capitalize the first letter of each name part
-    const capitalize = (name) =>
-      name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    const capitalize = (name) => {
+      if (
+        name === undefined ||
+        name === null ||
+        name === "N/D" ||
+        name === "" ||
+        !name
+      )
+        return "None";
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    };
 
     // Return the formatted name as "FirstName_LastName"
     return `${capitalize(firstName)}_${capitalize(lastName)}`;
@@ -201,7 +293,9 @@ const HeaderUserView = ({ league }) => {
         logoUrl: "/teams_icons/default_team_icon.png",
       },
     });
+
     setShowGameDropdown(false);
+    //triggerFireworks(); // Call the fireworks here
   };
 
   const renderGameOptions = () => {
@@ -253,7 +347,9 @@ const HeaderUserView = ({ league }) => {
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
         <div className={styles.initialView}>
-          {!selectedGame && <h2>Select a game to view the details of it</h2>}
+          {!selectedGame && (
+            <h2>Choose a game to explore its detailed stats and highlights!</h2>
+          )}
           <div className={styles.selectors}>
             <div className={styles.selectWrapper}>
               <select
@@ -331,81 +427,114 @@ const HeaderUserView = ({ league }) => {
               HeaderData ? (
                 <div>
                   <div className={styles.gameInfo}>
-                    <h3>GENERAL INFO</h3>
+                    <h3>GAME DETAILS</h3>
                     <div className={styles.detailsGrid}>
                       <div className={styles.detail}>
-                        <strong>Date:</strong>
+                        <strong>📅 Date:</strong>
                         <span>{HeaderData.date_of_game}</span>
                       </div>
                       <div className={styles.detail}>
-                        <strong>Time:</strong>
+                        <strong>🕐 Time:</strong>
                         <span>{HeaderData.time_of_game?.slice(0, -3)}</span>
                       </div>
                       <div className={styles.detail}>
-                        <strong>Duration:</strong>
+                        <strong>⏲ Duration:</strong>
                         <span>{HeaderData.game_time} mins</span>
                       </div>
                       <div className={styles.detail}>
-                        <strong>Stadium (capacity):</strong>
+                        <strong>🏟️ Stadium (capacity):</strong>
                         <span>
                           {HeaderData.stadium} ({HeaderData.capacity})
                         </span>
                       </div>
                       <div className={styles.detail}>
-                        <strong>Referees:</strong>
+                        <strong>👨🏻‍⚖️ Referees:</strong>
                         <div className={styles.refereeList}>
                           <div>
-                            <a
-                              href={`https://en.wikipedia.org/wiki/${formatRefereeName(
-                                HeaderData.referee_1
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ textDecoration: "none", color: "#000" }}
-                            >
-                              {HeaderData.referee_1}{" "}
-                              <sup style={{ color: "#8b0000" }}>1</sup>
-                            </a>
+                            {HeaderData.referee_1 !==
+                            ("N/D" || null || undefined || "None" || "") ? (
+                              <a
+                                href={`https://en.wikipedia.org/wiki/${formatRefereeName(
+                                  HeaderData.referee_1
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  textDecoration: "none",
+                                  color: "#000",
+                                }}
+                              >
+                                {HeaderData.referee_1}{" "}
+                                <sup style={{ color: "#8b0000" }}>1</sup>
+                              </a>
+                            ) : (
+                              <span style={{ color: "#555" }}>
+                                undefined{" "}
+                                <sup style={{ color: "#8b0000" }}>1</sup>
+                              </span>
+                            )}
                           </div>
                           <div>
-                            <a
-                              href={`https://en.wikipedia.org/wiki/${formatRefereeName(
-                                HeaderData.referee_2
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ textDecoration: "none", color: "#000" }}
-                            >
-                              {HeaderData.referee_2}{" "}
-                              <sup style={{ color: "#8b0000" }}>2</sup>
-                            </a>
+                            {HeaderData.referee_2 !==
+                            ("N/D" || null || undefined || "None" || "") ? (
+                              <a
+                                href={`https://en.wikipedia.org/wiki/${formatRefereeName(
+                                  HeaderData.referee_2
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  textDecoration: "none",
+                                  color: "#000",
+                                }}
+                              >
+                                {HeaderData.referee_2}{" "}
+                                <sup style={{ color: "#8b0000" }}>2</sup>
+                              </a>
+                            ) : (
+                              <span style={{ color: "#555" }}>
+                                undefined{" "}
+                                <sup style={{ color: "#8b0000" }}>2</sup>
+                              </span>
+                            )}
                           </div>
                           <div>
-                            <a
-                              href={`https://en.wikipedia.org/wiki/${formatRefereeName(
-                                HeaderData.referee_3
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ textDecoration: "none", color: "#000" }}
-                            >
-                              {HeaderData.referee_3}{" "}
-                              <sup style={{ color: "#8b0000" }}>3</sup>
-                            </a>
+                            {HeaderData.referee_3 !==
+                            ("N/D" || null || undefined || "None" || "") ? (
+                              <a
+                                href={`https://en.wikipedia.org/wiki/${formatRefereeName(
+                                  HeaderData.referee_3
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  textDecoration: "none",
+                                  color: "#000",
+                                }}
+                              >
+                                {HeaderData.referee_3}{" "}
+                                <sup style={{ color: "#8b0000" }}>3</sup>
+                              </a>
+                            ) : (
+                              <span style={{ color: "#555" }}>
+                                undefined{" "}
+                                <sup style={{ color: "#8b0000" }}>3</sup>
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
                       <div className={styles.detail}>
-                        <strong>Phase:</strong>
+                        <strong>📌 Phase:</strong>
                         <span>{HeaderData.phase}</span>
                       </div>
                       <div className={styles.detail}>
-                        <strong>Round:</strong>
+                        <strong>🚩 Round:</strong>
                         <span>{HeaderData.round_of_game}</span>
                       </div>
                       {selectedSeason && (
                         <div className={styles.detail}>
-                          <strong>Season:</strong>
+                          <strong>🏆 Season:</strong>
                           <span>
                             {selectedSeason}-{parseInt(selectedSeason) + 1}
                           </span>
@@ -470,9 +599,9 @@ const HeaderUserView = ({ league }) => {
                             {keys.map((key) => {
                               const baseKey = key;
 
-                              // Log the current HeaderData and key being processed
-                              console.log("HeaderData:", HeaderData);
-                              console.log(`Processing key: ${baseKey}`);
+                              // Use the emojiMap for the table labels
+                              const label =
+                                emojiMap[baseKey] || baseKey.replace(/_/g, " ");
 
                               // Enhanced formatValue function with debug logs
                               const formatValue = (val) => {
@@ -484,14 +613,13 @@ const HeaderUserView = ({ league }) => {
                                     "score_extra_time_4",
                                   ].includes(baseKey)
                                 ) {
-                                  console.log(
-                                    `Processing key: ${baseKey}, Value A:`,
-                                    HeaderData[`${baseKey}_a`],
-                                    "Value B:",
-                                    HeaderData[`${baseKey}_b`]
-                                  );
                                   // Check specifically for null or undefined, return "None" only if invalid
-                                  return val === null || val === undefined || isNaN(val) || (typeof val === "string" && val.trim() === "")
+                                  return val === null ||
+                                    val === undefined ||
+                                    isNaN(val) ||
+                                    (typeof val === "string" &&
+                                      val.trim() === "") ||
+                                    val === 0
                                     ? "None"
                                     : val;
                                 }
@@ -536,13 +664,16 @@ const HeaderUserView = ({ league }) => {
 
                               return (
                                 <tr key={`row-${category}-${baseKey}`}>
-                                  <td>{baseKey.replace(/_/g, " ")}</td>
+                                  <td>{label}</td>
                                   <td>
                                     {formatValue(HeaderData?.[`${baseKey}_a`])}
                                     {isScoreKey &&
                                       HeaderData[`${baseKey}_a`] !== null &&
                                       HeaderData[`${baseKey}_a`] !==
                                         undefined &&
+                                      formatValue(
+                                        HeaderData[`${baseKey}_a`]
+                                      ) !== "None" &&
                                       calculatePercentage(
                                         parseFloat(HeaderData[`${baseKey}_a`]),
                                         parseFloat(totalScoreA)
@@ -554,6 +685,9 @@ const HeaderUserView = ({ league }) => {
                                       HeaderData[`${baseKey}_b`] !== null &&
                                       HeaderData[`${baseKey}_b`] !==
                                         undefined &&
+                                      formatValue(
+                                        HeaderData[`${baseKey}_b`]
+                                      ) !== "None" &&
                                       calculatePercentage(
                                         parseFloat(HeaderData[`${baseKey}_b`]),
                                         parseFloat(totalScoreB)
@@ -567,6 +701,43 @@ const HeaderUserView = ({ league }) => {
                       )}
                     </tbody>
                   </table>
+                  <div ref={winnerSectionRef} className={styles.winnerSection}>
+                    {HeaderData?.winner === "team_a" && (
+                      <div className={styles.winner}>
+                        <Image
+                          src={currentGameTeams.team1.logoUrl}
+                          alt={`${currentGameTeams.team1.fullName} logo`}
+                          width={50}
+                          height={50}
+                          className={styles.winnerLogo}
+                        />
+                        <p>
+                          <strong>{currentGameTeams.team1.fullName}</strong> Won
+                          the Game! 🎉
+                        </p>
+                      </div>
+                    )}
+                    {HeaderData?.winner === "team_b" && (
+                      <div className={styles.winner}>
+                        <Image
+                          src={currentGameTeams.team2.logoUrl}
+                          alt={`${currentGameTeams.team2.fullName} logo`}
+                          width={50}
+                          height={50}
+                          className={styles.winnerLogo}
+                        />
+                        <p>
+                          <strong>{currentGameTeams.team2.fullName}</strong> Won
+                          the Game! 🎉
+                        </p>
+                      </div>
+                    )}
+                    {HeaderData?.winner === "draw" && (
+                      <div className={styles.winner}>
+                        <p>🤝 It's a Draw! Both Teams Fought Hard! ⚡</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className={styles.comingSoon}>
