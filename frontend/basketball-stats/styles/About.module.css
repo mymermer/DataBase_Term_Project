@@ -102,3 +102,52 @@
     font-size: 1rem;
   }
 }
+
+/* QR Code Section */
+.qrSection {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  background-color: #ffffff; /* Subtle background color for QR section */
+  border-radius: 10px; /* Rounded corners for the QR section */
+}
+
+.qrSection p {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.qrCodeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.qrCode {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #000080; /* Navy border for the QR code */
+  border-radius: 10px; /* Slightly rounded corners for the QR code */
+  padding: 5px;
+  background-color: #fff; /* White background to ensure readability */
+}
+
+.qrCode:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+  transition: transform 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .qrCode {
+    width: 120px;
+    height: 120px; /* Adjust size for smaller screens */
+  }
+
+  .qrSection p {
+    font-size: 1rem;
+  }
+}

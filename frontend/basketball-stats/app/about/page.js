@@ -39,6 +39,17 @@ export default function About() {
           as your trusted source. Let’s celebrate the passion and excitement of
           European basketball together! 🏀
         </p>
+        {/* QR Code Section */}
+        <div className={styles.qrSection}>
+          <p>Feel free to share our website with others!</p>
+          <div className={styles.qrCodeContainer}>
+            <img
+              src="/qr-code.png"
+              alt="QR Code for website"
+              className={styles.qrCode}
+            />
+          </div>
+        </div>
       </main>
       <Footer />
     </div>
