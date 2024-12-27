@@ -491,7 +491,12 @@ const HeaderUserView = ({ league }) => {
                                     HeaderData[`${baseKey}_b`]
                                   );
                                   // Check specifically for null or undefined, return "None" only if invalid
-                                  return val === null || val === undefined || isNaN(val) || (typeof val === "string" && val.trim() === "")
+                                  return val === null ||
+                                    val === undefined ||
+                                    isNaN(val) ||
+                                    (typeof val === "string" &&
+                                      val.trim() === "") ||
+                                    val === 0
                                     ? "None"
                                     : val;
                                 }
@@ -543,6 +548,9 @@ const HeaderUserView = ({ league }) => {
                                       HeaderData[`${baseKey}_a`] !== null &&
                                       HeaderData[`${baseKey}_a`] !==
                                         undefined &&
+                                      formatValue(
+                                        HeaderData[`${baseKey}_a`]
+                                      ) !== "None" &&
                                       calculatePercentage(
                                         parseFloat(HeaderData[`${baseKey}_a`]),
                                         parseFloat(totalScoreA)
@@ -554,6 +562,9 @@ const HeaderUserView = ({ league }) => {
                                       HeaderData[`${baseKey}_b`] !== null &&
                                       HeaderData[`${baseKey}_b`] !==
                                         undefined &&
+                                      formatValue(
+                                        HeaderData[`${baseKey}_b`]
+                                      ) !== "None" &&
                                       calculatePercentage(
                                         parseFloat(HeaderData[`${baseKey}_b`]),
                                         parseFloat(totalScoreB)
