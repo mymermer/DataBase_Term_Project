@@ -50,6 +50,49 @@ const allColumns = [
 
 const foreignKeyColumns = ["season_team_id"];
 
+const primaryKey = "game_id";
+const columnTypes = {
+  game_id: "string",
+  game: "string",
+  date_of_game: "string",
+  time_of_game: "string",
+  round_of_game: "integer",
+  phase: "string",
+  season_team_id_a: "string",
+  season_team_id_b: "string",
+  score_a: "integer",
+  score_b: "integer",
+  coach_a: "string",
+  coach_b: "string",
+  game_time: "string",
+  referee_1: "string",
+  referee_2: "string",
+  referee_3: "string",
+  stadium: "string",
+  capacity: "integer",
+  fouls_a: "integer",
+  fouls_b: "integer",
+  timeouts_a: "integer",
+  timeouts_b: "integer",
+  score_quarter_1_a: "integer",
+  score_quarter_2_a: "integer",
+  score_quarter_3_a: "integer",
+  score_quarter_4_a: "integer",
+  score_quarter_1_b: "integer",
+  score_quarter_2_b: "integer",
+  score_quarter_3_b: "integer",
+  score_quarter_4_b: "integer",
+  score_extra_time_1_a: "integer",
+  score_extra_time_2_a: "integer",
+  score_extra_time_3_a: "integer",
+  score_extra_time_4_a: "integer",
+  score_extra_time_1_b: "integer",
+  score_extra_time_2_b: "integer",
+  score_extra_time_3_b: "integer",
+  score_extra_time_4_b: "integer",
+  winner: "string",
+};
+
 export default function HeaderPage({ params }) {
   const { league } = React.use(params);
 
@@ -253,6 +296,11 @@ export default function HeaderPage({ params }) {
             onDelete={handleDelete}
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
+            league={league}
+            onFetchData={fetchData}
+            error={error}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>
