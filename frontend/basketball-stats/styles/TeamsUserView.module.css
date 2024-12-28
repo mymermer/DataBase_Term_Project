@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 80vh;
+  height: 67vh;
 }
 
 .initialView h2 {
@@ -83,13 +83,14 @@
 .teamContent {
   display: flex;
   padding: 1rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .teamInfo {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   margin-right: 2rem;
   width: 200px;
 }
@@ -97,11 +98,25 @@
 .teamLogo {
   width: 60px;
   height: 60px;
-  margin-bottom: 1rem;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teamLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .teamDetails {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .teamName {
@@ -114,12 +129,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  justify-items: center;
+  align-items: center;
 }
 
 .statItem {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   margin-right: 1rem;
 }
 
@@ -140,15 +158,17 @@
   flex-grow: 1;
   gap: 1rem;
   justify-content: space-between;
+  align-items: center;
 }
 
-.performanceChart {
+.performanceChart, .spiderChartWrapper {
   flex: 1;
   min-width: 300px;
   height: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .performanceChart h4 {
@@ -156,14 +176,6 @@
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
-}
-
-.spiderChartWrapper {
-  flex: 1;
-  min-width: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .spiderChartWrapper h4 {
@@ -174,7 +186,6 @@
 }
 
 .spiderChart {
-  width: 100%;
   height: 300px;
   display: flex;
   justify-content: center;
