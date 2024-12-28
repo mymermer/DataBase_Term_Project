@@ -285,12 +285,26 @@ const DataTable = ({
     try {
       let hasError = false;
 
-      for (const [column, value] of Object.entries(newRowData)) {
-        if (!validateInput(value, columnTypes[column])) {
+      // Validation for the "Add" popup
+      if (popupType === "add") {
+        for (const [column, value] of Object.entries(newRowData)) {
+          if (!validateInput(value, columnTypes[column])) {
+            hasError = true;
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              [column]: errorMessages[columnTypes[column]],
+            }));
+          }
+        }
+      }
+
+      // Validation for the "Update" popup
+      if (popupType === "update") {
+        if (!validateInput(updateValue, columnTypes[updateColumn])) {
           hasError = true;
           setErrors((prevErrors) => ({
             ...prevErrors,
-            [column]: errorMessages[columnTypes[column]],
+            [updateColumn]: errorMessages[columnTypes[updateColumn]],
           }));
         }
       }
@@ -312,6 +326,7 @@ const DataTable = ({
           result = await handleUpdate();
           break;
       }
+
       setMessage({ type: "success", text: "Operation successful" });
       handlePopupClose();
       onFetchData();
@@ -797,21 +812,44 @@ const DataTable = ({
                         value={updateValue}
                         onChange={(e) => {
                           const value = e.target.value;
-                          if (validateInput(value, columnTypes[updateColumn])) {
-                            setUpdateValue(value);
-                            e.target.classList.remove(styles.invalidInput);
-                          } else {
-                            e.target.classList.add(styles.invalidInput);
-                          }
+                          setUpdateValue(value); // Update value immediately
+                        }}
+                        onBlur={(e) => {
+                          const value = e.target.value;
+                          const isValid = validateInput(
+                            value,
+                            columnTypes[updateColumn]
+                          );
+
+                          setErrors((prevErrors) => {
+                            if (isValid) {
+                              const { [updateColumn]: _, ...rest } = prevErrors; // Remove the error for this column
+                              return rest;
+                            } else {
+                              return {
+                                ...prevErrors,
+                                [updateColumn]:
+                                  errorMessages[columnTypes[updateColumn]], // Set error only on blur
+                              };
+                            }
+                          });
                         }}
                         placeholder={
                           updateColumn
                             ? `Enter ${columnTypes[updateColumn]}`
                             : "Select a column first"
                         }
-                        className={styles.input}
+                        className={`${styles.input} ${
+                          errors[updateColumn] ? styles.invalidInput : ""
+                        }`}
                         disabled={!updateColumn}
                       />
+                    )}
+                    {/* Add the error message here */}
+                    {errors[updateColumn] && (
+                      <span className={styles.errorText}>
+                        {errors[updateColumn]}
+                      </span>
                     )}
                   </div>
                 </div>
