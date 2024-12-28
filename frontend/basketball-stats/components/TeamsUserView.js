@@ -35,7 +35,7 @@ const TeamsUserView = ({ league }) => {
     const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/with_year_like?likePattern=${year}&sortBy=points&order=desc`);
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/with_year_like?likePattern=${year}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -100,7 +100,9 @@ const TeamsUserView = ({ league }) => {
 
   const fetchPerformanceData = async (teamAbbrs) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_teams/by_team_abbrs?teamAbbrs=${teamAbbrs.join(',')}&columns=season_team_id,valuation_per_game`);
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/v1/${tournament}_teams/by_team_abbrs?teamAbbrs=${teamAbbrs.join(',')}&columns=season_team_id,valuation_per_game&maxYear=${selectedSeason}`
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -110,6 +112,7 @@ const TeamsUserView = ({ league }) => {
       console.error('Error fetching performance data:', error);
     }
   };
+  
 
   const fetchAverageValues = async (year) => {
     try {
