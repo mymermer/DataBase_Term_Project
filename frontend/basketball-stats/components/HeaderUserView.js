@@ -4,11 +4,12 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import styles from "../styles/HeaderUserView.module.css";
 import { Fireworks } from "fireworks-js";
+import ErrorDisplay from "./ErrorDisplay";
 
 const HeaderUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
   const [games, setGames] = useState([]);
-  const [selectedGame, setSelectedGame] = useState("");
+  const [selectedGame, setSelectedGame] = useState(null);
   const [loading, setLoading] = useState(false);
   const [teamInfo, setTeamInfo] = useState({});
   const [showGameDropdown, setShowGameDropdown] = useState(false);
@@ -19,6 +20,7 @@ const HeaderUserView = ({ league }) => {
   const [HeaderData, setHeaderData] = useState(null); // New state for fetched header data
   const [isFireworksActive, setIsFireworksActive] = useState(false); // Declare at the top
   const winnerSectionRef = useRef(null); // Ref for the winner section
+  const [error, setError] = useState(null); // New state for error handling
 
   // Define categories for dividing the stats
   const categories = {
@@ -182,6 +184,7 @@ const HeaderUserView = ({ league }) => {
 
   const fetchGames = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const yearPrefix = tournament === "cup" ? "U" : "E";
     const year = `${yearPrefix}${selectedSeason}`;
     try {
@@ -198,13 +201,27 @@ const HeaderUserView = ({ league }) => {
       const allTeams = new Set(data.flatMap(({ game }) => game.split("-")));
       await fetchTeamInfo(Array.from(allTeams)); // Fetch team info
     } catch (error) {
-      console.error("Error fetching games:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
   const fetchTeamInfo = async (abbreviations) => {
+    setLoading(true);
+    setError(null); // Added to clear previous errors
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/team?abbreviation=${abbreviations.join(
@@ -227,7 +244,19 @@ const HeaderUserView = ({ league }) => {
       });
       setTeamInfo((prevTeamInfo) => ({ ...prevTeamInfo, ...teamInfoMap }));
     } catch (error) {
-      console.error("Error fetching team info:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     }
   };
 
@@ -238,6 +267,7 @@ const HeaderUserView = ({ league }) => {
     }
 
     setLoading(true);
+    setError(null); // Added to clear previous errors
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_header/${selectedGame.gameId}`
@@ -257,7 +287,19 @@ const HeaderUserView = ({ league }) => {
       console.log("API Response Data:", data); // Log the API response
       setHeaderData(data);
     } catch (error) {
-      console.error("Error fetching header data:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -421,6 +463,7 @@ const HeaderUserView = ({ league }) => {
             </div>
           </div>
         </div>
+        {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
         {selectedGame && (
           <div className={styles.headerView}>
             {currentGameTeams.team1 && currentGameTeams.team2 ? (
@@ -701,7 +744,11 @@ const HeaderUserView = ({ league }) => {
                       )}
                     </tbody>
                   </table>
-                  <div ref={winnerSectionRef} className={styles.winnerSection} onClick={() => triggerFireworks()}>
+                  <div
+                    ref={winnerSectionRef}
+                    className={styles.winnerSection}
+                    onClick={() => triggerFireworks()}
+                  >
                     {HeaderData?.winner === "team_a" && (
                       <div className={styles.winner}>
                         <Image

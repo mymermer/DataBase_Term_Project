@@ -5,6 +5,7 @@ import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
 import ComparisonUserView from "../../../components/ComparisonUserView";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 
 const allColumns = [
   "game_id",
@@ -119,6 +120,7 @@ export default function ComparisonPage({ params }) {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const offset = currentPage * rowsPerPage;
     const columnsParam = selectedColumns.join(",");
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_comparison?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
@@ -158,9 +160,20 @@ export default function ComparisonPage({ params }) {
       setTotalRows(countResult.total);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error.message);
       setLoading(false);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     }
   };
 
@@ -192,6 +205,7 @@ export default function ComparisonPage({ params }) {
   };
 
   const handleAdd = async (newRowData) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison`,
@@ -211,12 +225,24 @@ export default function ComparisonPage({ params }) {
       await fetchData(); // Refresh data after successful add
       return true;
     } catch (error) {
-      console.error("Error adding new row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
   const handleDelete = async (gameId) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${gameId}`,
@@ -232,12 +258,24 @@ export default function ComparisonPage({ params }) {
       await fetchData(); // Refresh data after successful delete
       return true;
     } catch (error) {
-      console.error("Error deleting row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
   const handleUpdate = async (gameId, column, value) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${gameId}`,
@@ -257,12 +295,25 @@ export default function ComparisonPage({ params }) {
       await fetchData(); // Refresh data after successful update
       return true;
     } catch (error) {
-      console.error("Error updating row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
-  if (error) return <p>Error: {error}</p>;
+  {
+    error && <ErrorDisplay message={error} onRetry={fetchData} />;
+  }
 
   return (
     <StatPageTemplate
@@ -298,6 +349,7 @@ export default function ComparisonPage({ params }) {
             league={league}
             onFetchData={fetchData}
             error={error}
+            onRetry={fetchData}
             primaryKey={primaryKey}
             columnTypes={columnTypes}
           />

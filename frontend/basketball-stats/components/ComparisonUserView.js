@@ -13,11 +13,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import ErrorDisplay from "./ErrorDisplay";
 
 const ComparisonUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
   const [games, setGames] = useState([]);
-  const [selectedGame, setSelectedGame] = useState("");
+  const [selectedGame, setSelectedGame] = useState(null);
   const [loading, setLoading] = useState(false);
   const [teamInfo, setTeamInfo] = useState({});
   const [showGameDropdown, setShowGameDropdown] = useState(false);
@@ -26,6 +27,7 @@ const ComparisonUserView = ({ league }) => {
     team2: null,
   });
   const [comparisonData, setComparisonData] = useState(null); // New state for fetched comparison data
+  const [error, setError] = useState(null); // New state for error handling
 
   // Define categories for dividing the stats
   const categories = {
@@ -170,6 +172,7 @@ const ComparisonUserView = ({ league }) => {
 
   const fetchGames = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const yearPrefix = tournament === "cup" ? "U" : "E";
     const year = `${yearPrefix}${selectedSeason}`;
     try {
@@ -186,13 +189,27 @@ const ComparisonUserView = ({ league }) => {
       const allTeams = new Set(data.flatMap(({ game }) => game.split("-")));
       await fetchTeamInfo(Array.from(allTeams)); // Fetch team info
     } catch (error) {
-      console.error("Error fetching games:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
   const fetchTeamInfo = async (abbreviations) => {
+    setLoading(true);
+    setError(null); // Added to clear previous errors
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/team?abbreviation=${abbreviations.join(
@@ -215,7 +232,19 @@ const ComparisonUserView = ({ league }) => {
       });
       setTeamInfo((prevTeamInfo) => ({ ...prevTeamInfo, ...teamInfoMap }));
     } catch (error) {
-      console.error("Error fetching team info:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     }
   };
 
@@ -226,6 +255,7 @@ const ComparisonUserView = ({ league }) => {
     }
 
     setLoading(true);
+    setError(null); // Added to clear previous errors
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${selectedGame.gameId}`
@@ -244,7 +274,19 @@ const ComparisonUserView = ({ league }) => {
       const data = await response.json();
       setComparisonData(data);
     } catch (error) {
-      console.error("Error fetching comparison data:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -406,6 +448,7 @@ const ComparisonUserView = ({ league }) => {
             </div>
           </div>
         </div>
+        {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
         {selectedGame && (
           <div className={styles.comparisonView}>
             {currentGameTeams.team1 && currentGameTeams.team2 ? (
