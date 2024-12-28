@@ -188,7 +188,18 @@ const TeamsUserView = ({ league }) => {
       },
       plugins: {
         legend: { display: false },
-        tooltip: { enabled: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const index = context.dataIndex;
+              const stat = scaledData[index];
+              return [
+                `Team: ${stat.value.toFixed(2)}`,
+                `Average: ${stat.avg.toFixed(2)}`,
+              ];
+            },
+          },
+        },
       },
       pointLabels: {
         font: { size: 12 },
@@ -266,6 +277,7 @@ const TeamsUserView = ({ league }) => {
                           width={60}
                           height={60}
                           objectFit="contain"
+                          layout="responsive"
                         />
                       </div>
                       <div className={styles.teamDetails}>
