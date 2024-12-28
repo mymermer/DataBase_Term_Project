@@ -547,15 +547,11 @@ class Lig_TeamsDAO():
 
 
     @staticmethod
-    def get_paginated_lig_teams_by_abbrs(
+    def get_lig_teams_by_abbrs(
         db: db,
         team_abbrs: list,
-        offset: int = 0,
-        limit: int = 25,
         columns: list = None,
-        filters: dict = None,
-        sort_by: str = None,
-        order: str = 'asc'
+        max_year: str = None
     ) -> dict:
         try:
             connection = db.get_connection()
@@ -571,30 +567,18 @@ class Lig_TeamsDAO():
                 where_clauses = [f"season_team_id LIKE %s"]
                 params = [f"%_{abbr}"]
 
-                if filters:
-                    for column, value in filters.items():
-                        where_clauses.append(f"{column} = %s")
-                        params.append(value)
+                # Add max_year filter if provided
+                if max_year:
+                    where_clauses.append(f"SUBSTRING(season_team_id, 2, 4) <= %s")
+                    params.append(max_year)
 
                 where_clause = f"WHERE {' AND '.join(where_clauses)}"
-
-                # Add ORDER BY clause
-                order_clause = ""
-                if sort_by:
-                    if order.lower() not in ['asc', 'desc']:
-                        order = 'asc'  # Default to ascending
-                    order_clause = f"ORDER BY {sort_by} {order.upper()}"
 
                 # Final query with LIMIT and OFFSET
                 query = f"""
                     SELECT {selected_columns} FROM LIG_TEAMS
                     {where_clause}
-                    {order_clause}
-                    LIMIT %s OFFSET %s
                 """
-
-                # Append limit and offset to the params
-                params.extend([limit, offset])
                 
                 cursor = connection.cursor(dictionary=True)
                 cursor.execute(query, params)
