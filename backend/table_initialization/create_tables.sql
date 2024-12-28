@@ -256,7 +256,7 @@ CREATE TABLE CUP_HEADER(
     score_extra_time_2_b INT,
     score_extra_time_3_b INT,
     score_extra_time_4_b INT,
-    winner CHAR(6)
+    winner VARCHAR(10)
 );
 
 CREATE TABLE LIG_HEADER(
@@ -298,7 +298,7 @@ CREATE TABLE LIG_HEADER(
     score_extra_time_2_b INT,
     score_extra_time_3_b INT,
     score_extra_time_4_b INT,
-    winner CHAR(6)
+    winner VARCHAR(10)
 );
 
 CREATE TABLE CUP_PLAY_BY_PLAY(

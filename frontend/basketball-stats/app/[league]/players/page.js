@@ -62,8 +62,8 @@ const foreignKeyColumns = [
 
 const primaryKey = 'season_player_id';
 const columnTypes = {
-  season_player_id: 'string',
-  season_team_id: 'string',
+  season_player_id: 'season_player_id',
+  season_team_id: 'season_team_id',
   player: 'string',
   games_played: 'integer',
   games_started: 'integer',

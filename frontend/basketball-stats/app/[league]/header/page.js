@@ -53,19 +53,19 @@ const foreignKeyColumns = ["season_team_id"];
 
 const primaryKey = "game_id";
 const columnTypes = {
-  game_id: "string",
-  game: "string",
+  game_id: "game_id",
+  game: "game",
   date_of_game: "date",
   time_of_game: "time",
   round_of_game: "integer",
   phase: "string",
-  season_team_id_a: "string",
-  season_team_id_b: "string",
+  season_team_id_a: "season_team_id",
+  season_team_id_b: "season_team_id",
   score_a: "integer",
   score_b: "integer",
   coach_a: "string",
   coach_b: "string",
-  game_time: "string",
+  game_time: "game_time",
   referee_1: "string",
   referee_2: "string",
   referee_3: "string",
@@ -91,7 +91,7 @@ const columnTypes = {
   score_extra_time_2_b: "integer",
   score_extra_time_3_b: "integer",
   score_extra_time_4_b: "integer",
-  winner: "string",
+  winner: "winner",
 };
 
 export default function HeaderPage({ params }) {
