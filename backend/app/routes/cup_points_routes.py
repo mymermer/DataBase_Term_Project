@@ -166,7 +166,7 @@ def get_paginated_points_with_like():
 @cup_points_bp.route('/cup_points/year_distinct_games', methods=['GET'])
 def get_distinct_games_with_like():
     """
-    API endpoint for retrieving distinct values of the 'game' column along with scores, with a compulsory 'LIKE' filter on game_point_id.
+    API endpoint for retrieving distinct values of the 'game' column with a compulsory 'LIKE' filter on game_point_id.
     """
     try:
         # Retrieve query parameters

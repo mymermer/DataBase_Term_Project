@@ -157,7 +157,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
+  margin-bottom: 10px;
+  width: calc(50% - 30px);
 }
 
 .playerName {
@@ -228,14 +229,6 @@
   transition: all 0.3s ease;
 }
 
-.selectedGame .teamInfo {
-  flex: 1;
-}
-
-.selectedGame .scoreVs {
-  flex-shrink: 0;
-}
-
 .selectedGame.filled {
   border-color: #000080;
 }
@@ -260,72 +253,52 @@
 }
 
 .gameOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .gameOption:hover {
   background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.gameOption:active {
+  transform: translateX(2px);
 }
 
 .gameOption.selectedGame {
   background-color: #e6e6fa;
 }
 
-.gameOptionContent {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  white-space: nowrap;
-}
-
-.selectedGameOption {
-  background-color: #e6e6fa;
-}
-
-.teamName {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
-  line-height: 30px; /* Match the height of the logo */
-}
-
-.scoreVs {
-  display: flex;
-  align-items: center;
-  margin: 0 10px;
-  flex-shrink: 0;
-  line-height: 30px; /* Match the height of the logo */
-}
-
-.score {
-  font-weight: bold;
-  margin: 0 5px;
-}
-
 .vsText {
-  margin: 0 5px;
+  margin: 0 auto;
   font-weight: bold;
-}
-
-.rightTeam {
-  justify-content: flex-end;
-  text-align: right;
 }
 
 .teamLogo {
   object-fit: contain;
   height: 30px;
-  width: 30px;
-  flex-shrink: 0;
+  width: auto;
 }
 
 .teamLogo[src*="default_team_icon.png"] {
   filter: grayscale(100%) brightness(1);
 }
 
+.teamName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rightTeam {
+  justify-content: flex-end;
+}
 
 .disabled {
   opacity: 0.7;
@@ -372,15 +345,3 @@
     transform: translateY(0);
   }
 }
-
-.scoreVs {
-  display: flex;
-  align-items: center;
-  margin: 0 10px;
-}
-
-.score {
-  font-weight: bold;
-  margin: 0 5px;
-}
-
