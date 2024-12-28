@@ -307,6 +307,24 @@ const DataTable = ({
             [updateColumn]: errorMessages[columnTypes[updateColumn]],
           }));
         }
+        if (!validateInput(updateId, columnTypes[primaryKey])) {
+          hasError = true;
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [primaryKey]: errorMessages[columnTypes[primaryKey]],
+          }));
+        }
+      }
+
+      // Validation for the "Delete" popup
+      if (popupType === "delete") {
+        if (!validateInput(deleteId, columnTypes[primaryKey])) {
+          hasError = true;
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [primaryKey]: errorMessages[columnTypes[primaryKey]],
+          }));
+        }
       }
 
       if (hasError) {
@@ -736,10 +754,40 @@ const DataTable = ({
                       type="text"
                       id="deleteId"
                       value={deleteId}
-                      onChange={(e) => setDeleteId(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setDeleteId(value); // Update value immediately
+
+                        const isValid = validateInput(
+                          value,
+                          columnTypes[primaryKey]
+                        );
+
+                        // Update error state based on validation
+                        setErrors((prevErrors) => {
+                          if (isValid) {
+                            const { [primaryKey]: _, ...rest } = prevErrors; // Remove the error for this column
+                            return rest;
+                          } else {
+                            return {
+                              ...prevErrors,
+                              [primaryKey]:
+                                errorMessages[columnTypes[primaryKey]],
+                            };
+                          }
+                        });
+                      }}
                       placeholder={`Enter ${primaryKey}`}
-                      className={styles.input}
+                      className={`${styles.input} ${
+                        errors[primaryKey] ? styles.invalidInput : ""
+                      }`}
                     />
+                    {/* Display the error message */}
+                    {errors[primaryKey] && (
+                      <span className={styles.errorText}>
+                        {errors[primaryKey]}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -751,10 +799,50 @@ const DataTable = ({
                       type="text"
                       id="updateId"
                       value={updateId}
-                      onChange={(e) => setUpdateId(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setUpdateId(value); // Update value immediately
+
+                        const isValid = validateInput(
+                          value,
+                          columnTypes[primaryKey]
+                        ); // Validate input
+
+                        // Update error state based on validation
+                        setErrors((prevErrors) => {
+                          if (isValid) {
+                            const { [primaryKey]: _, ...rest } = prevErrors; // Remove the error for this column
+                            return rest;
+                          } else {
+                            return {
+                              ...prevErrors,
+                              [primaryKey]:
+                                errorMessages[columnTypes[primaryKey]], // Add error message
+                            };
+                          }
+                        });
+                      }}
+                      onBlur={(e) => {
+                        const value = e.target.value;
+                        if (!validateInput(value, columnTypes[primaryKey])) {
+                          setErrors((prevErrors) => ({
+                            ...prevErrors,
+                            [primaryKey]:
+                              errorMessages[columnTypes[primaryKey]],
+                          }));
+                        }
+                      }}
                       placeholder={`Enter ${primaryKey}`}
-                      className={styles.input}
+                      className={`${styles.input} ${
+                        errors[primaryKey] ? styles.invalidInput : ""
+                      }`}
                     />
+                    {/* Display the error message */}
+                    {errors[primaryKey] && (
+                      <span className={styles.errorText}>
+                        {errors[primaryKey]}
+                      </span>
+                    )}
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="updateColumn">Column to Update</label>
