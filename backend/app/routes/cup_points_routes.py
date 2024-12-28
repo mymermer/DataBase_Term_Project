@@ -174,17 +174,10 @@ def get_distinct_games_with_like():
         if not like_pattern or len(like_pattern) < 5:
             return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
 
-        columns = request.args.get('columns', None)  # Optional columns to fetch
-
-        # Parse columns if provided
-        if columns:
-            columns = columns.split(",")
-
         # Call the DAO method
         distinct_games = Cup_PointsDAO.get_distinct_games_with_like(
             db,
             like_pattern=like_pattern,
-            columns=columns
         )
         if distinct_games is None:
             return jsonify([]), 200

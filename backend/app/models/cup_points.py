@@ -396,8 +396,7 @@ class Cup_PointsDAO():
     @staticmethod
     def get_distinct_games_with_like(
         db: db,
-        like_pattern: str,
-        columns: list = None
+        like_pattern: str
     ) -> list:
 
         try:
@@ -406,16 +405,13 @@ class Cup_PointsDAO():
             # Add `%` wildcard to the LIKE pattern
             like_pattern = f"{like_pattern}%"
 
-            # Default columns to return
-            selected_columns = ", ".join(columns) if columns else "game"
-
             # WHERE clause for the LIKE filter
             where_clause = "WHERE game_point_id LIKE %s"
             params = [like_pattern]
 
             # Query to fetch distinct games
             query = f"""
-                SELECT DISTINCT {selected_columns} FROM CUP_POINTS
+                SELECT DISTINCT game FROM CUP_POINTS
                 {where_clause}
             """
 
@@ -425,12 +421,8 @@ class Cup_PointsDAO():
 
             if distinct_games is None:
                 return None
-
-            # Map fetched rows to dicts or raw values if only one column is selected
-            if columns:
-                return [dict(zip(columns, row)) for row in distinct_games]
-            else:
-                return [row[0] for row in distinct_games]  # Only return 'game' column
+        
+            return [row[0] for row in distinct_games]  # Only return 'game' column
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")
