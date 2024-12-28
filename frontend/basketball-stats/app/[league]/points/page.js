@@ -59,7 +59,7 @@ const columnTypes = {
   minute: 'integer',
   points_a: 'integer',
   points_b: 'integer',
-  date_time_stp: 'date'
+  date_time_stp: 'date_time'
 };
 
 export default function PointsPage({ params }) {

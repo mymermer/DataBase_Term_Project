@@ -575,7 +575,7 @@ const DataTable = ({
                   {allColumns.map((column) => (
                     <div key={column} className={styles.formGroup}>
                       <label htmlFor={column}>{column}</label>
-                      {columnTypes[column] === "date" ? (
+                      {columnTypes[column] === "date_time" ? (
                         <DateTimeInput
                           value={newRowData[column] || ""}
                           onChange={(value) => {
@@ -653,7 +653,7 @@ const DataTable = ({
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="updateValue">New Value</label>
-                    {updateColumn && columnTypes[updateColumn] === "date" ? (
+                    {updateColumn && columnTypes[updateColumn] === "date_time" ? (
                       <DateTimeInput
                         value={updateValue}
                         onChange={(value) => {
