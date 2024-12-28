@@ -64,3 +64,7 @@ import LoadingSkeleton from 'wherelaodingskeletonis/LoadingSkeleton';
 
 
     {  loading &&  <LoadingSkeleton rows={5} columns={3} /> }
+
+We know have 3 types of pickers for constraints handling: DateTime, Date, and Time pickers.
+
+If you have any columns of these types, you can just change your page.js/columnTypes to either "date_time", "date", or "time" and it will implemented automatically.
