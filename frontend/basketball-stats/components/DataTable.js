@@ -19,6 +19,8 @@ import {
 import LoadingOverlay from "./LoadingOverlay";
 import ErrorDisplay from "./ErrorDisplay";
 import DateTimeInput from "./DateTimeInput";
+import DateInput from "./DateInput";
+import TimeInput from "./TimeInput";
 
 const DataTable = ({
   initialData,
@@ -211,9 +213,15 @@ const DataTable = ({
         return Number.isInteger(Number(value));
       case "float":
         return !isNaN(parseFloat(value)) && isFinite(value);
+      case "date_time":
+        const dateTimeRegex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
+        return dateTimeRegex.test(value);
       case "date":
-        const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
+        const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
         return dateRegex.test(value);
+      case "time":
+        const timeRegex = /^(\d{2}):(\d{2})$/;
+        return timeRegex.test(value);
       default:
         return true;
     }
@@ -232,7 +240,11 @@ const DataTable = ({
             if (!validateInput(value, columnTypes[column])) {
               throw new Error(`Invalid input for ${column}`);
             }
-            if (columnTypes[column] === "date") {
+            if (
+              columnTypes[column] === "date_time" ||
+              columnTypes[column] === "date" ||
+              columnTypes[column] === "time"
+            ) {
               newRowData[column] = formatDateInput(value);
             }
           }
@@ -585,6 +597,26 @@ const DataTable = ({
                           }}
                           placeholder="MM/DD/YYYY HH:MM"
                         />
+                      ) : columnTypes[column] === "date" ? (
+                        <DateInput
+                          value={newRowData[column] || ""}
+                          onChange={(value) => {
+                            if (validateInput(value, columnTypes[column])) {
+                              setNewRowData({ ...newRowData, [column]: value });
+                            }
+                          }}
+                          placeholder={"MM/DD/YYYY"}
+                        />
+                      ) : columnTypes[column] === "time" ? (
+                        <TimeInput
+                          value={newRowData[column] || ""}
+                          onChange={(value) => {
+                            if (validateInput(value, columnTypes[column])) {
+                              setNewRowData({ ...newRowData, [column]: value });
+                            }
+                          }}
+                          placeholder={"HH:MM"}
+                        />
                       ) : (
                         <input
                           type="text"
@@ -653,7 +685,8 @@ const DataTable = ({
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="updateValue">New Value</label>
-                    {updateColumn && columnTypes[updateColumn] === "date_time" ? (
+                    {updateColumn &&
+                    columnTypes[updateColumn] === "date_time" ? (
                       <DateTimeInput
                         value={updateValue}
                         onChange={(value) => {
@@ -662,6 +695,26 @@ const DataTable = ({
                           }
                         }}
                         placeholder="MM/DD/YYYY HH:MM"
+                      />
+                    ) : columnTypes[updateColumn] === "date" ? (
+                      <DateInput
+                        value={updateValue}
+                        onChange={(value) => {
+                          if (validateInput(value, columnTypes[updateColumn])) {
+                            setUpdateValue(value);
+                          }
+                        }}
+                        placeholder={"MM/DD/YYYY"}
+                      />
+                    ) : columnTypes[updateColumn] === "time" ? (
+                      <TimeInput
+                        value={updateValue}
+                        onChange={(value) => {
+                          if (validateInput(value, columnTypes[updateColumn])) {
+                            setUpdateValue(value);
+                          }
+                        }}
+                        placeholder={"HH:MM"}
                       />
                     ) : (
                       <input

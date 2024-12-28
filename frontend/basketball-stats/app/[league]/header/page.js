@@ -55,8 +55,8 @@ const primaryKey = "game_id";
 const columnTypes = {
   game_id: "string",
   game: "string",
-  date_of_game: "string",
-  time_of_game: "string",
+  date_of_game: "date",
+  time_of_game: "time",
   round_of_game: "integer",
   phase: "string",
   season_team_id_a: "string",
