@@ -59,6 +59,8 @@ const HeaderUserView = ({ league }) => {
   const seasons = Array.from({ length: 2023 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
 
+  const sanitizedWinner = HeaderData?.winner?.trim();
+
   const gameDropdownRef = useRef(null);
 
   useEffect(() => {
@@ -139,7 +141,7 @@ const HeaderUserView = ({ league }) => {
         sectionPosition.top >= 0 && sectionPosition.top <= window.innerHeight;
 
       if (isVisible) {
-        if (HeaderData?.winner !== "draw") {
+        if (sanitizedWinner !== "draw") {
           triggerFireworks();
         }
         window.removeEventListener("scroll", handleScroll); // Fireworks only trigger once
@@ -687,9 +689,6 @@ const HeaderUserView = ({ league }) => {
                                     score,
                                     totalScore
                                   ) => {
-                                    console.log(
-                                      `Calculating percentage for score: ${score}, totalScore: ${totalScore}`
-                                    );
                                     if (
                                       score === null ||
                                       totalScore === null ||
@@ -762,9 +761,13 @@ const HeaderUserView = ({ league }) => {
                       <div
                         ref={winnerSectionRef}
                         className={styles.winnerSection}
-                        onClick={() => triggerFireworks()}
+                        onClick={() => {
+                          if (sanitizedWinner !== "draw") {
+                            triggerFireworks();
+                          }
+                        }}
                       >
-                        {HeaderData?.winner === "team_a" && (
+                        {sanitizedWinner === "team_a" && (
                           <div className={styles.winner}>
                             <Image
                               src={currentGameTeams.team1.logoUrl}
@@ -779,7 +782,7 @@ const HeaderUserView = ({ league }) => {
                             </p>
                           </div>
                         )}
-                        {HeaderData?.winner === "team_b" && (
+                        {sanitizedWinner === "team_b" && (
                           <div className={styles.winner}>
                             <Image
                               src={currentGameTeams.team2.logoUrl}
@@ -794,9 +797,9 @@ const HeaderUserView = ({ league }) => {
                             </p>
                           </div>
                         )}
-                        {HeaderData?.winner === "draw" && (
+                        {sanitizedWinner === "draw" && (
                           <div className={styles.winner}>
-                            <p>🤝 It's a Draw! Both Teams Fought Hard! ⚡</p>
+                            <p>It's a Draw! Both Teams Fought Hard! 🤝</p>
                           </div>
                         )}
                       </div>

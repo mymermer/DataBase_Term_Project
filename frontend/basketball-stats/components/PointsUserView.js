@@ -6,11 +6,11 @@ import styles from '../styles/PointsUserView.module.css';
 import LoadingSkeleton from './LoadingSkeleton';
 import ErrorDisplay from './ErrorDisplay';
 
-
 const PointsUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState('');
   const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState('');
+  const [gameselectedornot, Setgameselectedornot] = useState('');
   const [scoreAttempts, setScoreAttempts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -19,7 +19,8 @@ const PointsUserView = ({ league }) => {
   const [showGameDropdown, setShowGameDropdown] = useState(false);
   const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null, team2: null });
   const [error, setError] = useState(null);
-  
+  const [lastFetchedGame, setLastFetchedGame] = useState('');
+  const [hasNextPage, setHasNextPage] = useState(true);
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
@@ -27,15 +28,25 @@ const PointsUserView = ({ league }) => {
   useEffect(() => {
     if (selectedSeason) {
       fetchGames();
+      setSelectedGame('');
+      setCurrentGameTeams({ team1: null, team2: null });
     }
   }, [selectedSeason]);
 
   useEffect(() => {
     if (selectedGame) {
+      setOffset(0);
+      setRowsPerPage(25);
       fetchScoreAttempts();
       updateCurrentGameTeams();
     }
-  }, [selectedGame, offset, rowsPerPage]);
+  }, [selectedGame]);
+
+  useEffect(() => {
+    if (lastFetchedGame) {
+      fetchScoreAttempts();
+    }
+  }, [offset, rowsPerPage]);
 
   const fetchGames = async () => {
     setLoading(true);
@@ -65,13 +76,16 @@ const PointsUserView = ({ league }) => {
     setError(null);
     const yearPrefix = tournament === 'cup' ? 'U' : 'E';
     const year = `${yearPrefix}${selectedSeason}`;
+    const gameToFetch = selectedGame || lastFetchedGame;
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/with_year_like?likePattern=${year}%&offset=${offset}&limit=${rowsPerPage}&columns=game_point_id,points,coord_x,coord_y,season_team_id,player,action_of_play,points_a,points_b,game,minute&filters=game:${selectedGame}&sortBy=minute&order=asc`);
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/${tournament}_points/with_year_like?likePattern=${year}%&offset=${offset}&limit=${rowsPerPage + 1}&columns=game_point_id,points,coord_x,coord_y,season_team_id,player,action_of_play,points_a,points_b,game,minute&filters=game:${gameToFetch}&sortBy=minute&order=asc`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setScoreAttempts(data);
+      setHasNextPage(data.length > rowsPerPage);
+      setScoreAttempts(data.slice(0, rowsPerPage));
+      setLastFetchedGame(gameToFetch);
     } catch (error) {
       console.error('Error fetching score attempts:', error);
       setError('Unable to fetch teams data. Please try again later.');
@@ -130,7 +144,9 @@ const PointsUserView = ({ league }) => {
   };
 
   const handleNext = () => {
-    setOffset(offset + rowsPerPage);
+    if (hasNextPage) {
+      setOffset(offset + rowsPerPage);
+    }
   };
 
   const renderGameOptions = () => {
@@ -144,6 +160,7 @@ const PointsUserView = ({ league }) => {
           className={`${styles.gameOption} ${selectedGame === game ? styles.selectedGame : ''}`}
           onClick={() => {
             setSelectedGame(game);
+            Setgameselectedornot(true);
             setShowGameDropdown(false);
           }}
         >
@@ -177,7 +194,7 @@ const PointsUserView = ({ league }) => {
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
         <div className={styles.initialView}>
-          {!selectedGame && <h2>Select a competition to see score changes</h2>}
+          {!gameselectedornot && <h2>Select a competition to see score changes</h2>}
           <div className={styles.selectors}>
             <div className={styles.selectWrapper}>
               <select 
@@ -235,53 +252,49 @@ const PointsUserView = ({ league }) => {
           </div>
         </div>
         {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
-        {selectedGame && (
+        {lastFetchedGame && (
           <>
-            {loading ? (
-              <LoadingSkeleton rows={5} columns={3} />
-            ) : (
-              <div className={styles.scoreAttempts}>
-                {scoreAttempts.map((attempt, index) => (
-                  <div key={attempt.game_point_id} className={`${styles.attemptBlock} ${styles.fadeIn}`}>
-                    <div className={styles.courtWrapper}>
-                      <Image src="/basketball-court.png" alt="Basketball Court" width={300} height={150} />
-                      <div 
-                        className={styles.shotMarker} 
-                        style={{ 
-                          left: `${(1500 + attempt.coord_y) / 7000  * 300}px`, 
-                          top: `${(950 + attempt.coord_x) / 1900 * 150}px` 
-                        }}
+            <div className={styles.scoreAttempts}>
+              {scoreAttempts.map((attempt, index) => (
+                <div key={attempt.game_point_id} className={`${styles.attemptBlock} ${styles.fadeIn}`}>
+                  <div className={styles.courtWrapper}>
+                    <Image src="/basketball-court.png" alt="Basketball Court" width={300} height={150} />
+                    <div 
+                      className={styles.shotMarker} 
+                      style={{ 
+                        left: `${(1500 + attempt.coord_y) / 7000  * 300}px`, 
+                        top: `${(950 + attempt.coord_x) / 1900 * 150}px` 
+                      }}
+                    />
+                    <div className={styles.minuteDisplay}>{attempt.minute}'</div>
+                  </div>
+                  <div className={styles.attemptInfo}>
+                    <div className={styles.teamInfo}>
+                      <Image 
+                        src={teamInfo[getTeamCode(attempt.season_team_id)]?.logoUrl || '/teams_icons/default_team_icon.png'} 
+                        alt="Team Logo" 
+                        width={60} 
+                        height={60} 
+                        className={styles.teamLogo}
                       />
-                      <div className={styles.minuteDisplay}>{attempt.minute}'</div>
+                      <span className={styles.playerName}>{formatPlayerName(attempt.player)}</span>
                     </div>
-                    <div className={styles.attemptInfo}>
-                      <div className={styles.teamInfo}>
-                        <Image 
-                          src={teamInfo[getTeamCode(attempt.season_team_id)]?.logoUrl || '/teams_icons/default_team_icon.png'} 
-                          alt="Team Logo" 
-                          width={60} 
-                          height={60} 
-                          className={styles.teamLogo}
-                        />
-                        <span className={styles.playerName}>{formatPlayerName(attempt.player)}</span>
-                      </div>
-                      <div className={styles.actionInfo}>
-                        <span>{attempt.action_of_play}</span>
-                        <span>
-                          <span className={attempt.points > 0 && getTeamCode(attempt.season_team_id) === attempt.game.split('-')[0] ? styles.scoringTeam : ''}>
-                            {attempt.points_a}
-                          </span>
-                          {' - '}
-                          <span className={attempt.points > 0 && getTeamCode(attempt.season_team_id) === attempt.game.split('-')[1] ? styles.scoringTeam : ''}>
-                            {attempt.points_b}
-                          </span>
+                    <div className={styles.actionInfo}>
+                      <span>{attempt.action_of_play}</span>
+                      <span>
+                        <span className={attempt.points > 0 && getTeamCode(attempt.season_team_id) === attempt.game.split('-')[0] ? styles.scoringTeam : ''}>
+                          {attempt.points_a}
                         </span>
-                      </div>
+                        {' - '}
+                        <span className={attempt.points > 0 && getTeamCode(attempt.season_team_id) === attempt.game.split('-')[1] ? styles.scoringTeam : ''}>
+                          {attempt.points_b}
+                        </span>
+                      </span>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
             <div className={styles.paginationControls}>
               <button onClick={handlePrevious} disabled={offset === 0}>Previous</button>
               <select 
@@ -292,7 +305,7 @@ const PointsUserView = ({ league }) => {
                 <option value={50}>50 rows</option>
                 <option value={100}>100 rows</option>
               </select>
-              <button onClick={handleNext}>Next</button>
+              <button onClick={handleNext} disabled={!hasNextPage}>Next</button>
             </div>
           </>
         )}
