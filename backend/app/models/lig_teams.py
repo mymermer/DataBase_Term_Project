@@ -482,7 +482,7 @@ class Lig_TeamsDAO():
 
 
     @staticmethod
-    def get_paginated_lig_teams_with_like(
+    def get_lig_teams_with_like(
         db: db,
         like_pattern: str,
     ) -> list:
@@ -498,25 +498,34 @@ class Lig_TeamsDAO():
             # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT 
-                        ct.*,  -- Select all columns from LIG_TEAMS
-                        cp.season_player_id AS best_player_id, 
-                        cp.player AS best_player, 
-                        cp.points AS best_player_valuation
+                        lt.season_team_id,
+                        lt.points,
+                        lt.games_played,
+                        lt.minutes_played,
+                        lt.valuation,
+                        lt.total_rebounds_per_game,
+                        lt.assists_per_game,
+                        lt.steals_per_game,
+                        lt.blocks_favour_per_game,  
+                
+                        lp.season_player_id AS best_player_id, 
+                        lp.player AS best_player, 
+                        lp.points AS best_player_valuation
                     FROM 
-                        LIG_TEAMS ct
+                        LIG_TEAMS lt
                     LEFT JOIN 
-                        LIG_PLAYERS cp 
+                        LIG_PLAYERS lp 
                     ON 
-                        ct.season_team_id = cp.season_team_id
+                        lt.season_team_id = lp.season_team_id
                     WHERE 
-                        ct.season_team_id LIKE %s
-                        AND cp.points = (
+                        lt.season_team_id LIKE %s
+                        AND lp.points = (
                             SELECT MAX(inner_cp.points)
                             FROM LIG_PLAYERS inner_cp
-                            WHERE inner_cp.season_team_id = cp.season_team_id
+                            WHERE inner_cp.season_team_id = lp.season_team_id
                         )
                     ORDER BY 
-                        ct.valuation DESC
+                        lt.points DESC
             """
 
             cursor = connection.cursor(dictionary=True)

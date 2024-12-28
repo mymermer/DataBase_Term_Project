@@ -132,31 +132,15 @@ def get_average_values(season):
 
 
 @cup_teams_bp.route('/cup_teams/with_year_like', methods=['GET'])
-def get_paginated_teams_with_like():
+def get_teams_with_like():
     try:
         # Retrieve query parameters
         like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
         if not like_pattern or len(like_pattern) < 5:
             return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
 
-        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
-        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
-        columns = request.args.get('columns', None)  # Optional column list
-        filters_raw = request.args.get('filters', None)  # Optional filters
-        sort_by = request.args.get('sortBy', None)  # Optional sort column
-        order = request.args.get('order', 'asc')  # Default to ascending order
-
-        # Parse columns if provided
-        if columns:
-            columns = columns.split(",")
-
-        # Parse filters if provided
-        filters = None
-        if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
-
         # Call the DAO method with the like_pattern
-        cup_teams = Cup_TeamsDAO.get_paginated_cup_teams_with_like(
+        cup_teams = Cup_TeamsDAO.get_cup_teams_with_like(
             db,
             like_pattern=like_pattern,
         )

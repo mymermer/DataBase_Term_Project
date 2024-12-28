@@ -483,7 +483,7 @@ class Cup_TeamsDAO():
 
 
     @staticmethod
-    def get_paginated_cup_teams_with_like(
+    def get_cup_teams_with_like(
         db: db,
         like_pattern: str,
     ) -> list:
@@ -499,7 +499,16 @@ class Cup_TeamsDAO():
             # Final query with LIMIT and OFFSET
             query = f"""
                 SELECT 
-                        ct.*,  -- Select all columns from CUP_TEAMS
+                        ct.season_team_id,
+                        ct.points,
+                        ct.games_played,
+                        ct.minutes_played,
+                        ct.valuation,
+                        ct.total_rebounds_per_game,
+                        ct.assists_per_game,
+                        ct.steals_per_game,
+                        ct.blocks_favour_per_game,  
+
                         cp.season_player_id AS best_player_id, 
                         cp.player AS best_player, 
                         cp.points AS best_player_valuation
@@ -517,7 +526,7 @@ class Cup_TeamsDAO():
                             WHERE inner_cp.season_team_id = cp.season_team_id
                         )
                     ORDER BY 
-                        ct.valuation DESC
+                        ct.points DESC
             """
 
             cursor = connection.cursor(dictionary=True)
