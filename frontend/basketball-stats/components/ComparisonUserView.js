@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import ErrorDisplay from "./ErrorDisplay";
+import LoadingSkeleton from "./LoadingSkeleton";
 
 const ComparisonUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
@@ -450,151 +451,161 @@ const ComparisonUserView = ({ league }) => {
         </div>
         {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
         {selectedGame && (
-          <div className={styles.comparisonView}>
-            {currentGameTeams.team1 && currentGameTeams.team2 ? (
-              comparisonData ? (
-                <div>
-                  <div className={styles.gameInfo}>
-                    <h3>GAME DETAILS</h3>
-                    <div className={styles.detailsRow}>
-                      <span className={styles.detail}>
-                        <strong>🚩 Round:</strong>{" "}
-                        <span style={{ color: "black" }}>
-                          {comparisonData.round_of_game}
-                        </span>
-                      </span>
-                      <span className={styles.detail}>
-                        <strong>📌 Phase:</strong>{" "}
-                        <span style={{ color: "black" }}>
-                          {comparisonData.phase}
-                        </span>
-                      </span>
-                      {selectedSeason && ( // Conditionally render if season is selected
-                        <span className={styles.detail}>
-                          <strong>🏆 Season:</strong>{" "}
-                          <span style={{ color: "black" }}>
-                            {selectedSeason}-{parseInt(selectedSeason) + 1}
+          <>
+            {loading ? (
+              <LoadingSkeleton rows={5} columns={3} />
+            ) : (
+              <div className={styles.comparisonView}>
+                {currentGameTeams.team1 && currentGameTeams.team2 ? (
+                  comparisonData ? (
+                    <div>
+                      <div className={styles.gameInfo}>
+                        <h3>GAME DETAILS</h3>
+                        <div className={styles.detailsRow}>
+                          <span className={styles.detail}>
+                            <strong>🚩 Round:</strong>{" "}
+                            <span style={{ color: "black" }}>
+                              {comparisonData.round_of_game}
+                            </span>
                           </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                          <span className={styles.detail}>
+                            <strong>📌 Phase:</strong>{" "}
+                            <span style={{ color: "black" }}>
+                              {comparisonData.phase}
+                            </span>
+                          </span>
+                          {selectedSeason && ( // Conditionally render if season is selected
+                            <span className={styles.detail}>
+                              <strong>🏆 Season:</strong>{" "}
+                              <span style={{ color: "black" }}>
+                                {selectedSeason}-{parseInt(selectedSeason) + 1}
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                  <h3>
-                    Comparison between {currentGameTeams.team1.fullName} &{" "}
-                    {currentGameTeams.team2.fullName}
-                  </h3>
-                  <table className={styles.comparisonTable}>
-                    <thead>
-                      <tr>
-                        <th style={{ fontSize: "18px" }}>Statistic</th>
-                        <th>
-                          <div className={styles.teamHeader}>
-                            <div className={styles.teamLogoWrapper}>
-                              <Image
-                                src={
-                                  currentGameTeams.team1.logoUrl ||
-                                  "/teams_icons/default_team_icon.png"
-                                }
-                                alt={`${currentGameTeams.team1.fullName} logo`}
-                                width={30}
-                                height={30}
-                                className={styles.teamLogo}
-                              />
-                            </div>
-                            <div className={styles.teamNameWrapper}>
-                              {currentGameTeams.team1.fullName}
-                            </div>
-                          </div>
-                        </th>
-                        <th>
-                          <div className={styles.teamHeader}>
-                            <div className={styles.teamLogoWrapper}>
-                              <Image
-                                src={
-                                  currentGameTeams.team2.logoUrl ||
-                                  "/teams_icons/default_team_icon.png"
-                                }
-                                alt={`${currentGameTeams.team2.fullName} logo`}
-                                width={30}
-                                height={30}
-                                className={styles.teamLogo}
-                              />
-                            </div>
-                            <div className={styles.teamNameWrapper}>
-                              {currentGameTeams.team2.fullName}
-                            </div>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(categories).map(
-                        ([category, keys], categoryIndex) => (
-                          <React.Fragment key={`category-${categoryIndex}`}>
-                            <tr>
-                              <td colSpan="3" className={styles.categoryHeader}>
-                                {category + " STATS:"}
-                              </td>
-                            </tr>
-                            {keys.map((key) => {
-                              const baseKey = key;
-
-                              // Use the emojiMap for the table labels
-                              const label =
-                                emojiMap[baseKey] || baseKey.replace(/_/g, " ");
-
-                              const formatValue = (val) =>
-                                val === null ||
-                                val === undefined ||
-                                (typeof val === "string" && val.trim() === "")
-                                  ? "N/A"
-                                  : typeof val === "string"
-                                  ? val.trim()
-                                  : val;
-
-                              return (
-                                <tr key={`row-${category}-${baseKey}`}>
-                                  <td>{label}</td>
-                                  <td>
-                                    {formatValue(
-                                      comparisonData[`${baseKey}_a`]
-                                    )}
-                                  </td>
-                                  <td>
-                                    {formatValue(
-                                      comparisonData[`${baseKey}_b`]
-                                    )}
+                      <h3>
+                        Comparison between {currentGameTeams.team1.fullName} &{" "}
+                        {currentGameTeams.team2.fullName}
+                      </h3>
+                      <table className={styles.comparisonTable}>
+                        <thead>
+                          <tr>
+                            <th style={{ fontSize: "18px" }}>Statistic</th>
+                            <th>
+                              <div className={styles.teamHeader}>
+                                <div className={styles.teamLogoWrapper}>
+                                  <Image
+                                    src={
+                                      currentGameTeams.team1.logoUrl ||
+                                      "/teams_icons/default_team_icon.png"
+                                    }
+                                    alt={`${currentGameTeams.team1.fullName} logo`}
+                                    width={30}
+                                    height={30}
+                                    className={styles.teamLogo}
+                                  />
+                                </div>
+                                <div className={styles.teamNameWrapper}>
+                                  {currentGameTeams.team1.fullName}
+                                </div>
+                              </div>
+                            </th>
+                            <th>
+                              <div className={styles.teamHeader}>
+                                <div className={styles.teamLogoWrapper}>
+                                  <Image
+                                    src={
+                                      currentGameTeams.team2.logoUrl ||
+                                      "/teams_icons/default_team_icon.png"
+                                    }
+                                    alt={`${currentGameTeams.team2.fullName} logo`}
+                                    width={30}
+                                    height={30}
+                                    className={styles.teamLogo}
+                                  />
+                                </div>
+                                <div className={styles.teamNameWrapper}>
+                                  {currentGameTeams.team2.fullName}
+                                </div>
+                              </div>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(categories).map(
+                            ([category, keys], categoryIndex) => (
+                              <React.Fragment key={`category-${categoryIndex}`}>
+                                <tr>
+                                  <td
+                                    colSpan="3"
+                                    className={styles.categoryHeader}
+                                  >
+                                    {category + " STATS:"}
                                   </td>
                                 </tr>
-                              );
-                            })}
-                            {/* Add chart for this category */}
-                            <tr>
-                              <td colSpan="3">
-                                {comparisonData &&
-                                  renderCategoryChart(category, keys)}
-                              </td>
-                            </tr>
-                          </React.Fragment>
-                        )
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className={styles.comingSoon}>
-                  <p>Loading comparison data...</p>
-                </div>
-              )
-            ) : (
-              <div className={styles.comingSoon}>
-                <p>Under Maintenance...</p>
+                                {keys.map((key) => {
+                                  const baseKey = key;
+
+                                  // Use the emojiMap for the table labels
+                                  const label =
+                                    emojiMap[baseKey] ||
+                                    baseKey.replace(/_/g, " ");
+
+                                  const formatValue = (val) =>
+                                    val === null ||
+                                    val === undefined ||
+                                    (typeof val === "string" &&
+                                      val.trim() === "")
+                                      ? "N/A"
+                                      : typeof val === "string"
+                                      ? val.trim()
+                                      : val;
+
+                                  return (
+                                    <tr key={`row-${category}-${baseKey}`}>
+                                      <td>{label}</td>
+                                      <td>
+                                        {formatValue(
+                                          comparisonData[`${baseKey}_a`]
+                                        )}
+                                      </td>
+                                      <td>
+                                        {formatValue(
+                                          comparisonData[`${baseKey}_b`]
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                                {/* Add chart for this category */}
+                                <tr>
+                                  <td colSpan="3">
+                                    {comparisonData &&
+                                      renderCategoryChart(category, keys)}
+                                  </td>
+                                </tr>
+                              </React.Fragment>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className={styles.comingSoon}>
+                      <p>Loading comparison data...</p>
+                    </div>
+                  )
+                ) : (
+                  <div className={styles.comingSoon}>
+                    <p>Under Maintenance...</p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
+          </>
         )}
-        {loading && <p>Loading...</p>}
       </div>
     </div>
   );

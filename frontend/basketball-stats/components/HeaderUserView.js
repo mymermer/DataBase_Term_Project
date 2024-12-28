@@ -5,6 +5,7 @@ import Image from "next/image";
 import styles from "../styles/HeaderUserView.module.css";
 import { Fireworks } from "fireworks-js";
 import ErrorDisplay from "./ErrorDisplay";
+import LoadingSkeleton from "./LoadingSkeleton";
 
 const HeaderUserView = ({ league }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
@@ -465,340 +466,355 @@ const HeaderUserView = ({ league }) => {
         </div>
         {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
         {selectedGame && (
-          <div className={styles.headerView}>
-            {currentGameTeams.team1 && currentGameTeams.team2 ? (
-              HeaderData ? (
-                <div>
-                  <div className={styles.gameInfo}>
-                    <h3>GAME DETAILS</h3>
-                    <div className={styles.detailsGrid}>
-                      <div className={styles.detail}>
-                        <strong>📅 Date:</strong>
-                        <span>{HeaderData.date_of_game}</span>
-                      </div>
-                      <div className={styles.detail}>
-                        <strong>🕐 Time:</strong>
-                        <span>{HeaderData.time_of_game?.slice(0, -3)}</span>
-                      </div>
-                      <div className={styles.detail}>
-                        <strong>⏲ Duration:</strong>
-                        <span>{HeaderData.game_time} mins</span>
-                      </div>
-                      <div className={styles.detail}>
-                        <strong>🏟️ Stadium (capacity):</strong>
-                        <span>
-                          {HeaderData.stadium} ({HeaderData.capacity})
-                        </span>
-                      </div>
-                      <div className={styles.detail}>
-                        <strong>👨🏻‍⚖️ Referees:</strong>
-                        <div className={styles.refereeList}>
-                          <div>
-                            {HeaderData.referee_1 !==
-                            ("N/D" || null || undefined || "None" || "") ? (
-                              <a
-                                href={`https://en.wikipedia.org/wiki/${formatRefereeName(
-                                  HeaderData.referee_1
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  textDecoration: "none",
-                                  color: "#000",
-                                }}
-                              >
-                                {HeaderData.referee_1}{" "}
-                                <sup style={{ color: "#8b0000" }}>1</sup>
-                              </a>
-                            ) : (
-                              <span style={{ color: "#555" }}>
-                                undefined{" "}
-                                <sup style={{ color: "#8b0000" }}>1</sup>
-                              </span>
-                            )}
-                          </div>
-                          <div>
-                            {HeaderData.referee_2 !==
-                            ("N/D" || null || undefined || "None" || "") ? (
-                              <a
-                                href={`https://en.wikipedia.org/wiki/${formatRefereeName(
-                                  HeaderData.referee_2
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  textDecoration: "none",
-                                  color: "#000",
-                                }}
-                              >
-                                {HeaderData.referee_2}{" "}
-                                <sup style={{ color: "#8b0000" }}>2</sup>
-                              </a>
-                            ) : (
-                              <span style={{ color: "#555" }}>
-                                undefined{" "}
-                                <sup style={{ color: "#8b0000" }}>2</sup>
-                              </span>
-                            )}
-                          </div>
-                          <div>
-                            {HeaderData.referee_3 !==
-                            ("N/D" || null || undefined || "None" || "") ? (
-                              <a
-                                href={`https://en.wikipedia.org/wiki/${formatRefereeName(
-                                  HeaderData.referee_3
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  textDecoration: "none",
-                                  color: "#000",
-                                }}
-                              >
-                                {HeaderData.referee_3}{" "}
-                                <sup style={{ color: "#8b0000" }}>3</sup>
-                              </a>
-                            ) : (
-                              <span style={{ color: "#555" }}>
-                                undefined{" "}
-                                <sup style={{ color: "#8b0000" }}>3</sup>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className={styles.detail}>
-                        <strong>📌 Phase:</strong>
-                        <span>{HeaderData.phase}</span>
-                      </div>
-                      <div className={styles.detail}>
-                        <strong>🚩 Round:</strong>
-                        <span>{HeaderData.round_of_game}</span>
-                      </div>
-                      {selectedSeason && (
-                        <div className={styles.detail}>
-                          <strong>🏆 Season:</strong>
-                          <span>
-                            {selectedSeason}-{parseInt(selectedSeason) + 1}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <h3>
-                    Details of the game between{" "}
-                    {currentGameTeams.team1.fullName} &{" "}
-                    {currentGameTeams.team2.fullName}
-                  </h3>
-                  <table className={styles.headerTable}>
-                    <thead>
-                      <tr>
-                        <th style={{ fontSize: "18px" }}>Statistic</th>
-                        <th>
-                          <div className={styles.teamHeader}>
-                            <div className={styles.teamLogoWrapper}>
-                              <Image
-                                src={
-                                  currentGameTeams.team1.logoUrl ||
-                                  "/teams_icons/default_team_icon.png"
-                                }
-                                alt={`${currentGameTeams.team1.fullName} logo`}
-                                width={30}
-                                height={30}
-                                className={styles.teamLogo}
-                              />
-                            </div>
-                            <div className={styles.teamNameWrapper}>
-                              {currentGameTeams.team1.fullName}
-                            </div>
-                          </div>
-                        </th>
-                        <th>
-                          <div className={styles.teamHeader}>
-                            <div className={styles.teamLogoWrapper}>
-                              <Image
-                                src={
-                                  currentGameTeams.team2.logoUrl ||
-                                  "/teams_icons/default_team_icon.png"
-                                }
-                                alt={`${currentGameTeams.team2.fullName} logo`}
-                                width={30}
-                                height={30}
-                                className={styles.teamLogo}
-                              />
-                            </div>
-                            <div className={styles.teamNameWrapper}>
-                              {currentGameTeams.team2.fullName}
-                            </div>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(categories).map(
-                        ([category, keys], categoryIndex) => (
-                          <React.Fragment key={`category-${categoryIndex}`}>
-                            {keys.map((key) => {
-                              const baseKey = key;
-
-                              // Use the emojiMap for the table labels
-                              const label =
-                                emojiMap[baseKey] || baseKey.replace(/_/g, " ");
-
-                              // Enhanced formatValue function with debug logs
-                              const formatValue = (val) => {
-                                if (
-                                  [
-                                    "score_extra_time_1",
-                                    "score_extra_time_2",
-                                    "score_extra_time_3",
-                                    "score_extra_time_4",
-                                  ].includes(baseKey)
-                                ) {
-                                  // Check specifically for null or undefined, return "None" only if invalid
-                                  return val === null ||
-                                    val === undefined ||
-                                    isNaN(val) ||
-                                    (typeof val === "string" &&
-                                      val.trim() === "") ||
-                                    val === 0
-                                    ? "None"
-                                    : val;
-                                }
-
-                                // General case for other keys
-                                return val === null ||
-                                  val === undefined ||
-                                  (typeof val === "string" && val.trim() === "")
-                                  ? "N/A"
-                                  : val;
-                              };
-
-                              // Enhanced percentage calculation function with debug logs
-                              const calculatePercentage = (
-                                score,
-                                totalScore
-                              ) => {
-                                console.log(
-                                  `Calculating percentage for score: ${score}, totalScore: ${totalScore}`
-                                );
-                                if (
-                                  score === null ||
-                                  totalScore === null ||
-                                  isNaN(score) ||
-                                  isNaN(totalScore) ||
-                                  totalScore === 0
-                                ) {
-                                  return ""; // Return empty if invalid or zero total score
-                                }
-                                return ` (${(
-                                  (score / totalScore) *
-                                  100
-                                ).toFixed(2)}%)`;
-                              };
-
-                              const totalScoreA = HeaderData?.score_a ?? 0; // Team A total score
-                              const totalScoreB = HeaderData?.score_b ?? 0; // Team B total score
-
-                              const isScoreKey =
-                                baseKey.startsWith("score_quarter_") ||
-                                baseKey.startsWith("score_extra_time_");
-
-                              return (
-                                <tr key={`row-${category}-${baseKey}`}>
-                                  <td>{label}</td>
-                                  <td>
-                                    {formatValue(HeaderData?.[`${baseKey}_a`])}
-                                    {isScoreKey &&
-                                      HeaderData[`${baseKey}_a`] !== null &&
-                                      HeaderData[`${baseKey}_a`] !==
-                                        undefined &&
-                                      formatValue(
-                                        HeaderData[`${baseKey}_a`]
-                                      ) !== "None" &&
-                                      calculatePercentage(
-                                        parseFloat(HeaderData[`${baseKey}_a`]),
-                                        parseFloat(totalScoreA)
-                                      )}
-                                  </td>
-                                  <td>
-                                    {formatValue(HeaderData?.[`${baseKey}_b`])}
-                                    {isScoreKey &&
-                                      HeaderData[`${baseKey}_b`] !== null &&
-                                      HeaderData[`${baseKey}_b`] !==
-                                        undefined &&
-                                      formatValue(
-                                        HeaderData[`${baseKey}_b`]
-                                      ) !== "None" &&
-                                      calculatePercentage(
-                                        parseFloat(HeaderData[`${baseKey}_b`]),
-                                        parseFloat(totalScoreB)
-                                      )}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </React.Fragment>
-                        )
-                      )}
-                    </tbody>
-                  </table>
-                  <div
-                    ref={winnerSectionRef}
-                    className={styles.winnerSection}
-                    onClick={() => triggerFireworks()}
-                  >
-                    {HeaderData?.winner === "team_a" && (
-                      <div className={styles.winner}>
-                        <Image
-                          src={currentGameTeams.team1.logoUrl}
-                          alt={`${currentGameTeams.team1.fullName} logo`}
-                          width={50}
-                          height={50}
-                          className={styles.winnerLogo}
-                        />
-                        <p>
-                          <strong>{currentGameTeams.team1.fullName}</strong> Won
-                          the Game! 🎉
-                        </p>
-                      </div>
-                    )}
-                    {HeaderData?.winner === "team_b" && (
-                      <div className={styles.winner}>
-                        <Image
-                          src={currentGameTeams.team2.logoUrl}
-                          alt={`${currentGameTeams.team2.fullName} logo`}
-                          width={50}
-                          height={50}
-                          className={styles.winnerLogo}
-                        />
-                        <p>
-                          <strong>{currentGameTeams.team2.fullName}</strong> Won
-                          the Game! 🎉
-                        </p>
-                      </div>
-                    )}
-                    {HeaderData?.winner === "draw" && (
-                      <div className={styles.winner}>
-                        <p>🤝 It's a Draw! Both Teams Fought Hard! ⚡</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className={styles.comingSoon}>
-                  <p>Loading header data...</p>
-                </div>
-              )
+          <>
+            {loading ? (
+              <LoadingSkeleton rows={5} columns={3} />
             ) : (
-              <div className={styles.comingSoon}>
-                <p>Under Maintenance...</p>
+              <div className={styles.headerView}>
+                {currentGameTeams.team1 && currentGameTeams.team2 ? (
+                  HeaderData ? (
+                    <div>
+                      <div className={styles.gameInfo}>
+                        <h3>GAME DETAILS</h3>
+                        <div className={styles.detailsGrid}>
+                          <div className={styles.detail}>
+                            <strong>📅 Date:</strong>
+                            <span>{HeaderData.date_of_game}</span>
+                          </div>
+                          <div className={styles.detail}>
+                            <strong>🕐 Time:</strong>
+                            <span>{HeaderData.time_of_game?.slice(0, -3)}</span>
+                          </div>
+                          <div className={styles.detail}>
+                            <strong>⏲ Duration:</strong>
+                            <span>{HeaderData.game_time} mins</span>
+                          </div>
+                          <div className={styles.detail}>
+                            <strong>🏟️ Stadium (capacity):</strong>
+                            <span>
+                              {HeaderData.stadium} ({HeaderData.capacity})
+                            </span>
+                          </div>
+                          <div className={styles.detail}>
+                            <strong>👨🏻‍⚖️ Referees:</strong>
+                            <div className={styles.refereeList}>
+                              <div>
+                                {HeaderData.referee_1 !==
+                                ("N/D" || null || undefined || "None" || "") ? (
+                                  <a
+                                    href={`https://en.wikipedia.org/wiki/${formatRefereeName(
+                                      HeaderData.referee_1
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      textDecoration: "none",
+                                      color: "#000",
+                                    }}
+                                  >
+                                    {HeaderData.referee_1}{" "}
+                                    <sup style={{ color: "#8b0000" }}>1</sup>
+                                  </a>
+                                ) : (
+                                  <span style={{ color: "#555" }}>
+                                    undefined{" "}
+                                    <sup style={{ color: "#8b0000" }}>1</sup>
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                {HeaderData.referee_2 !==
+                                ("N/D" || null || undefined || "None" || "") ? (
+                                  <a
+                                    href={`https://en.wikipedia.org/wiki/${formatRefereeName(
+                                      HeaderData.referee_2
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      textDecoration: "none",
+                                      color: "#000",
+                                    }}
+                                  >
+                                    {HeaderData.referee_2}{" "}
+                                    <sup style={{ color: "#8b0000" }}>2</sup>
+                                  </a>
+                                ) : (
+                                  <span style={{ color: "#555" }}>
+                                    undefined{" "}
+                                    <sup style={{ color: "#8b0000" }}>2</sup>
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                {HeaderData.referee_3 !==
+                                ("N/D" || null || undefined || "None" || "") ? (
+                                  <a
+                                    href={`https://en.wikipedia.org/wiki/${formatRefereeName(
+                                      HeaderData.referee_3
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      textDecoration: "none",
+                                      color: "#000",
+                                    }}
+                                  >
+                                    {HeaderData.referee_3}{" "}
+                                    <sup style={{ color: "#8b0000" }}>3</sup>
+                                  </a>
+                                ) : (
+                                  <span style={{ color: "#555" }}>
+                                    undefined{" "}
+                                    <sup style={{ color: "#8b0000" }}>3</sup>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className={styles.detail}>
+                            <strong>📌 Phase:</strong>
+                            <span>{HeaderData.phase}</span>
+                          </div>
+                          <div className={styles.detail}>
+                            <strong>🚩 Round:</strong>
+                            <span>{HeaderData.round_of_game}</span>
+                          </div>
+                          {selectedSeason && (
+                            <div className={styles.detail}>
+                              <strong>🏆 Season:</strong>
+                              <span>
+                                {selectedSeason}-{parseInt(selectedSeason) + 1}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <h3>
+                        Details of the game between{" "}
+                        {currentGameTeams.team1.fullName} &{" "}
+                        {currentGameTeams.team2.fullName}
+                      </h3>
+                      <table className={styles.headerTable}>
+                        <thead>
+                          <tr>
+                            <th style={{ fontSize: "18px" }}>Statistic</th>
+                            <th>
+                              <div className={styles.teamHeader}>
+                                <div className={styles.teamLogoWrapper}>
+                                  <Image
+                                    src={
+                                      currentGameTeams.team1.logoUrl ||
+                                      "/teams_icons/default_team_icon.png"
+                                    }
+                                    alt={`${currentGameTeams.team1.fullName} logo`}
+                                    width={30}
+                                    height={30}
+                                    className={styles.teamLogo}
+                                  />
+                                </div>
+                                <div className={styles.teamNameWrapper}>
+                                  {currentGameTeams.team1.fullName}
+                                </div>
+                              </div>
+                            </th>
+                            <th>
+                              <div className={styles.teamHeader}>
+                                <div className={styles.teamLogoWrapper}>
+                                  <Image
+                                    src={
+                                      currentGameTeams.team2.logoUrl ||
+                                      "/teams_icons/default_team_icon.png"
+                                    }
+                                    alt={`${currentGameTeams.team2.fullName} logo`}
+                                    width={30}
+                                    height={30}
+                                    className={styles.teamLogo}
+                                  />
+                                </div>
+                                <div className={styles.teamNameWrapper}>
+                                  {currentGameTeams.team2.fullName}
+                                </div>
+                              </div>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(categories).map(
+                            ([category, keys], categoryIndex) => (
+                              <React.Fragment key={`category-${categoryIndex}`}>
+                                {keys.map((key) => {
+                                  const baseKey = key;
+
+                                  // Use the emojiMap for the table labels
+                                  const label =
+                                    emojiMap[baseKey] ||
+                                    baseKey.replace(/_/g, " ");
+
+                                  // Enhanced formatValue function with debug logs
+                                  const formatValue = (val) => {
+                                    if (
+                                      [
+                                        "score_extra_time_1",
+                                        "score_extra_time_2",
+                                        "score_extra_time_3",
+                                        "score_extra_time_4",
+                                      ].includes(baseKey)
+                                    ) {
+                                      // Check specifically for null or undefined, return "None" only if invalid
+                                      return val === null ||
+                                        val === undefined ||
+                                        isNaN(val) ||
+                                        (typeof val === "string" &&
+                                          val.trim() === "") ||
+                                        val === 0
+                                        ? "None"
+                                        : val;
+                                    }
+
+                                    // General case for other keys
+                                    return val === null ||
+                                      val === undefined ||
+                                      (typeof val === "string" &&
+                                        val.trim() === "")
+                                      ? "N/A"
+                                      : val;
+                                  };
+
+                                  // Enhanced percentage calculation function with debug logs
+                                  const calculatePercentage = (
+                                    score,
+                                    totalScore
+                                  ) => {
+                                    console.log(
+                                      `Calculating percentage for score: ${score}, totalScore: ${totalScore}`
+                                    );
+                                    if (
+                                      score === null ||
+                                      totalScore === null ||
+                                      isNaN(score) ||
+                                      isNaN(totalScore) ||
+                                      totalScore === 0
+                                    ) {
+                                      return ""; // Return empty if invalid or zero total score
+                                    }
+                                    return ` (${(
+                                      (score / totalScore) *
+                                      100
+                                    ).toFixed(2)}%)`;
+                                  };
+
+                                  const totalScoreA = HeaderData?.score_a ?? 0; // Team A total score
+                                  const totalScoreB = HeaderData?.score_b ?? 0; // Team B total score
+
+                                  const isScoreKey =
+                                    baseKey.startsWith("score_quarter_") ||
+                                    baseKey.startsWith("score_extra_time_");
+
+                                  return (
+                                    <tr key={`row-${category}-${baseKey}`}>
+                                      <td>{label}</td>
+                                      <td>
+                                        {formatValue(
+                                          HeaderData?.[`${baseKey}_a`]
+                                        )}
+                                        {isScoreKey &&
+                                          HeaderData[`${baseKey}_a`] !== null &&
+                                          HeaderData[`${baseKey}_a`] !==
+                                            undefined &&
+                                          formatValue(
+                                            HeaderData[`${baseKey}_a`]
+                                          ) !== "None" &&
+                                          calculatePercentage(
+                                            parseFloat(
+                                              HeaderData[`${baseKey}_a`]
+                                            ),
+                                            parseFloat(totalScoreA)
+                                          )}
+                                      </td>
+                                      <td>
+                                        {formatValue(
+                                          HeaderData?.[`${baseKey}_b`]
+                                        )}
+                                        {isScoreKey &&
+                                          HeaderData[`${baseKey}_b`] !== null &&
+                                          HeaderData[`${baseKey}_b`] !==
+                                            undefined &&
+                                          formatValue(
+                                            HeaderData[`${baseKey}_b`]
+                                          ) !== "None" &&
+                                          calculatePercentage(
+                                            parseFloat(
+                                              HeaderData[`${baseKey}_b`]
+                                            ),
+                                            parseFloat(totalScoreB)
+                                          )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </React.Fragment>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                      <div
+                        ref={winnerSectionRef}
+                        className={styles.winnerSection}
+                        onClick={() => triggerFireworks()}
+                      >
+                        {HeaderData?.winner === "team_a" && (
+                          <div className={styles.winner}>
+                            <Image
+                              src={currentGameTeams.team1.logoUrl}
+                              alt={`${currentGameTeams.team1.fullName} logo`}
+                              width={50}
+                              height={50}
+                              className={styles.winnerLogo}
+                            />
+                            <p>
+                              <strong>{currentGameTeams.team1.fullName}</strong>{" "}
+                              Won the Game! 🎉
+                            </p>
+                          </div>
+                        )}
+                        {HeaderData?.winner === "team_b" && (
+                          <div className={styles.winner}>
+                            <Image
+                              src={currentGameTeams.team2.logoUrl}
+                              alt={`${currentGameTeams.team2.fullName} logo`}
+                              width={50}
+                              height={50}
+                              className={styles.winnerLogo}
+                            />
+                            <p>
+                              <strong>{currentGameTeams.team2.fullName}</strong>{" "}
+                              Won the Game! 🎉
+                            </p>
+                          </div>
+                        )}
+                        {HeaderData?.winner === "draw" && (
+                          <div className={styles.winner}>
+                            <p>🤝 It's a Draw! Both Teams Fought Hard! ⚡</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.comingSoon}>
+                      <p>Loading header data...</p>
+                    </div>
+                  )
+                ) : (
+                  <div className={styles.comingSoon}>
+                    <p>Under Maintenance...</p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
+          </>
         )}
-        {loading && <p>Loading...</p>}
       </div>
     </div>
   );
