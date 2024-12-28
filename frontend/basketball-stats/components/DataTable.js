@@ -1,20 +1,33 @@
-'use client'
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import styles from '../styles/DataTable.module.css';
-import { ChevronDown, ChevronUp, ArrowUpDown, Check, Filter, Columns, Plus, Trash, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import LoadingOverlay from './LoadingOverlay';
-import ErrorDisplay from './ErrorDisplay';
-import DateTimeInput from './DateTimeInput';
+import React, { useState, useRef, useEffect } from "react";
+import styles from "../styles/DataTable.module.css";
+import {
+  ChevronDown,
+  ChevronUp,
+  ArrowUpDown,
+  Check,
+  Filter,
+  Columns,
+  Plus,
+  Trash,
+  Edit,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import LoadingOverlay from "./LoadingOverlay";
+import ErrorDisplay from "./ErrorDisplay";
+import DateTimeInput from "./DateTimeInput";
 
-const DataTable = ({ 
-  initialData, 
-  initialColumns, 
+const DataTable = ({
+  initialData,
+  initialColumns,
   allColumns,
-  currentPage, 
-  rowsPerPage, 
-  totalRows, 
-  onPageChange, 
+  currentPage,
+  rowsPerPage,
+  totalRows,
+  onPageChange,
   onRowsPerPageChange,
   onColumnChange,
   onFilterChange,
@@ -30,7 +43,7 @@ const DataTable = ({
   onFetchData,
   error,
   primaryKey,
-  columnTypes
+  columnTypes,
 }) => {
   const [data, setData] = useState(initialData);
   const [visibleColumns, setVisibleColumns] = useState(initialColumns);
@@ -43,10 +56,10 @@ const DataTable = ({
   const [showPopup, setShowPopup] = useState(false);
   const [popupType, setPopupType] = useState(null);
   const [newRowData, setNewRowData] = useState({});
-  const [deleteId, setDeleteId] = useState('');
-  const [updateId, setUpdateId] = useState('');
-  const [updateColumn, setUpdateColumn] = useState('');
-  const [updateValue, setUpdateValue] = useState('');
+  const [deleteId, setDeleteId] = useState("");
+  const [updateId, setUpdateId] = useState("");
+  const [updateColumn, setUpdateColumn] = useState("");
+  const [updateValue, setUpdateValue] = useState("");
   const [message, setMessage] = useState(null);
 
   const columnSelectorRef = useRef(null);
@@ -65,29 +78,37 @@ const DataTable = ({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (columnSelectorRef.current && !columnSelectorRef.current.contains(event.target) && !columnButtonRef.current.contains(event.target)) {
+      if (
+        columnSelectorRef.current &&
+        !columnSelectorRef.current.contains(event.target) &&
+        !columnButtonRef.current.contains(event.target)
+      ) {
         setShowColumnSelector(false);
       }
-      if (filterSelectorRef.current && !filterSelectorRef.current.contains(event.target) && !filterButtonRef.current.contains(event.target)) {
+      if (
+        filterSelectorRef.current &&
+        !filterSelectorRef.current.contains(event.target) &&
+        !filterButtonRef.current.contains(event.target)
+      ) {
         setShowFilterSelector(false);
         setCurrentFilterColumn(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   useEffect(() => {
-    const longestColumnName = allColumns.reduce((longest, current) => 
+    const longestColumnName = allColumns.reduce((longest, current) =>
       current.length > longest.length ? current : longest
     );
-    const tempElement = document.createElement('span');
-    tempElement.style.visibility = 'hidden';
-    tempElement.style.position = 'absolute';
-    tempElement.style.whiteSpace = 'nowrap';
+    const tempElement = document.createElement("span");
+    tempElement.style.visibility = "hidden";
+    tempElement.style.position = "absolute";
+    tempElement.style.whiteSpace = "nowrap";
     tempElement.innerHTML = longestColumnName;
     document.body.appendChild(tempElement);
     const width = Math.max(200, tempElement.offsetWidth + 50);
@@ -96,9 +117,9 @@ const DataTable = ({
   }, [allColumns]);
 
   const toggleColumn = (columnName) => {
-    setTempVisibleColumns(prev => 
-      prev.includes(columnName) 
-        ? prev.filter(col => col !== columnName)
+    setTempVisibleColumns((prev) =>
+      prev.includes(columnName)
+        ? prev.filter((col) => col !== columnName)
         : [...prev, columnName]
     );
   };
@@ -115,7 +136,7 @@ const DataTable = ({
 
   const applyFilter = () => {
     const filterValue = document.querySelector(`.${styles.filterInput}`).value;
-    if (filterValue.trim() !== '') {
+    if (filterValue.trim() !== "") {
       const newFilters = { ...filters };
       if (!newFilters[currentFilterColumn]) {
         newFilters[currentFilterColumn] = [];
@@ -132,7 +153,7 @@ const DataTable = ({
 
   const removeFilter = (column, value) => {
     const newFilters = { ...filters };
-    newFilters[column] = newFilters[column].filter(v => v !== value);
+    newFilters[column] = newFilters[column].filter((v) => v !== value);
     if (newFilters[column].length === 0) {
       delete newFilters[column];
     }
@@ -151,46 +172,46 @@ const DataTable = ({
     setShowPopup(false);
     setPopupType(null);
     setNewRowData({});
-    setDeleteId('');
-    setUpdateId('');
-    setUpdateColumn('');
-    setUpdateValue('');
+    setDeleteId("");
+    setUpdateId("");
+    setUpdateColumn("");
+    setUpdateValue("");
     setMessage(null); //Added to clear message on close
   };
 
   const handleDelete = async () => {
     try {
       await onDelete(deleteId);
-      setMessage({ type: 'success', text: 'Row deleted successfully' });
+      setMessage({ type: "success", text: "Row deleted successfully" });
       handlePopupClose();
       onFetchData();
     } catch (error) {
-      setMessage({ type: 'error', text: error.message });
+      setMessage({ type: "error", text: error.message });
     }
   };
 
   const handleUpdate = async () => {
     try {
       let formattedUpdateValue = updateValue;
-      if (columnTypes[updateColumn] === 'date') {
+      if (columnTypes[updateColumn] === "date") {
         formattedUpdateValue = formatDateInput(updateValue);
       }
       await onUpdate(updateId, updateColumn, formattedUpdateValue);
-      setMessage({ type: 'success', text: 'Row updated successfully' });
+      setMessage({ type: "success", text: "Row updated successfully" });
       handlePopupClose();
       onFetchData();
     } catch (error) {
-      setMessage({ type: 'error', text: error.message });
+      setMessage({ type: "error", text: error.message });
     }
   };
 
   const validateInput = (value, type) => {
     switch (type) {
-      case 'integer':
+      case "integer":
         return Number.isInteger(Number(value));
-      case 'float':
+      case "float":
         return !isNaN(parseFloat(value)) && isFinite(value);
-      case 'date':
+      case "date":
         const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
         return dateRegex.test(value);
       default:
@@ -206,79 +227,70 @@ const DataTable = ({
     try {
       let result;
       switch (popupType) {
-        case 'add':
+        case "add":
           for (const [column, value] of Object.entries(newRowData)) {
             if (!validateInput(value, columnTypes[column])) {
               throw new Error(`Invalid input for ${column}`);
             }
-            if (columnTypes[column] === 'date') {
+            if (columnTypes[column] === "date") {
               newRowData[column] = formatDateInput(value);
             }
           }
           result = await onAdd(newRowData);
           break;
-        case 'delete':
+        case "delete":
           result = await handleDelete();
           break;
-        case 'update':
+        case "update":
           if (!validateInput(updateValue, columnTypes[updateColumn])) {
             throw new Error(`Invalid input for ${updateColumn}`);
           }
           result = await handleUpdate();
           break;
       }
-      setMessage({ type: 'success', text: 'Operation successful' });
+      setMessage({ type: "success", text: "Operation successful" });
       handlePopupClose();
       onFetchData();
     } catch (error) {
-      setMessage({ type: 'error', text: error.message });
+      setMessage({ type: "error", text: error.message });
     }
     setTimeout(() => setMessage(null), 3000);
   };
 
   useEffect(() => {
     const handleEsc = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         handlePopupClose();
       }
     };
-    window.addEventListener('keydown', handleEsc);
+    window.addEventListener("keydown", handleEsc);
 
     return () => {
-      window.removeEventListener('keydown', handleEsc);
+      window.removeEventListener("keydown", handleEsc);
     };
   }, []);
 
-  const fetchData = async () => { 
-
+  const fetchData = async () => {
     try {
-
       setError(null);
 
       setIsLoading(true);
 
       await onFetchData();
-
     } catch (err) {
-
       setError("Unable to fetch data. Please try again later.");
-
     } finally {
-
       setIsLoading(false);
-
     }
-
   };
-
-
-
-
 
   return (
     <div className={styles.fullWidthWrapper}>
       <div className={styles.dataTable}>
-        <LoadingOverlay isLoading={isLoading} tableWrapperRef={tableWrapperRef} />
+        <LoadingOverlay
+          isLoading={isLoading}
+          tableWrapperRef={tableWrapperRef}
+        />
         {message && (
           <div className={`${styles.message} ${styles[message.type]}`}>
             {message.text}
@@ -288,22 +300,28 @@ const DataTable = ({
           <div className={styles.topButtons}>
             <div className={styles.leftButtons}>
               <div className={styles.controlButtonWrapper}>
-                <button 
+                <button
                   ref={columnButtonRef}
                   onClick={() => {
-                    setShowColumnSelector(prev => !prev);
+                    setShowColumnSelector((prev) => !prev);
                     setShowFilterSelector(false);
-                  }} 
+                  }}
                   className={styles.controlButton}
                 >
-                  <span className={styles.buttonIcon}><Columns size={16} /></span>
+                  <span className={styles.buttonIcon}>
+                    <Columns size={16} />
+                  </span>
                   More Columns
                 </button>
                 {showColumnSelector && (
-                  <div ref={columnSelectorRef} className={styles.selectorBubble} style={{ width: bubbleWidth }}>
+                  <div
+                    ref={columnSelectorRef}
+                    className={styles.selectorBubble}
+                    style={{ width: bubbleWidth }}
+                  >
                     <h3>Select Columns</h3>
                     <div className={styles.columnList}>
-                      {allColumns.map(column => (
+                      {allColumns.map((column) => (
                         <label key={column} className={styles.columnOption}>
                           <span>{column}</span>
                           {tempVisibleColumns.includes(column) && (
@@ -319,35 +337,46 @@ const DataTable = ({
                       ))}
                     </div>
                     <div className={styles.applyButtonWrapper}>
-                      <button onClick={applyColumnSelection} className={styles.applyButton}>Apply</button>
+                      <button
+                        onClick={applyColumnSelection}
+                        className={styles.applyButton}
+                      >
+                        Apply
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
               <div className={styles.controlButtonWrapper}>
-                <button 
+                <button
                   ref={filterButtonRef}
                   onClick={() => {
-                    setShowFilterSelector(prev => !prev);
+                    setShowFilterSelector((prev) => !prev);
                     setShowColumnSelector(false);
                     if (showFilterSelector) {
                       setCurrentFilterColumn(null);
                     }
-                  }} 
+                  }}
                   className={styles.controlButton}
                 >
-                  <span className={styles.buttonIcon}><Filter size={16} /></span>
+                  <span className={styles.buttonIcon}>
+                    <Filter size={16} />
+                  </span>
                   Add Filter
                 </button>
                 {showFilterSelector && (
-                  <div ref={filterSelectorRef} className={styles.selectorBubble} style={{ width: bubbleWidth }}>
+                  <div
+                    ref={filterSelectorRef}
+                    className={styles.selectorBubble}
+                    style={{ width: bubbleWidth }}
+                  >
                     {!currentFilterColumn ? (
                       <>
                         <h3>Select Column to Filter</h3>
                         <div className={styles.columnList}>
-                          {visibleColumns.map(column => (
-                            <button 
-                              key={column} 
+                          {visibleColumns.map((column) => (
+                            <button
+                              key={column}
                               onClick={() => setCurrentFilterColumn(column)}
                               className={styles.columnOption}
                             >
@@ -359,19 +388,23 @@ const DataTable = ({
                     ) : (
                       <>
                         <h3>Filter {currentFilterColumn}</h3>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="Enter filter value"
                           className={styles.filterInput}
-                          defaultValue={filters[currentFilterColumn] ? filters[currentFilterColumn][0] : ''}
+                          defaultValue={
+                            filters[currentFilterColumn]
+                              ? filters[currentFilterColumn][0]
+                              : ""
+                          }
                           onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === "Enter") {
                               applyFilter();
                             }
                           }}
                         />
                         <div className={styles.applyButtonWrapper}>
-                          <button 
+                          <button
                             onClick={applyFilter}
                             className={styles.applyButton}
                           >
@@ -385,38 +418,67 @@ const DataTable = ({
               </div>
             </div>
             <div className={styles.crudButtons}>
-              <button onClick={() => handlePopupOpen('add')} className={`${styles.crudButton} ${styles.addButton}`}>
+              <button
+                onClick={() => handlePopupOpen("add")}
+                className={`${styles.crudButton} ${styles.addButton}`}
+              >
                 <Plus size={16} /> Add
               </button>
-              <button onClick={() => handlePopupOpen('delete')} className={`${styles.crudButton} ${styles.deleteButton}`}>
+              <button
+                onClick={() => handlePopupOpen("delete")}
+                className={`${styles.crudButton} ${styles.deleteButton}`}
+              >
                 <Trash size={16} /> Delete
               </button>
-              <button onClick={() => handlePopupOpen('update')} className={`${styles.crudButton} ${styles.updateButton}`}>
+              <button
+                onClick={() => handlePopupOpen("update")}
+                className={`${styles.crudButton} ${styles.updateButton}`}
+              >
                 <Edit size={16} /> Update
               </button>
             </div>
           </div>
           <div className={styles.filterTags}>
-            {Object.entries(filters).map(([column, values]) => (
+            {Object.entries(filters).map(([column, values]) =>
               values.map((value, index) => (
                 <span key={`${column}-${index}`} className={styles.filterTag}>
                   {column}: {value}
-                  <button onClick={() => removeFilter(column, value)} className={styles.removeFilterButton}>×</button>
+                  <button
+                    onClick={() => removeFilter(column, value)}
+                    className={styles.removeFilterButton}
+                  >
+                    ×
+                  </button>
                 </span>
               ))
-            ))}
+            )}
           </div>
         </div>
-        <div className={`${styles.tableWrapper} ${isLoading ? styles.loading : ''}`} ref={tableWrapperRef}>
+        <div
+          className={`${styles.tableWrapper} ${
+            isLoading ? styles.loading : ""
+          }`}
+          ref={tableWrapperRef}
+        >
           <table className={styles.table}>
             <thead>
               <tr>
-                {visibleColumns.map(column => (
+                {visibleColumns.map((column) => (
                   <th key={column} onClick={() => requestSort(column)}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
                       <span>{column}</span>
                       {sortBy === column ? (
-                        sortOrder === 'asc' ? <ChevronUp className={styles.sortIcon} /> : <ChevronDown className={styles.sortIcon} />
+                        sortOrder === "asc" ? (
+                          <ChevronUp className={styles.sortIcon} />
+                        ) : (
+                          <ChevronDown className={styles.sortIcon} />
+                        )
                       ) : (
                         <ArrowUpDown className={styles.sortIcon} />
                       )}
@@ -428,7 +490,7 @@ const DataTable = ({
             <tbody>
               {data.map((row, rowIndex) => (
                 <tr key={rowIndex}>
-                  {visibleColumns.map(column => (
+                  {visibleColumns.map((column) => (
                     <td key={column}>{row[column]}</td>
                   ))}
                 </tr>
@@ -439,14 +501,14 @@ const DataTable = ({
         {error && <ErrorDisplay message={error} onRetry={onFetchData} />}
         <div className={styles.pagination}>
           <div className={styles.bottomButtons}>
-            <button 
+            <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 0}
               className={styles.paginationButton}
             >
               <ChevronLeft size={20} />
             </button>
-            <button 
+            <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages - 1}
               className={styles.paginationButton}
@@ -455,9 +517,32 @@ const DataTable = ({
             </button>
           </div>
           <div className={styles.paginationControls}>
-            <span>Page {currentPage + 1} of {totalPages}</span>
-            <select 
-              value={rowsPerPage} 
+            <span>
+              Page{" "}
+              <input
+                type="number"
+                min={1}
+                max={totalPages}
+                value={currentPage + 1} // Display the current page + 1
+                onChange={(e) => {
+                  const page = Math.max(
+                    1,
+                    Math.min(totalPages, Number(e.target.value))
+                  ); // Clamp the value between 1 and totalPages
+                  onPageChange(page - 1); // Convert to zero-based index
+                }}
+                onWheel={(e) => e.stopPropagation()} // Prevent page scrolling while using mouse scroll
+                className={styles.pageInput} // Add custom styling for input field
+                style={{
+                  width: "40px",
+                  margin: "auto",
+                  textAlign: "center",
+                }} // Inline styles for a compact design
+              />{" "}
+              of {totalPages}
+            </span>
+            <select
+              value={rowsPerPage}
               onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
             >
               <option value={25}>25 rows</option>
@@ -469,26 +554,33 @@ const DataTable = ({
       </div>
       {showPopup && (
         <div className={styles.popupOverlay} onClick={handlePopupClose}>
-          <div className={styles.popup} onClick={(e) => e.stopPropagation()} style={{ overflow: 'visible' }}>
+          <div
+            className={styles.popup}
+            onClick={(e) => e.stopPropagation()}
+            style={{ overflow: "visible" }}
+          >
             <button className={styles.closeButton} onClick={handlePopupClose}>
               <X size={24} />
             </button>
-            <h2 className={styles.popupTitle}>{popupType.charAt(0).toUpperCase() + popupType.slice(1)}</h2>
+            <h2 className={styles.popupTitle}>
+              {popupType.charAt(0).toUpperCase() + popupType.slice(1)}
+            </h2>
             <div className={styles.warningMessage}>
-              WARNING: This method will have impact on other tables due to foreign key columns: {foreignKeyColumns.join(', ')}.
+              WARNING: This method will have impact on other tables due to
+              foreign key columns: {foreignKeyColumns.join(", ")}.
             </div>
             <div className={styles.popupContent}>
-              {popupType === 'add' && (
+              {popupType === "add" && (
                 <div className={styles.addForm}>
-                  {allColumns.map(column => (
+                  {allColumns.map((column) => (
                     <div key={column} className={styles.formGroup}>
                       <label htmlFor={column}>{column}</label>
-                      {columnTypes[column] === 'date' ? (
+                      {columnTypes[column] === "date" ? (
                         <DateTimeInput
-                          value={newRowData[column] || ''}
+                          value={newRowData[column] || ""}
                           onChange={(value) => {
                             if (validateInput(value, columnTypes[column])) {
-                              setNewRowData({...newRowData, [column]: value});
+                              setNewRowData({ ...newRowData, [column]: value });
                             }
                           }}
                           placeholder="MM/DD/YYYY HH:MM"
@@ -497,11 +589,11 @@ const DataTable = ({
                         <input
                           type="text"
                           id={column}
-                          value={newRowData[column] || ''}
+                          value={newRowData[column] || ""}
                           onChange={(e) => {
                             const value = e.target.value;
                             if (validateInput(value, columnTypes[column])) {
-                              setNewRowData({...newRowData, [column]: value});
+                              setNewRowData({ ...newRowData, [column]: value });
                               e.target.classList.remove(styles.invalidInput);
                             } else {
                               e.target.classList.add(styles.invalidInput);
@@ -515,7 +607,7 @@ const DataTable = ({
                   ))}
                 </div>
               )}
-              {popupType === 'delete' && (
+              {popupType === "delete" && (
                 <div className={styles.deleteForm}>
                   <div className={styles.formGroup}>
                     <label htmlFor="deleteId">{primaryKey}</label>
@@ -530,7 +622,7 @@ const DataTable = ({
                   </div>
                 </div>
               )}
-              {popupType === 'update' && (
+              {popupType === "update" && (
                 <div className={styles.updateForm}>
                   <div className={styles.formGroup}>
                     <label htmlFor="updateId">{primaryKey}</label>
@@ -552,14 +644,16 @@ const DataTable = ({
                       className={styles.input}
                     >
                       <option value="">Select a column</option>
-                      {allColumns.map(column => (
-                        <option key={column} value={column}>{column}</option>
+                      {allColumns.map((column) => (
+                        <option key={column} value={column}>
+                          {column}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="updateValue">New Value</label>
-                    {updateColumn && columnTypes[updateColumn] === 'date' ? (
+                    {updateColumn && columnTypes[updateColumn] === "date" ? (
                       <DateTimeInput
                         value={updateValue}
                         onChange={(value) => {
@@ -583,7 +677,11 @@ const DataTable = ({
                             e.target.classList.add(styles.invalidInput);
                           }
                         }}
-                        placeholder={updateColumn ? `Enter ${columnTypes[updateColumn]}` : 'Select a column first'}
+                        placeholder={
+                          updateColumn
+                            ? `Enter ${columnTypes[updateColumn]}`
+                            : "Select a column first"
+                        }
                         className={styles.input}
                         disabled={!updateColumn}
                       />
@@ -593,8 +691,15 @@ const DataTable = ({
               )}
             </div>
             <div className={styles.popupFooter}>
-              <button onClick={handlePopupClose} className={styles.cancelButton}>Cancel</button>
-              <button onClick={handleApply} className={styles.applyButton}>Apply</button>
+              <button
+                onClick={handlePopupClose}
+                className={styles.cancelButton}
+              >
+                Cancel
+              </button>
+              <button onClick={handleApply} className={styles.applyButton}>
+                Apply
+              </button>
             </div>
           </div>
         </div>
@@ -604,4 +709,3 @@ const DataTable = ({
 };
 
 export default DataTable;
-
