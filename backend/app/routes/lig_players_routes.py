@@ -67,7 +67,7 @@ def update_lig_players(season_player_id):
     try:
         data = request.get_json()
         lig_player = Lig_Player(season_player_id=season_player_id, **data)
-        Lig_PlayersDAO.update_lig_player(db, lig_player, season_player_id)
+        Lig_PlayersDAO.update_lig_player(db, lig_player)
         return jsonify({"message": "Lig player updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
