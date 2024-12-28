@@ -619,6 +619,13 @@
   box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
 }
 
+.errorText {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+
 @keyframes shake {
   10%,
   90% {
