@@ -63,6 +63,7 @@ const DataTable = ({
   const [updateColumn, setUpdateColumn] = useState("");
   const [updateValue, setUpdateValue] = useState("");
   const [message, setMessage] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const columnSelectorRef = useRef(null);
   const filterSelectorRef = useRef(null);
@@ -226,9 +227,54 @@ const DataTable = ({
       case "time":
         const timeRegex = /^(\d{2}):(\d{2})$/;
         return timeRegex.test(value);
+      case "game_id":
+        const gameIdRegex = /^(E|U)\d{4}_\d{3}$/;
+        return gameIdRegex.test(value);
+      case "game":
+        const gameRegex = /^[A-Z]{3}-[A-Z]{3}$/;
+        return gameRegex.test(value);
+      case "season_team_id":
+        const seasonTeamIdRegex = /^(E|U)\d{4}_[A-Z]{3}$/;
+        return seasonTeamIdRegex.test(value);
+      case "game_player_id":
+        const gamePlayerIdRegex = /^(E|U)\d{4}_\d{3}_[A-Za-z0-9]+$/;
+        return gamePlayerIdRegex.test(value);
+      case "season_player_id":
+        const seasonPlayerIdRegex = /^(E|U)\d{4}_[A-Za-z0-9]+_[A-Za-z]{3}$/;
+        return seasonPlayerIdRegex.test(value);
+      case "game_play_id":
+      case "game_point_id": // Same validation as game_play_id
+        const gamePlayIdRegex = /^(E|U)\d{4}_\d{3}_\d+$/;
+        return gamePlayIdRegex.test(value);
+      case "winner":
+        return ["team_a", "team_b", "draw"].includes(value);
+      case "game_time":
+        const gameTimeRegex = /^\d+:\d+:\d+$/;
+        return gameTimeRegex.test(value);
       default:
         return true;
     }
+  };
+
+  const errorMessages = {
+    integer: "Value must be an integer.",
+    float: "Value must be a float.",
+    date_time: "Value must be in the format MM/DD/YYYY HH:MM.",
+    date: "Value must be in the format MM/DD/YYYY.",
+    time: "Value must be in the format HH:MM.",
+    game_id: "Value must be in a format like E2007_001 or U2007_001.",
+    game: "Value must be in the format TEAM1-TEAM2 (e.g., MAD-BAR).",
+    season_team_id: "Value must be in a format like E2007_TEAM or U2007_TEAM.",
+    game_player_id:
+      "Value must be in the format U2007_001_ABC (e.g., U2007_123_PJEZ or E2013_123_PJEZ).",
+    season_player_id:
+      "Value must be in the format U2007_ABC123_ABC (e.g., U2007_PKQK_JER or E2014_PNZ130_MAD).",
+    game_play_id:
+      "Value must be in the format U2007_123_13245 (e.g., U2007_001_006 or E2009_052_1208).",
+    game_point_id:
+      "Value must be in the format U2007_123_13245 (e.g., U2007_001_006 or E2009_052_1208).",
+    winner: "Value must be one of: 'team_a', 'team_b', or 'draw'.",
+    game_time: "Value must match the format MM:SS:MS (e.g., 40:00:00).",
   };
 
   const formatDateInput = (value) => {
@@ -237,33 +283,50 @@ const DataTable = ({
 
   const handleApply = async () => {
     try {
+      let hasError = false;
+
+      // Validation for the "Add" popup
+      if (popupType === "add") {
+        for (const [column, value] of Object.entries(newRowData)) {
+          if (!validateInput(value, columnTypes[column])) {
+            hasError = true;
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              [column]: errorMessages[columnTypes[column]],
+            }));
+          }
+        }
+      }
+
+      // Validation for the "Update" popup
+      if (popupType === "update") {
+        if (!validateInput(updateValue, columnTypes[updateColumn])) {
+          hasError = true;
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [updateColumn]: errorMessages[columnTypes[updateColumn]],
+          }));
+        }
+      }
+
+      if (hasError) {
+        setMessage({ type: "error", text: "Please correct the errors." });
+        return;
+      }
+
       let result;
       switch (popupType) {
         case "add":
-          for (const [column, value] of Object.entries(newRowData)) {
-            if (!validateInput(value, columnTypes[column])) {
-              throw new Error(`Invalid input for ${column}`);
-            }
-            if (
-              columnTypes[column] === "date_time" ||
-              columnTypes[column] === "date" ||
-              columnTypes[column] === "time"
-            ) {
-              newRowData[column] = formatDateInput(value);
-            }
-          }
           result = await onAdd(newRowData);
           break;
         case "delete":
           result = await handleDelete();
           break;
         case "update":
-          if (!validateInput(updateValue, columnTypes[updateColumn])) {
-            throw new Error(`Invalid input for ${updateColumn}`);
-          }
           result = await handleUpdate();
           break;
       }
+
       setMessage({ type: "success", text: "Operation successful" });
       handlePopupClose();
       onFetchData();
@@ -628,16 +691,38 @@ const DataTable = ({
                           value={newRowData[column] || ""}
                           onChange={(e) => {
                             const value = e.target.value;
-                            if (validateInput(value, columnTypes[column])) {
-                              setNewRowData({ ...newRowData, [column]: value });
-                              e.target.classList.remove(styles.invalidInput);
-                            } else {
-                              e.target.classList.add(styles.invalidInput);
-                            }
+                            setNewRowData({ ...newRowData, [column]: value }); // Update value immediately
+                          }}
+                          onBlur={(e) => {
+                            const value = e.target.value;
+                            const isValid = validateInput(
+                              value,
+                              columnTypes[column]
+                            );
+
+                            setErrors((prevErrors) => {
+                              if (isValid) {
+                                const { [column]: _, ...rest } = prevErrors; // Remove the error for this column
+                                return rest;
+                              } else {
+                                return {
+                                  ...prevErrors,
+                                  [column]: errorMessages[columnTypes[column]], // Set error only on blur
+                                };
+                              }
+                            });
                           }}
                           placeholder={`Enter ${columnTypes[column]}`}
-                          className={styles.input}
+                          className={`${styles.input} ${
+                            errors[column] ? styles.invalidInput : ""
+                          }`}
                         />
+                      )}
+                      {/* Add the error message here */}
+                      {errors[column] && (
+                        <span className={styles.errorText}>
+                          {errors[column]}
+                        </span>
                       )}
                     </div>
                   ))}
@@ -727,21 +812,44 @@ const DataTable = ({
                         value={updateValue}
                         onChange={(e) => {
                           const value = e.target.value;
-                          if (validateInput(value, columnTypes[updateColumn])) {
-                            setUpdateValue(value);
-                            e.target.classList.remove(styles.invalidInput);
-                          } else {
-                            e.target.classList.add(styles.invalidInput);
-                          }
+                          setUpdateValue(value); // Update value immediately
+                        }}
+                        onBlur={(e) => {
+                          const value = e.target.value;
+                          const isValid = validateInput(
+                            value,
+                            columnTypes[updateColumn]
+                          );
+
+                          setErrors((prevErrors) => {
+                            if (isValid) {
+                              const { [updateColumn]: _, ...rest } = prevErrors; // Remove the error for this column
+                              return rest;
+                            } else {
+                              return {
+                                ...prevErrors,
+                                [updateColumn]:
+                                  errorMessages[columnTypes[updateColumn]], // Set error only on blur
+                              };
+                            }
+                          });
                         }}
                         placeholder={
                           updateColumn
                             ? `Enter ${columnTypes[updateColumn]}`
                             : "Select a column first"
                         }
-                        className={styles.input}
+                        className={`${styles.input} ${
+                          errors[updateColumn] ? styles.invalidInput : ""
+                        }`}
                         disabled={!updateColumn}
                       />
+                    )}
+                    {/* Add the error message here */}
+                    {errors[updateColumn] && (
+                      <span className={styles.errorText}>
+                        {errors[updateColumn]}
+                      </span>
                     )}
                   </div>
                 </div>
