@@ -4,6 +4,6 @@
 __pycache__
 backend/dataset
 .gitigonre
-
-
+backend/table_initialization/*.sql
+*.sql
 backend/app/config.py
