@@ -106,7 +106,7 @@ class Lig_PlayersDAO():
     def create_lig_players(db: db, player: Lig_Player) -> None:
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
             if isinstance(player, Lig_Player):
                 player = player.__dict__
 

@@ -106,7 +106,7 @@ class Cup_PlayersDAO():
     def create_cup_players(db: db, player: Cup_Player) -> None:
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
             if isinstance(player, Cup_Player):
                 player = player.__dict__
 

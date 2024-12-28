@@ -195,7 +195,11 @@ const DataTable = ({
   const handleUpdate = async () => {
     try {
       let formattedUpdateValue = updateValue;
-      if (columnTypes[updateColumn] === "date") {
+      if (
+        columnTypes[updateColumn] === "date_time" ||
+        columnTypes[updateColumn] === "date" ||
+        columnTypes[updateColumn] === "time"
+      ) {
         formattedUpdateValue = formatDateInput(updateValue);
       }
       await onUpdate(updateId, updateColumn, formattedUpdateValue);
