@@ -270,8 +270,8 @@ class Lig_HeaderDAO():
             params = []
             if filters:
                 for column, value in filters.items():
-                    where_clauses.append(f"{column} = %s")
-                    params.append(value)
+                    where_clauses.append(f"LOWER(TRIM(REPLACE({column}, '\\r', ''))) = %s")
+                    params.append(value.strip().lower())
 
             where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
 
