@@ -39,6 +39,7 @@ Welcome to the KickStats Term Project! Follow the instructions below to set up a
     ```bash
     cd backend
     ```
+2. Change `app/config.py`according to your mysql username and password.    
 
 2. Install the required Python packages:
 
