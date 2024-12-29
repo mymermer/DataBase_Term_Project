@@ -4,46 +4,6 @@ from app.db.db import db
 
 cup_header_bp = Blueprint('cup_header', __name__)
 
-# game_id VARCHAR(50) PRIMARY KEY,
-# game VARCHAR(50),
-# date_of_game DATE,
-# time_of_game TIME,
-# round_of_game INT,
-# phase VARCHAR(50),
-# season_team_id_a VARCHAR(50),
-# season_team_id_b VARCHAR(50),
-# score_a INT,
-# score_b INT,
-# coach_a VARCHAR(50),
-# coach_b VARCHAR(50),
-# game_time TIME,
-# referee_1 VARCHAR(50),
-# referee_2 VARCHAR(50),
-# referee_3 VARCHAR(50),
-# stadium VARCHAR(50),
-# capacity INT,
-# fouls_a INT,
-# fouls_b INT,
-# timeouts_a INT,
-# timeouts_b INT,
-# score_quarter_1_a INT,
-# score_quarter_2_a INT,
-# score_quarter_3_a INT,
-# score_quarter_4_a INT,
-# score_quarter_1_b INT,
-# score_quarter_2_b INT,
-# score_quarter_3_b INT,
-# score_quarter_4_b INT,
-# score_extra_time_1_a INT,
-# score_extra_time_2_a INT,
-# score_extra_time_3_a INT,
-# score_extra_time_4_a INT,
-# score_extra_time_1_b INT,
-# score_extra_time_2_b INT,
-# score_extra_time_3_b INT,
-# score_extra_time_4_b INT,
-# winner CHAR(6)
-
 @cup_header_bp.route('/cup_header/<string:game_id>', methods=['GET'])
 def get_cup_header(game_id):
     # Fetch the game data

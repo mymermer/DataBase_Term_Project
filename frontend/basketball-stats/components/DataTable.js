@@ -585,13 +585,23 @@ const DataTable = ({
               </tr>
             </thead>
             <tbody>
-              {data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {visibleColumns.map((column) => (
-                    <td key={column}>{row[column]}</td>
-                  ))}
+              {data.length > 0 ? (
+                data.map((row, rowIndex) => {
+                  return (
+                    <tr key={rowIndex}>
+                      {visibleColumns.map((column) => (
+                        <td key={column}>{row[column]}</td>
+                      ))}
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={visibleColumns.length}>
+                    No data available (data length: {data.length})
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

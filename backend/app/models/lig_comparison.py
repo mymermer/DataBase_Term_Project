@@ -3,43 +3,6 @@ from app.db.db import db
 import mysql.connector
 from typing import Optional
 
-# game_id VARCHAR(50) PRIMARY KEY,
-# game VARCHAR(50),
-# round_of_game INT,
-# phase VARCHAR(50),
-# season_team_id_a VARCHAR(50),
-# season_team_id_b VARCHAR(50),
-# fast_break_points_a INT,
-# fast_break_points_b INT,
-# turnover_points_a INT,
-# turnover_points_b INT,
-# second_chance_points_a INT,
-# second_chance_points_b INT,
-# defensive_rebounds_a INT,
-# offensive_rebounds_b INT,
-# offensive_rebounds_a INT,
-# defensive_rebounds_b INT,
-# turnovers_starters_a INT,
-# turnovers_bench_a INT,
-# turnovers_starters_b INT,
-# turnovers_bench_b INT,
-# steals_starters_a INT,
-# steals_bench_a INT,
-# steals_starters_b INT,
-# steals_bench_b INT,
-# assists_starters_a INT,
-# assists_bench_a INT,
-# assists_starters_b INT,
-# assists_bench_b INT,
-# points_starters_a INT,
-# points_bench_a INT,
-# points_starters_b INT,
-# points_bench_b INT,
-# max_lead_a INT,
-# max_lead_b INT,
-# minute_max_lead_a INT,
-# minute_max_lead_b INT
-
 @dataclass
 class Lig_Comparison:
     game_id: Optional[str] = None
