@@ -18,8 +18,8 @@ def get_cup_box_score(game_player_id):
 @cup_box_score_bp.route('/cup_box_score', methods=['GET'])
 def get_paginated_box_score():
     try:
-        offset = int(request.args.get('offset', 0)) 
-        limit = int(request.args.get('limit', 25))  
+        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
+        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  
         filters_raw = request.args.get('filters', None)  
         sort_by = request.args.get('sortBy', None)  
@@ -37,7 +37,7 @@ def get_paginated_box_score():
         cup_box_score = CupBoxScoreDAO.get_paginated_cup_box_scores(
             db, 
             offset=offset, 
-            limit=limit, 
+            limit=limit,
             columns=columns, 
             filters=filters, 
             sort_by=sort_by, 
@@ -56,7 +56,6 @@ def get_paginated_box_score():
 def get_total_box_score_count():
     try:
         filters_raw = request.args.get('filters', None)  
-
         
         filters = None
         if filters_raw:
@@ -99,9 +98,9 @@ def delete_cup_box_score(game_player_id):
     
     
 @cup_box_score_bp.route('/cup_box_score/with_year_like', methods=['GET'])
-def get_paginated_box_score_with_like():
+def get_filtered_box_score_with_like():
     """
-    API endpoint for retrieving paginated plays with a compulsory 'LIKE' filter on game_play_id.
+    API endpoint for retrieving filtered plays with a compulsory 'LIKE' filter on game_play_id.
     """
     try:
         # Retrieve query parameters
@@ -109,8 +108,6 @@ def get_paginated_box_score_with_like():
         if not like_pattern or len(like_pattern) < 5:
             return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
 
-        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
-        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
         filters_raw = request.args.get('filters', None)  # Optional filters
         sort_by = request.args.get('sortBy', None)  # Optional sort column
@@ -126,11 +123,9 @@ def get_paginated_box_score_with_like():
             filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
         # Call the DAO method with the like_pattern
-        cup_box_score = CupBoxScoreDAO.get_paginated_cup_box_score_with_like(
+        cup_box_score = CupBoxScoreDAO.get_filtered_cup_box_score_with_like(
             db,
             like_pattern=like_pattern,
-            offset=offset,
-            limit=limit,
             columns=columns,
             filters=filters,
             sort_by=sort_by,
@@ -140,10 +135,9 @@ def get_paginated_box_score_with_like():
             return jsonify([]), 200
         return jsonify(cup_box_score), 200  # Already a list of dicts if columns are specified
     except ValueError:
-        return jsonify({'error': 'Invalid offset, limit, columns, filters, sortBy, or order'}), 400
+        return jsonify({'error': 'Invalid columns, filters, sortBy, or order'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 
 
@@ -178,3 +172,6 @@ def get_distinct_games_with_like():
         return jsonify({'error': 'Invalid columns or likePattern'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500    
+    
+    
+    

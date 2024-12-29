@@ -26,6 +26,10 @@ class LigPlayByPlay:
     play_info: Optional[str] = None
 
 class LigPlayByPlayDAO:
+    
+
+        
+    
     @staticmethod
     def create_play(db: db, play: LigPlayByPlay) -> None:
         try:
@@ -148,7 +152,7 @@ class LigPlayByPlayDAO:
             connection.close()
 
     @staticmethod
-    def get_paginated_plays(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None) -> list:
+    def get_paginated_plays(db: db, offset: int = 0, limit: int = 25, columns: list = None, filters: dict = None, sort_by: str = None, order: str = 'asc') -> list:
         try:
             connection = db.get_connection()
             
@@ -163,9 +167,16 @@ class LigPlayByPlayDAO:
 
             where_clause = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
             
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+            
             query = f"""
                 SELECT {selected_columns} FROM LIG_PLAY_BY_PLAY
                 {where_clause}
+                {order_clause}
                 LIMIT %s OFFSET %s
             """
             
@@ -345,4 +356,4 @@ class LigPlayByPlayDAO:
             raise
         finally:
             cursor.close()
-            connection.close()                
+            connection.close()    
