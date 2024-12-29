@@ -1,70 +1,101 @@
-come to directory of basketball-stats
+# basketball-stats
 
-npm install
+This document outlines the project setup, development, and error/loading handling for the basketball-stats frontend application.
 
-npm run dev
+## Getting Started
 
-for production:
-npm run build
+1. **Navigate to the project directory:**
 
-************\*\*\*\*************HANDILING ERROR************\*\*\*\*************
-At first put "const [error, setError] = useState(null); " if you didn't put to your file that needs error handling.
+   cd basketball-stats
 
-Those errors handling places are where you fetch data via sending requests to database (just look places that have api calls)
-put "setError(error.message);" to their catch statement.
+2. **Install dependencies:**
 
-Then we need to put the error box. Determine file that you need to put error to. DataTable already puts. If you need to put to another file, put this code to the file that you need to put error to:
+   npm install
 
-```javascript
-{
-  error && <ErrorDisplay message={error} onRetry={onFetchData} />;
-}
-```
+3. **Run in development mode:**
 
-you need to put ErrorDisplay to your path as:
-import ErrorDisplay from 'place_of_error_display/ErrorDisplay';
+   npm run dev
 
-"onFetchData" is const variable that you are saving your request to. Just put your the variable at the beginning of your api's call
+4. **Build for production:**
 
-If you need to handle error from other files, please also add them as parameter you are sending. like:
-<DataTable error={error} />
+   npm run build
 
-Besides of your user view, you need to also send your errors to DataTable as well as parameter. DataTable will handle the rest.
+## Error Handling
 
-You can use this block for catching errors inside your functions:
+**1. State Management:**
 
-```javascript
-    catch (error) {
-      if (error.message.includes("404")) {
-        setError(
-          "No data found for the selected criteria. Please refine your search."
-        );
-      } else if (error.message.includes("Failed to fetch")) {
-        setError(
-          "Unable to load data. Please check your network connection or try again later."
-        );
-      } else {
+- Add the following to files requiring error handling:
+
+   const [error, setError] = useState(null);
+
+**2. Error Handling in API Calls:**
+
+- In API call `catch` blocks:
+
+   setError(error.message);
+
+**3. Displaying Errors:**
+
+- Determine the component to display the error in.
+- Add the following to the desired component:
+
+   {
+       error && <ErrorDisplay message={error} onRetry={onFetchData} />;
+   }
+
+- Import `ErrorDisplay`:
+
+   import ErrorDisplay from 'place_of_error_display/ErrorDisplay';
+
+- Pass `error` to components that need to display it (e.g., `DataTable`):
+
+   <DataTable error={error} />
+
+**4. Centralized Error Handling (Example):**
+
+try {
+    // Your API call logic
+} catch (error) {
+    if (error.message.includes("404")) {
+        setError("No data found for the selected criteria. Please refine your search.");
+    } else if (error.message.includes("Failed to fetch")) {
+        setError("Unable to load data. Please check your network connection or try again later.");
+    } else {
         setError("An unexpected error occurred. Please contact support.");
-      }
-      console.error("Error message:", error.message);
-      throw error;
     }
-```
+    console.error("Error message:", error.message);
+    throw error;
+}
 
-Note: Sometimes, you will need to setLoading(false); too (it depends on your implementation)
+**Note:** Update `setLoading(false)` as needed based on your implementation.
 
-************\*\*\*\*************HANDILING LOADING************\*\*\*\*************
-in same manner
-import LoadingSkeleton from 'wherelaodingskeletonis/LoadingSkeleton';
+## Loading Handling
 
-    const [loading, setLoading] = useState(false);
+**1. State Management:**
 
-    setLoading(true); //to start loading
-    setLoading(false); //to stop loading
+- Add the following to components requiring loading indicators:
 
+   const [loading, setLoading] = useState(false);
 
-    {  loading &&  <LoadingSkeleton rows={5} columns={3} /> }
+**2. Loading Indicator:**
 
-We know have 3 types of pickers for constraints handling: DateTime, Date, and Time pickers.
+- Import `LoadingSkeleton`:
 
-If you have any columns of these types, you can just change your page.js/columnTypes to either "date_time", "date", or "time" and it will implemented automatically.
+   import LoadingSkeleton from 'wherelaodingskeletonis/LoadingSkeleton';
+
+- Display the loading indicator:
+
+   { loading && <LoadingSkeleton rows={5} columns={3} /> }
+
+**3. Toggle Loading State:**
+
+- `setLoading(true)` to start loading.
+- `setLoading(false)` to stop loading.
+
+## Constraints Handling (Pickers)
+
+- For `DateTime`, `Date`, and `Time` columns:
+    - Set the `columnTypes` property in `page.js` to the respective value ("date_time", "date", or "time").
+    - The picker will be implemented automatically.
+
+This document provides a basic framework for error and loading handling in the basketball-stats application. Adapt it to your specific needs and project structure.

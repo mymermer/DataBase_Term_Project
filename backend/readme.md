@@ -1,41 +1,66 @@
-first!!! open mysql and please run in the order create -> load ->prepare -> foreign keys.
-DONT FORGET TO HAVE LATEST VERSION OF CSV'S FROM WHATSAPP!!!!!!!
+## Database Initialization
 
-If you are having problems in rerunning the files, use this code in your local SQL first:
+### Steps to Setup the Database
+1. **Start MySQL**:
+   - Run the SQL files in the following order:
+     - `create.sql`
+     - `load.sql`
+     - `prepare.sql`
+     - `foreign_keys.sql`
 
-```sql
--- Drop tables (order doesn't matter now since foreign key checks are disabled)
-drop database basketball ; 
+   ⚠️ **Important**:
+   - Ensure you have the latest version of the required CSV files, typically were shared via WhatsApp.
 
--- recreate database
-create database basketball ;
+2. **Troubleshooting Database Reset**:
+   - If you encounter issues re-running the files, use the following commands to reset your database:
 
--- come to directory of table initilizations and run each file
-source create_tables.sql ;
+   ```sql
+   -- Disable foreign key checks and drop the existing database
+   DROP DATABASE basketball;
 
-```
-sql does not have access to csv files other than directory that I specified. You can change your version name accordingly!!!!
+   -- Recreate the database
+   CREATE DATABASE basketball;
 
-change app/config.py's database values according to yours. Later it will be deleted from github and will be gitignored as it will be different in everybody.
+   -- Navigate to the directory containing initialization scripts and execute each file
+   SOURCE create_tables.sql;
 
-then run the run.py
 
-download postman app and open new request for whatever operation you wanna do.
+- **CSV File Access**:
+   - The SQL scripts do not have access to CSV files outside the specified directory. Ensure the directory is correctly set up, and update version names if necessary.
 
-for update and create you need to fill body in json format
+- **Configuration Updates**:
+   - Modify the `app/config.py` file to reflect your database credentials. Example configuration:
+     ```python
+     class Config:
+         DB_HOST = "127.0.0.1"
+         DB_PORT = 3306
+         DB_USER = "root"
+         DB_PASSWORD = "yourpassword"
+         DB_NAME = "basketball"
+         DEBUG = True
+     ```
+   - This file will eventually be removed from the repository and `.gitignore`d as configurations will differ for each user.
 
-TODO: create route files and from your models files, update "update", "create" functions and allow varabiles to take NULL values (look my code). **init**.py add the register_blueprint
+## Running the Application
 
-We may further .gitignore "load_tables.sql" file to not push different directories in the future
+1. **Start the Backend**:
+   - Run the `run.py` script to initialize the backend server.
 
-backend/app/config.py *********************************************
+2. **API Interaction Using Postman**:
+   - Download the Postman app for testing.
+   - Open a new request to interact with the backend.
+   - For `update` and `create` operations, fill the request body in JSON format.
 
-```python
-class Config:
-    DB_HOST = "127.0.0.1"
-    DB_PORT = 3306
-    DB_USER = "root"
-    DB_PASSWORD = "yourpassword"
-    DB_NAME = "basketball"
-    DEBUG = True
-```
+## Development Tasks (TODOs)
+
+1. **Create Route Files**:
+   - Organize the routes into separate files for better modularity.
+
+2. **Update Model Functions**:
+   - Modify the `update` and `create` functions in the model files to handle `NULL` values gracefully.
+
+3. **Blueprint Registration**:
+   - Register blueprints in `__init__.py` to connect route files to the main application.
+
+4. **Ignore Directory-Specific SQL Files**:
+   - Add `load_tables.sql` to `.gitignore` to avoid pushing files with directory-specific configurations.
