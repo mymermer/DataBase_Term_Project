@@ -5,3 +5,4 @@ __pycache__
 backend/dataset
 *.DS_Store
 backend/app/config.py
+*.sql

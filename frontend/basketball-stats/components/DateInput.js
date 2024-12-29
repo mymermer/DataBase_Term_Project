@@ -3,17 +3,18 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "../styles/DateTimeInput.module.css";
 
+// Custom input component to render the input field
 const CustomInput = forwardRef(({ value, onClick }, ref) => (
   <input
-    className={styles.dateTimeInput}
+    className={styles.dateInput}
     onClick={onClick}
     ref={ref}
-    value={value || "__/__/____ __:__"}
+    value={value || "__/__/____"}
     readOnly
   />
 ));
 
-const DateTimeInput = ({ value, onChange, placeholder }) => {
+const DateInput = ({ value, onChange, placeholder }) => {
   const [selectedDate, setSelectedDate] = useState(
     value ? new Date(value) : null
   );
@@ -25,16 +26,11 @@ const DateTimeInput = ({ value, onChange, placeholder }) => {
   const handleChange = (date) => {
     setSelectedDate(date);
     if (date) {
-      const formattedDate = date
-        .toLocaleString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-        .replace(",", "");
+      const formattedDate = date.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      });
       onChange(formattedDate);
     } else {
       onChange("");
@@ -61,22 +57,17 @@ const DateTimeInput = ({ value, onChange, placeholder }) => {
   ];
 
   return (
-    <div className={styles.dateTimeInputWrapper}>
+    <div className={styles.dateInputWrapper}>
       <DatePicker
         selected={selectedDate}
         onChange={handleChange}
-        showTimeSelect
-        timeFormat="HH:mm"
-        timeIntervals={15}
-        timeCaption="Time"
-        dateFormat="MM/dd/yyyy HH:mm"
+        dateFormat="MM/dd/yyyy"
         customInput={<CustomInput />}
         popperClassName={styles.datePickerPopper}
         calendarClassName={styles.datePickerCalendar}
         wrapperClassName={styles.datePickerWrapper}
         dayClassName={() => styles.datePickerDay}
         monthClassName={() => styles.datePickerMonth}
-        timeClassName={() => styles.datePickerTime}
         className={styles.datePicker}
         renderCustomHeader={({
           date,
@@ -123,4 +114,4 @@ const DateTimeInput = ({ value, onChange, placeholder }) => {
   );
 };
 
-export default DateTimeInput;
+export default DateInput;

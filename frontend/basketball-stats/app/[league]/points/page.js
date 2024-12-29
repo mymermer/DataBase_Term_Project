@@ -40,15 +40,15 @@ const foreignKeyColumns = [
 
 const primaryKey = 'game_point_id';
 const columnTypes = {
-  game_point_id: 'string',
-  game_player_id: 'string',
-  game_play_id: 'string',
-  game_id: 'string',
-  game: 'string',
+  game_point_id: 'game_point_id',
+  game_player_id: 'game_player_id',
+  game_play_id: 'game_play_id',
+  game_id: 'game_id',
+  game: 'game',
   round_of_game: 'integer',
   phase: 'string',
-  season_player_id: 'string',
-  season_team_id: 'string',
+  season_player_id: 'season_player_id',
+  season_team_id: 'season_team_id',
   player: 'string',
   action_id: 'integer',
   action_of_play: 'string',
@@ -59,7 +59,7 @@ const columnTypes = {
   minute: 'integer',
   points_a: 'integer',
   points_b: 'integer',
-  date_time_stp: 'date'
+  date_time_stp: 'date_time'
 };
 
 export default function PointsPage({ params }) {

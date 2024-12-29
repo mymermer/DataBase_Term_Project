@@ -93,7 +93,7 @@
 }
 
 .addButton {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 .addButton:hover {
@@ -109,11 +109,11 @@
 }
 
 .updateButton {
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
 
 .updateButton:hover {
-  background-color: #1976D2;
+  background-color: #1976d2;
 }
 
 .crudButton:hover {
@@ -121,7 +121,7 @@
 }
 
 .crudButton.active {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 .crudButton.active:hover {
@@ -211,7 +211,7 @@
 }
 
 .checkIcon {
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .filterInput {
@@ -251,10 +251,11 @@
   border: none;
   margin-bottom: 0;
   background-color: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.table th, .table td {
+.table th,
+.table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #e0e0e0;
@@ -307,7 +308,57 @@
 .paginationControls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-start; /* Aligns items to the left */
+  gap: 15px;
+  font-family: "Roboto", sans-serif; /* Consistent font */
+  font-size: 14px;
+  padding: 10px 0; /* Adds spacing for a clean layout */
+}
+
+.paginationControls span {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between text and input */
+  font-size: 14px;
+  color: #333; /* Neutral color for text */
+}
+
+.pageInput {
+  width: 50px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.pageInput:focus {
+  outline: none;
+  border-color: #000080; /* Highlighted border on focus */
+  box-shadow: 0 0 3px #000080;
+}
+
+.pageInput::-webkit-inner-spin-button,
+.pageInput::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Hides increment buttons */
+  margin: 0;
+}
+
+.paginationControls select {
+  padding: 5px 8px;
+  border: 1px solid #000;
+  border-radius: 4px;
+  background-color: white;
+  color: #0078d4;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.paginationControls select:focus {
+  outline: none;
+  box-shadow: 0 0 3px #000080;
 }
 
 .bottomButtons {
@@ -368,7 +419,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 10px 20px;
   border-radius: 4px;
@@ -377,8 +428,14 @@
 }
 
 @keyframes fadeInOut {
-  0%, 100% { opacity: 0; }
-  10%, 90% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
@@ -523,7 +580,7 @@
 }
 
 .success {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
@@ -551,7 +608,7 @@
 
 .invalidInput {
   border: 2px solid #ff0000 !important;
-  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   perspective: 1000px;
@@ -562,21 +619,32 @@
   box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
 }
 
+.errorText {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+
 @keyframes shake {
-  10%, 90% {
+  10%,
+  90% {
     transform: translate3d(-1px, 0, 0);
   }
 
-  20%, 80% {
+  20%,
+  80% {
     transform: translate3d(2px, 0, 0);
   }
 
-  30%, 50%, 70% {
+  30%,
+  50%,
+  70% {
     transform: translate3d(-4px, 0, 0);
   }
 
-  40%, 60% {
+  40%,
+  60% {
     transform: translate3d(4px, 0, 0);
   }
 }
-

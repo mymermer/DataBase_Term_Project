@@ -91,7 +91,7 @@ class Lig_ComparisonDAO():
         """
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
 
             # Convert Lig_Comparison object to dictionary if necessary
             if isinstance(comparison, Lig_Comparison):

@@ -130,31 +130,15 @@ def get_average_values(season):
 
 
 @lig_teams_bp.route('/lig_teams/with_year_like', methods=['GET'])
-def get_paginated_teams_with_like():
+def get_teams_with_like():
     try:
         # Retrieve query parameters
         like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
         if not like_pattern or len(like_pattern) < 5:
             return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
 
-        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
-        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
-        columns = request.args.get('columns', None)  # Optional column list
-        filters_raw = request.args.get('filters', None)  # Optional filters
-        sort_by = request.args.get('sortBy', None)  # Optional sort column
-        order = request.args.get('order', 'asc')  # Default to ascending order
-
-        # Parse columns if provided
-        if columns:
-            columns = columns.split(",")
-
-        # Parse filters if provided
-        filters = None
-        if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
-
         # Call the DAO method with the like_pattern
-        lig_teams = Lig_TeamsDAO.get_paginated_lig_teams_with_like(
+        lig_teams = Lig_TeamsDAO.get_lig_teams_with_like(
             db,
             like_pattern=like_pattern
         )
@@ -169,7 +153,7 @@ def get_paginated_teams_with_like():
 
 
 @lig_teams_bp.route('/lig_teams/by_team_abbrs', methods=['GET'])
-def get_paginated_teams_by_abbrs():
+def get_teams_by_abbrs():
     try:
         # Retrieve query parameters
         team_abbrs_raw = request.args.get('teamAbbrs', None)  # Comma-separated list of abbreviations
@@ -181,32 +165,19 @@ def get_paginated_teams_by_abbrs():
         if not team_abbrs:
             return jsonify({'error': 'All team abbreviations must be exactly 3 characters long.'}), 400
 
-        offset = int(request.args.get('offset', 0))  # Default to 0 if not provided
-        limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
-        filters_raw = request.args.get('filters', None)  # Optional filters
-        sort_by = request.args.get('sortBy', None)  # Optional sort column
-        order = request.args.get('order', 'asc')  # Default to ascending order
+        max_year = request.args.get('maxYear', None)  # Optional maxYear parameter
 
         # Parse columns if provided
         if columns:
             columns = columns.split(",")
 
-        # Parse filters if provided
-        filters = None
-        if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
-
-        # Call the DAO method with the list of team abbreviations
-        lig_teams_by_abbr = Lig_TeamsDAO.get_paginated_lig_teams_by_abbrs(
+        # Call the DAO method with the list of team abbreviations and maxYear
+        lig_teams_by_abbr = Lig_TeamsDAO.get_lig_teams_by_abbrs(
             db,
             team_abbrs=team_abbrs,
-            offset=offset,
-            limit=limit,
             columns=columns,
-            filters=filters,
-            sort_by=sort_by,
-            order=order
+            max_year=max_year
         )
 
         # Add year information to each row and separate by abbreviation

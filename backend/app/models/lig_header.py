@@ -97,7 +97,7 @@ class Lig_HeaderDAO():
         """
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
 
             # Convert Lig_Header object to dictionary if necessary
             if isinstance(header, Lig_Header):

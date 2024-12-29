@@ -5,6 +5,7 @@ import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
 import ComparisonUserView from "../../../components/ComparisonUserView";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 
 const allColumns = [
   "game_id",
@@ -47,6 +48,46 @@ const allColumns = [
 
 const foreignKeyColumns = ["season_team_id", "game_id"];
 
+const primaryKey = "game_id";
+const columnTypes = {
+  game_id: "game_id",
+  game: "game",
+  round_of_game: "integer",
+  phase: "string",
+  season_team_id_a: "season_team_id",
+  season_team_id_b: "season_team_id",
+  fast_break_points_a: "integer",
+  fast_break_points_b: "integer",
+  turnover_points_a: "integer",
+  turnover_points_b: "integer",
+  second_chance_points_a: "integer",
+  second_chance_points_b: "integer",
+  defensive_rebounds_a: "integer",
+  offensive_rebounds_b: "integer",
+  offensive_rebounds_a: "integer",
+  defensive_rebounds_b: "integer",
+  turnovers_starters_a: "integer",
+  turnovers_bench_a: "integer",
+  turnovers_starters_b: "integer",
+  turnovers_bench_b: "integer",
+  steals_starters_a: "integer",
+  steals_bench_a: "integer",
+  steals_starters_b: "integer",
+  steals_bench_b: "integer",
+  assists_starters_a: "integer",
+  assists_bench_a: "integer",
+  assists_starters_b: "integer",
+  assists_bench_b: "integer",
+  points_starters_a: "integer",
+  points_bench_a: "integer",
+  points_starters_b: "integer",
+  points_bench_b: "integer",
+  max_lead_a: "integer",
+  max_lead_b: "integer",
+  minute_max_lead_a: "integer",
+  minute_max_lead_b: "integer",
+};
+
 export default function ComparisonPage({ params }) {
   const { league } = React.use(params);
 
@@ -79,6 +120,7 @@ export default function ComparisonPage({ params }) {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null); // Added to clear previous errors
     const offset = currentPage * rowsPerPage;
     const columnsParam = selectedColumns.join(",");
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_comparison?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
@@ -118,9 +160,20 @@ export default function ComparisonPage({ params }) {
       setTotalRows(countResult.total);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error.message);
       setLoading(false);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     }
   };
 
@@ -152,6 +205,7 @@ export default function ComparisonPage({ params }) {
   };
 
   const handleAdd = async (newRowData) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison`,
@@ -171,12 +225,24 @@ export default function ComparisonPage({ params }) {
       await fetchData(); // Refresh data after successful add
       return true;
     } catch (error) {
-      console.error("Error adding new row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
   const handleDelete = async (gameId) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${gameId}`,
@@ -192,12 +258,24 @@ export default function ComparisonPage({ params }) {
       await fetchData(); // Refresh data after successful delete
       return true;
     } catch (error) {
-      console.error("Error deleting row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
   const handleUpdate = async (gameId, column, value) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_comparison/${gameId}`,
@@ -217,12 +295,25 @@ export default function ComparisonPage({ params }) {
       await fetchData(); // Refresh data after successful update
       return true;
     } catch (error) {
-      console.error("Error updating row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
-  if (error) return <p>Error: {error}</p>;
+  {
+    error && <ErrorDisplay message={error} onRetry={fetchData} />;
+  }
 
   return (
     <StatPageTemplate
@@ -255,6 +346,12 @@ export default function ComparisonPage({ params }) {
             onDelete={handleDelete}
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
+            league={league}
+            onFetchData={fetchData}
+            error={error}
+            onRetry={fetchData}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>

@@ -5,6 +5,7 @@ import StatPageTemplate from "../../../components/StatPageTemplate";
 import DataTable from "../../../components/DataTable";
 import styles from "../../../styles/Page.module.css";
 import HeaderUserView from "../../../components/HeaderUserView";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 
 const allColumns = [
   "game_id",
@@ -50,6 +51,49 @@ const allColumns = [
 
 const foreignKeyColumns = ["season_team_id"];
 
+const primaryKey = "game_id";
+const columnTypes = {
+  game_id: "game_id",
+  game: "game",
+  date_of_game: "date",
+  time_of_game: "time",
+  round_of_game: "integer",
+  phase: "string",
+  season_team_id_a: "season_team_id",
+  season_team_id_b: "season_team_id",
+  score_a: "integer",
+  score_b: "integer",
+  coach_a: "string",
+  coach_b: "string",
+  game_time: "game_time",
+  referee_1: "string",
+  referee_2: "string",
+  referee_3: "string",
+  stadium: "string",
+  capacity: "integer",
+  fouls_a: "integer",
+  fouls_b: "integer",
+  timeouts_a: "integer",
+  timeouts_b: "integer",
+  score_quarter_1_a: "integer",
+  score_quarter_2_a: "integer",
+  score_quarter_3_a: "integer",
+  score_quarter_4_a: "integer",
+  score_quarter_1_b: "integer",
+  score_quarter_2_b: "integer",
+  score_quarter_3_b: "integer",
+  score_quarter_4_b: "integer",
+  score_extra_time_1_a: "integer",
+  score_extra_time_2_a: "integer",
+  score_extra_time_3_a: "integer",
+  score_extra_time_4_a: "integer",
+  score_extra_time_1_b: "integer",
+  score_extra_time_2_b: "integer",
+  score_extra_time_3_b: "integer",
+  score_extra_time_4_b: "integer",
+  winner: "winner",
+};
+
 export default function HeaderPage({ params }) {
   const { league } = React.use(params);
 
@@ -82,6 +126,7 @@ export default function HeaderPage({ params }) {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     const offset = currentPage * rowsPerPage;
     const columnsParam = selectedColumns.join(",");
     let dataUrl = `http://127.0.0.1:5000/api/v1/${tournament}_header?offset=${offset}&limit=${rowsPerPage}&columns=${columnsParam}`;
@@ -121,9 +166,20 @@ export default function HeaderPage({ params }) {
       setTotalRows(countResult.total);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error.message);
       setLoading(false);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
+      throw error;
     }
   };
 
@@ -155,6 +211,7 @@ export default function HeaderPage({ params }) {
   };
 
   const handleAdd = async (newRowData) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_header`,
@@ -174,12 +231,24 @@ export default function HeaderPage({ params }) {
       await fetchData(); // Refresh data after successful add
       return true;
     } catch (error) {
-      console.error("Error adding new row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
   const handleDelete = async (gameId) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_header/${gameId}`,
@@ -195,12 +264,24 @@ export default function HeaderPage({ params }) {
       await fetchData(); // Refresh data after successful delete
       return true;
     } catch (error) {
-      console.error("Error deleting row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
   const handleUpdate = async (gameId, column, value) => {
+    setError(null);
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/v1/${tournament}_header/${gameId}`,
@@ -220,12 +301,25 @@ export default function HeaderPage({ params }) {
       await fetchData(); // Refresh data after successful update
       return true;
     } catch (error) {
-      console.error("Error updating row:", error);
+      if (error.message.includes("404")) {
+        setError(
+          "No data found for the selected criteria. Please refine your search."
+        );
+      } else if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Unable to load data. Please check your network connection or try again later."
+        );
+      } else {
+        setError("An unexpected error occurred. Please contact support.");
+      }
+      console.error("Error message:", error.message);
       throw error;
     }
   };
 
-  if (error) return <p>Error: {error}</p>;
+  {
+    error && <ErrorDisplay message={error} onRetry={fetchData} />;
+  }
 
   return (
     <StatPageTemplate league={league} stat="Header" UserView={HeaderUserView}>
@@ -253,6 +347,12 @@ export default function HeaderPage({ params }) {
             onDelete={handleDelete}
             onUpdate={handleUpdate}
             foreignKeyColumns={foreignKeyColumns}
+            league={league}
+            onFetchData={fetchData}
+            error={error}
+            onRetry={fetchData}
+            primaryKey={primaryKey}
+            columnTypes={columnTypes}
           />
         </div>
       </div>

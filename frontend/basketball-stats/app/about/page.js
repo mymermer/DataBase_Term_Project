@@ -43,11 +43,13 @@ export default function About() {
         <div className={styles.qrSection}>
           <p>Feel free to share our website with others!</p>
           <div className={styles.qrCodeContainer}>
+            <a href="https://qrco.de/bfep5t">
             <img
               src="/qr-code.png"
               alt="QR Code for website"
               className={styles.qrCode}
             />
+            </a>
           </div>
         </div>
       </main>

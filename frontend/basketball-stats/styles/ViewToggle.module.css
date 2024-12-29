@@ -7,9 +7,14 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.viewToggle svg {
+  margin-right: 7px; /* Adds space between the icon and text */
 }
 
 .viewToggle:hover {
   background-color: #000066;
 }
-

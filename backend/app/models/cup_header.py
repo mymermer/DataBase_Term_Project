@@ -97,7 +97,7 @@ class Cup_HeaderDAO():
         """
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
 
             # Convert Cup_Header object to dictionary if necessary
             if isinstance(header, Cup_Header):

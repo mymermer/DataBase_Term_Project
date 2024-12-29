@@ -55,58 +55,58 @@ from typing import Optional
 @dataclass
 class Lig_Player:
     season_player_id: Optional[str] #? why can the primary key be optional?
-    season_team_id: Optional[str]
-    player: Optional[str]
-    games_played: Optional[int]
-    games_started: Optional[int]
-    minutes_played: Optional[float]
-    points: Optional[int]
-    two_points_made: Optional[int]
-    two_points_attempted: Optional[int]
-    three_points_made: Optional[int]
-    three_points_attempted: Optional[int]
-    free_throws_made: Optional[int]
-    free_throws_attempted: Optional[int]
-    offensive_rebounds: Optional[int]
-    defensive_rebounds: Optional[int]
-    total_rebounds: Optional[int]
-    assists: Optional[int]
-    steals: Optional[int]
-    turnovers: Optional[int]
-    blocks_favour: Optional[int]
-    blocks_against: Optional[int]
-    fouls_committed: Optional[int]
-    fouls_received: Optional[int]
-    valuation: Optional[int]
-    minutes_per_game: Optional[float]
-    points_per_game: Optional[float]
-    two_points_made_per_game: Optional[float]
-    two_points_attempted_per_game: Optional[float]
-    two_points_percentage: Optional[float]
-    three_points_made_per_game: Optional[float]
-    three_points_attempted_per_game: Optional[float]
-    three_points_percentage: Optional[float]
-    free_throws_made_per_game: Optional[float]
-    free_throws_attempted_per_game: Optional[float]
-    free_throws_percentage: Optional[float]
-    offensive_rebounds_per_game: Optional[float]
-    defensive_rebounds_per_game: Optional[float]
-    total_rebounds_per_game: Optional[float]
-    assists_per_game: Optional[float]
-    steals_per_game: Optional[float]
-    turnovers_per_game: Optional[float]
-    blocks_favour_per_game: Optional[float]
-    blocks_against_per_game: Optional[float]
-    fouls_committed_per_game: Optional[float]
-    fouls_received_per_game: Optional[float]
-    valuation_per_game: Optional[float]
+    season_team_id: Optional[str] = None
+    player: Optional[str] = None
+    games_played: Optional[int] = None
+    games_started: Optional[int] = None
+    minutes_played: Optional[float] = None
+    points: Optional[int] = None
+    two_points_made: Optional[int] = None
+    two_points_attempted: Optional[int] = None
+    three_points_made: Optional[int] = None
+    three_points_attempted: Optional[int] = None
+    free_throws_made: Optional[int] = None
+    free_throws_attempted: Optional[int] = None
+    offensive_rebounds: Optional[int] = None
+    defensive_rebounds: Optional[int] = None
+    total_rebounds: Optional[int] = None
+    assists: Optional[int] = None
+    steals: Optional[int] = None
+    turnovers: Optional[int] = None
+    blocks_favour: Optional[int] = None
+    blocks_against: Optional[int] = None
+    fouls_committed: Optional[int] = None
+    fouls_received: Optional[int] = None
+    valuation: Optional[int] = None
+    minutes_per_game: Optional[float] = None
+    points_per_game: Optional[float] = None
+    two_points_made_per_game: Optional[float] = None
+    two_points_attempted_per_game: Optional[float] = None
+    two_points_percentage: Optional[float] = None
+    three_points_made_per_game: Optional[float] = None
+    three_points_attempted_per_game: Optional[float] = None
+    three_points_percentage: Optional[float] = None
+    free_throws_made_per_game: Optional[float] = None
+    free_throws_attempted_per_game: Optional[float] = None
+    free_throws_percentage: Optional[float] = None
+    offensive_rebounds_per_game: Optional[float] = None
+    defensive_rebounds_per_game: Optional[float] = None
+    total_rebounds_per_game: Optional[float] = None
+    assists_per_game: Optional[float] = None
+    steals_per_game: Optional[float] = None 
+    turnovers_per_game: Optional[float] = None
+    blocks_favour_per_game: Optional[float] = None
+    blocks_against_per_game: Optional[float] = None
+    fouls_committed_per_game: Optional[float] = None
+    fouls_received_per_game: Optional[float] = None
+    valuation_per_game: Optional[float] = None
 
 class Lig_PlayersDAO():
     @staticmethod
     def create_lig_players(db: db, player: Lig_Player) -> None:
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
             if isinstance(player, Lig_Player):
                 player = player.__dict__
 
@@ -281,9 +281,9 @@ class Lig_PlayersDAO():
                 raise ValueError("No fields to update")
             set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
             query = f"""
-                UPDATE Lig_PlayerS
-                SET {set_clause}
-                WHERE season_player_id = %s
+            UPDATE Lig_PlayerS
+            SET {set_clause}
+            WHERE season_player_id = %s
             """
             values = list(fields_to_update.values())
             values.append(player.season_player_id)
@@ -407,8 +407,135 @@ class Lig_PlayersDAO():
             if connection:
                 connection.close()
 
-        
+    # special to players
 
+#    @staticmethod
+    @staticmethod
+    def get_distinct_teams_by_year(
+        db: db,
+        year: str
+    ) -> list:
+        """
+        Fetch distinct team identifiers (e.g., 'PAM') from the LIG_PLAYERS table
+        where the season_team_id starts with the given year.
 
+        Args:
+            db: Database connection object.
+            year: The year to filter season_team_id, prefixed with 'E' (e.g., 'E2007').
+
+        Returns:
+            A list of distinct team identifiers (e.g., ['PAM', 'XYZ']).
+        """
+        try:
+            connection = db.get_connection()
+
+            # LIKE pattern to match the year at the start of season_team_id
+            like_pattern = f"{year}_%"
+
+            # Query to select distinct teams
+            query = """
+                SELECT DISTINCT 
+                    SUBSTRING_INDEX(season_team_id, '_', -1) AS team_identifier
+                FROM LIG_PLAYERS
+                WHERE season_team_id LIKE %s
+            """
+
+            cursor = connection.cursor()
+            cursor.execute(query, (like_pattern,))
+            distinct_teams = cursor.fetchall()
+
+            # Return the distinct teams as a flat list
+            return [row[0] for row in distinct_teams]
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+
+    
+    @staticmethod
+    def get_players_point_percentage_by_season(db, season: str) :
+        try:
+            connection = db.get_connection()
+            # ? why is this a dictionary
+            cursor = connection.cursor(dictionary=True)
+
+            query = f"""
+            SELECT LIG_PLAYERS.points as player_points
+            , LIG_PLAYERS.player as player_name
+            , SUBSTRING_INDEX(LIG_TEAMS.season_team_id, '_', -1) AS team_name
+            , LIG_TEAMS.points as team_points
+            , LIG_PLAYERS.points/LIG_TEAMS.points as point_percentage
+            FROM LIG_PLAYERS
+            JOIN LIG_TEAMS
+            ON LIG_PLAYERS.season_team_id = LIG_TEAMS.season_team_id
+            WHERE LIG_PLAYERS.season_team_id LIKE %s
+            """
+
+            cursor.execute(query, (season + '%',))
+            result = cursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
+
+    @staticmethod
+    def get_players_point_percentage_by_team_and_season(db, season: str, team: str):
+        """
+        Fetch player point percentages for a specific team in a selected season.
+
+        Args:
+            db: Database connection object.
+            season: The season to filter by (e.g., '2023').
+            team: The specific team to filter by (e.g., 'PAM').
+
+        Returns:
+            A list of dictionaries containing player points, player name, team name,
+            team points, and the player's point percentage of the team.
+        """
+        try:
+            connection = db.get_connection()
+            cursor = connection.cursor(dictionary=True)
+
+            query = f"""
+            SELECT 
+                LIG_PLAYERS.points AS player_points,
+                LIG_PLAYERS.player AS player_name,
+                SUBSTRING_INDEX(LIG_TEAMS.season_team_id, '_', -1) AS team_name,
+                LIG_TEAMS.points AS team_points,
+                LIG_PLAYERS.points / LIG_TEAMS.points AS point_percentage
+            FROM 
+                LIG_PLAYERS
+            JOIN 
+                LIG_TEAMS
+            ON 
+                LIG_PLAYERS.season_team_id = LIG_TEAMS.season_team_id
+            WHERE 
+                LIG_PLAYERS.season_team_id LIKE %s
+                AND SUBSTRING_INDEX(LIG_TEAMS.season_team_id, '_', -1) = %s
+            """
+
+            cursor.execute(query, (season + '%', team))
+            result = cursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'connection' in locals() and connection:
+                connection.close()
 
 

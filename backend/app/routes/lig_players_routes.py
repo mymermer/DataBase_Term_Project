@@ -67,7 +67,7 @@ def update_lig_players(season_player_id):
     try:
         data = request.get_json()
         lig_player = Lig_Player(season_player_id=season_player_id, **data)
-        Lig_PlayersDAO.update_lig_player(db, lig_player, season_player_id)
+        Lig_PlayersDAO.update_lig_player(db, lig_player)
         return jsonify({"message": "Lig player updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -94,3 +94,20 @@ def get_total_cup_players():
         return jsonify({'total': total_count}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@lig_players_bp.route('/lig_players/<string:season>/teams', methods=['GET'])
+def get_distinct_teams_by_year(season):
+    try:
+        teams = Lig_PlayersDAO.get_distinct_teams_by_year(db, season)
+        return jsonify(teams), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@lig_players_bp.route('/lig_players/<string:season>/<string:team>/player_percentages', methods=['GET'])
+def get_player_percentages_by_team_and_season(season, team):
+    try:
+        player_percentages = Lig_PlayersDAO.get_players_point_percentage_by_team_and_season(db, season, team)
+        return jsonify(player_percentages), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+

@@ -91,7 +91,7 @@ class Cup_ComparisonDAO():
         """
         try:
             connection  = db.get_connection()
-            cursor = db.connection.cursor()
+            cursor = connection.cursor()
 
             # Convert Cup_Comparison object to dictionary if necessary
             if isinstance(comparison, Cup_Comparison):

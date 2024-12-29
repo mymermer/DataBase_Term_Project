@@ -396,9 +396,8 @@ class Lig_PointsDAO():
     @staticmethod
     def get_distinct_games_with_like(
         db: db,
-        like_pattern: str,
-        columns: list = None
-    ) -> list:
+        like_pattern: str
+        ) -> list:
 
         try:
             connection = db.get_connection()
@@ -406,21 +405,13 @@ class Lig_PointsDAO():
             # Add `%` wildcard to the LIKE pattern
             like_pattern = f"{like_pattern}%"
 
-            # Default columns to return
-            selected_columns = ", ".join(columns) if columns else "LIG_POINTS.game"
-
-            # Add score columns from LIG_HEADER
-            selected_columns += ", LIG_HEADER.score_a, LIG_HEADER.score_b"
-
             # WHERE clause for the LIKE filter
-            where_clause = "WHERE LIG_POINTS.game_point_id LIKE %s"
+            where_clause = "WHERE game_point_id LIKE %s"
             params = [like_pattern]
 
-            # Join LIG_POINTS with LIG_HEADER on game_id
+            # Query to fetch distinct games
             query = f"""
-                SELECT DISTINCT {selected_columns} 
-                FROM LIG_POINTS
-                JOIN LIG_HEADER ON LIG_POINTS.game_id = LIG_HEADER.game_id
+                SELECT DISTINCT game FROM LIG_POINTS
                 {where_clause}
             """
 
@@ -431,14 +422,7 @@ class Lig_PointsDAO():
             if distinct_games is None:
                 return None
 
-            # Map fetched rows to dicts or raw values if only one column is selected
-            if columns:
-                # Include score_a and score_b in the result
-                extended_columns = columns + ["score_a", "score_b"]
-                return [dict(zip(extended_columns, row)) for row in distinct_games]
-            else:
-                # Return 'game' with scores as tuples
-                return [{"game": row[0], "score_a": row[-2], "score_b": row[-1]} for row in distinct_games]
+            return [row[0] for row in distinct_games]  # Only return 'game' column
 
         except mysql.connector.Error as err:
             print(f"Error: {err}")

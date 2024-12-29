@@ -166,25 +166,18 @@ def get_paginated_points_with_like():
 @lig_points_bp.route('/lig_points/year_distinct_games', methods=['GET'])
 def get_distinct_games_with_like():
     """
-    API endpoint for retrieving distinct values of the 'game' column along with scores, with a compulsory 'LIKE' filter on game_point_id.
+    API endpoint for retrieving distinct values of the 'game' column with a compulsory 'LIKE' filter on game_point_id.
     """
     try:
         # Retrieve query parameters
         like_pattern = request.args.get('likePattern', None)  # The LIKE pattern (e.g., "ABCDE%")
         if not like_pattern or len(like_pattern) < 5:
-            return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400
-
-        columns = request.args.get('columns', None)  # Optional columns to fetch
-
-        # Parse columns if provided
-        if columns:
-            columns = columns.split(",")
+            return jsonify({'error': 'Invalid likePattern. It must be at least 5 characters long.'}), 400(",")
 
         # Call the DAO method
         distinct_games = Lig_PointsDAO.get_distinct_games_with_like(
             db,
             like_pattern=like_pattern,
-            columns=columns
         )
         if distinct_games is None:
             return jsonify([]), 200
