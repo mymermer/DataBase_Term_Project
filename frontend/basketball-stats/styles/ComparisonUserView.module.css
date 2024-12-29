@@ -452,3 +452,66 @@
 .chartHeader {
   text-decoration: underline;
 }
+
+.winLossContainer {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #ffffff; /* Match the white background */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
+  border: 1px solid #ddd; /* Consistent border color */
+}
+
+.winLossContainer h3 {
+  margin-bottom: 15px;
+  font-size: 1.8rem; /* Match other headings */
+  color: #000080; /* Dark blue for consistency */
+  text-align: center; /* Center align */
+  font-weight: bold;
+  border-bottom: 2px solid #000080; /* Underline for emphasis */
+  padding-bottom: 10px;
+}
+
+.winLossContainer p {
+  font-size: 1rem;
+  margin: 8px 0;
+  color: #333; /* Neutral text color */
+}
+
+.historyTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff; /* Consistent background */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Match shadow styling */
+}
+
+.historyTable th,
+.historyTable td {
+  padding: 12px 15px;
+  text-align: center;
+  font-size: 1rem;
+  color: #333; /* Neutral text color */
+}
+
+.historyTable th {
+  background-color: #000080; /* Dark blue header */
+  color: #ffffff; /* White text for contrast */
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.historyTable tbody tr:nth-child(odd) {
+  background-color: #f9f9f9; /* Light background for alternating rows */
+}
+
+.historyTable tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.historyTable tbody tr:hover {
+  background-color: #e6e6fa; /* Subtle highlight on hover */
+  cursor: default;
+}

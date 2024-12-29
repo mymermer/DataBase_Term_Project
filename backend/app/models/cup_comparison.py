@@ -498,3 +498,109 @@ class Cup_ComparisonDAO():
         finally:
             cursor.close()
             connection.close()
+
+    # For the join operation
+    @staticmethod
+    def get_win_loss_history(db: db, team1: str, team2: str) -> dict:
+        try:
+            connection = db.get_connection()
+
+            # Fetch the abbreviations for the teams from `teams`
+            fetch_abbr_query = """
+                SELECT abbreviation, full_name
+                FROM teams
+                WHERE full_name IN (%s, %s);
+            """
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(fetch_abbr_query, [team1, team2])
+            abbr_results = cursor.fetchall()
+
+            # Check if abbreviations are found for both teams
+            if len(abbr_results) != 2:
+                print("Error: Abbreviations for one or both teams not found.")
+                return {
+                    "error": "Abbreviations for one or both teams not found.",
+                    "total_games": 0,
+                    "team1_wins": 0,
+                    "team2_wins": 0,
+                    "history": []
+                }
+
+            # Map abbreviations to their corresponding teams
+            abbr_map = {row["full_name"]: row["abbreviation"] for row in abbr_results}
+            abbr_team1 = abbr_map.get(team1)
+            abbr_team2 = abbr_map.get(team2)
+
+            if not abbr_team1 or not abbr_team2:
+                print("Error: Abbreviations mapping failed.")
+                return {
+                    "error": "Abbreviations mapping failed.",
+                    "total_games": 0,
+                    "team1_wins": 0,
+                    "team2_wins": 0,
+                    "history": []
+                }
+
+            # Format the game strings
+            game1 = f"{abbr_team1}-{abbr_team2}"
+            game2 = f"{abbr_team2}-{abbr_team1}"
+
+            # Query to fetch game history with join between CUP_HEADER and CUP_COMPARISON
+            game_history_query = """
+                SELECT 
+                    c.game_id,
+                    c.game,
+                    h.date_of_game,
+                    h.time_of_game,
+                    h.score_a,
+                    h.score_b,
+                    h.winner
+                FROM 
+                    CUP_COMPARISON c
+                JOIN 
+                    CUP_HEADER h
+                ON 
+                    c.game_id = h.game_id
+                WHERE 
+                    c.game IN (%s, %s)
+                ORDER BY 
+                    h.date_of_game ASC;
+            """
+            cursor.execute(game_history_query, [game1, game2])
+            game_results = cursor.fetchall()
+
+            # Calculate win-loss and draw counts
+            team1_wins = 0
+            team2_wins = 0
+            draws = 0
+
+            for game in game_results:
+                if game["score_a"] > game["score_b"]:  # Check if team_a wins
+                    if game["game"].startswith(abbr_team1):
+                        team1_wins += 1
+                    else:
+                        team2_wins += 1
+                elif game["score_b"] > game["score_a"]:  # Check if team_b wins
+                    if game["game"].startswith(abbr_team1):
+                        team2_wins += 1
+                    else:
+                        team1_wins += 1
+                else:  # Draw case
+                    draws += 1
+
+            total_games = len(game_results)
+
+            return {
+            "total_games": total_games,
+            "team1_wins": team1_wins,
+            "team2_wins": team2_wins,
+            "draws": draws,
+            "history": game_results
+            }
+        
+        except mysql.connector.Error as err:
+            print(f"Database Error: {err}")
+            raise
+        finally:
+            cursor.close()
+            connection.close()

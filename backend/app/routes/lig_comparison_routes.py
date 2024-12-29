@@ -242,3 +242,19 @@ def get_distinct_comparison_games_with_like():
         return jsonify([{"game_id": row[0], "game": row[1]} for row in result]), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+# For the join operation
+@lig_comparison_bp.route('/lig_comparison/win_loss_history', methods=['GET'])
+def get_win_loss_history():
+    try:
+        team1 = request.args.get('team1', None)
+        team2 = request.args.get('team2', None)
+
+        if not team1 or not team2:
+            return jsonify({"error": "Both team1 and team2 must be provided."}), 400
+
+        result = Lig_ComparisonDAO.get_win_loss_history(db, team1, team2)
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")  # Log the error
+        return jsonify({"error": str(e)}), 500

@@ -29,6 +29,9 @@ const ComparisonUserView = ({ league }) => {
   });
   const [comparisonData, setComparisonData] = useState(null); // New state for fetched comparison data
   const [error, setError] = useState(null); // New state for error handling
+  const [winLossData, setWinLossData] = useState(null);
+  const [isWinLossLoading, setIsWinLossLoading] = useState(false);
+  const [sortOrder, setSortOrder] = useState("desc");
 
   // Define categories for dividing the stats
   const categories = {
@@ -96,6 +99,17 @@ const ComparisonUserView = ({ league }) => {
   const tournament = league === "euroleague" ? "lig" : "cup";
 
   const gameDropdownRef = useRef(null);
+
+  const sortDataByDate = () => {
+    const sortedData = [...winLossData.history].sort((a, b) => {
+      const dateA = new Date(a.date_of_game);
+      const dateB = new Date(b.date_of_game);
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
+
+    setWinLossData({ ...winLossData, history: sortedData });
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
 
   const renderCategoryChart = (category, keys) => {
     // Prepare data for the chart
@@ -293,37 +307,228 @@ const ComparisonUserView = ({ league }) => {
     }
   };
 
+  const fetchWinLossHistory = async (team1Name, team2Name) => {
+    if (!team1Name || !team2Name) {
+      console.error("Teams are not selected.");
+      setWinLossData(null); // Clear the previous win-loss data
+      return;
+    }
+
+    setIsWinLossLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/v1/${tournament}_comparison/win_loss_history?team1=${team1Name}&team2=${team2Name}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      // Sort the fetched data by date in ascending order
+      const sortedHistory = data.history.sort((a, b) => {
+        const dateA = new Date(a.date_of_game);
+        const dateB = new Date(b.date_of_game);
+        return dateA - dateB; // Ascending order
+      });
+
+      // Update the state with sorted history
+      setWinLossData({ ...data, history: sortedHistory });
+    } catch (error) {
+      console.error("Error fetching win-loss history:", error.message);
+      setError("Failed to fetch win-loss history. Please try again later.");
+    } finally {
+      setIsWinLossLoading(false);
+    }
+  };
+
+  const renderWinLossHistory = () => {
+    if (isWinLossLoading) {
+      return <p>Loading win-loss history...</p>;
+    }
+
+    if (!winLossData) {
+      return <p>Win-loss history not available for this matchup.</p>;
+    }
+
+    return (
+      <div className={styles.winLossContainer}>
+        <h3>Win-Loss History</h3>
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "20px",
+            fontSize: "1.2rem",
+            color: "#333",
+          }}
+        >
+          <p
+            style={{
+              marginBottom: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "bold",
+            }}
+          >
+            <Image
+              src={
+                currentGameTeams.team1.logoUrl ||
+                "/teams_icons/default_team_icon.png"
+              }
+              alt={`${currentGameTeams.team1.fullName} logo`}
+              width={20}
+              height={20}
+              style={{ marginRight: "10px", verticalAlign: "middle" }}
+            />
+            {currentGameTeams.team1.fullName}: {winLossData.team1_wins} wins
+          </p>
+          <p
+            style={{
+              marginBottom: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "bold",
+            }}
+          >
+            <Image
+              src={
+                currentGameTeams.team2.logoUrl ||
+                "/teams_icons/default_team_icon.png"
+              }
+              alt={`${currentGameTeams.team2.fullName} logo`}
+              width={20}
+              height={20}
+              style={{ marginRight: "10px", verticalAlign: "middle" }}
+            />
+            {currentGameTeams.team2.fullName}: {winLossData.team2_wins} wins
+          </p>
+          <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+            🤝 Draws: {winLossData.draws}
+          </p>
+          <h4
+            style={{ marginTop: "10px", fontWeight: "bold", color: "#000080" }}
+          >
+            Total Games: {winLossData.total_games}
+          </h4>
+        </div>
+
+        <table className={styles.historyTable}>
+          <thead>
+            <tr>
+              <th onClick={sortDataByDate} style={{ cursor: "pointer" }}>
+                Date {sortOrder === "asc" ? "⬆️" : "⬇️"}
+              </th>
+              <th>Time</th>
+              <th>Game</th>
+              <th>Score</th>
+              <th>Winner</th>
+            </tr>
+          </thead>
+          <tbody>
+            {winLossData.history.map((game, index) => (
+              <tr key={index}>
+                <td>{game.date_of_game}</td>
+                <td>{game.time_of_game?.slice(0, -3)}</td>
+                <td>
+                  {teamInfo[game.game.split("-")[0]]?.fullName ||
+                    game.game.split("-")[0]}{" "}
+                  -{" "}
+                  {teamInfo[game.game.split("-")[1]]?.fullName ||
+                    game.game.split("-")[1]}
+                </td>
+                <td>
+                  <span
+                    style={{
+                      color:
+                        game.score_a === game.score_b
+                          ? "blue"
+                          : game.score_a > game.score_b
+                          ? "green"
+                          : "red",
+                    }}
+                  >
+                    {game.score_a}
+                  </span>{" "}
+                  -{" "}
+                  <span
+                    style={{
+                      color:
+                        game.score_a === game.score_b
+                          ? "blue"
+                          : game.score_b > game.score_a
+                          ? "green"
+                          : "red",
+                    }}
+                  >
+                    {game.score_b}
+                  </span>
+                </td>
+                <td>
+                  {(() => {
+                    const winner = game.winner?.trim().toLowerCase(); // Normalize the value of `game.winner`
+                    if (winner === "team_a") {
+                      return (
+                        teamInfo[game.game.split("-")[0]]?.fullName || "Team A"
+                      );
+                    } else if (winner === "team_b") {
+                      return (
+                        teamInfo[game.game.split("-")[1]]?.fullName || "Team B"
+                      );
+                    } else if (winner === "draw") {
+                      return "Draw!";
+                    } else {
+                      return "N/A"; // Fallback if no condition matches
+                    }
+                  })()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   const handleGameClick = (game_id) => {
     const selectedGameData = games.find((g) => g.game_id === game_id);
+    const team1 = teamInfo[selectedGameData?.game.split("-")[0]];
+    const team2 = teamInfo[selectedGameData?.game.split("-")[1]];
+
+    if (!team1 || !team2) {
+      console.error("Teams are not selected.");
+      return;
+    }
+
     setSelectedGame({
       gameId: game_id,
       team1: {
-        fullName:
-          teamInfo[selectedGameData?.game.split("-")[0]]?.fullName || "Team 1",
-        logoUrl:
-          teamInfo[selectedGameData?.game.split("-")[0]]?.logoUrl ||
-          "/teams_icons/default_team_icon.png",
+        fullName: team1.fullName || "Team 1",
+        logoUrl: team1.logoUrl || "/teams_icons/default_team_icon.png",
       },
       team2: {
-        fullName:
-          teamInfo[selectedGameData?.game.split("-")[1]]?.fullName || "Team 2",
-        logoUrl:
-          teamInfo[selectedGameData?.game.split("-")[1]]?.logoUrl ||
-          "/teams_icons/default_team_icon.png",
+        fullName: team2.fullName || "Team 2",
+        logoUrl: team2.logoUrl || "/teams_icons/default_team_icon.png",
       },
     });
 
     setCurrentGameTeams({
-      team1: teamInfo[selectedGameData?.game.split("-")[0]] || {
+      team1: team1 || {
         fullName: "Team 1",
         logoUrl: "/teams_icons/default_team_icon.png",
       },
-      team2: teamInfo[selectedGameData?.game.split("-")[1]] || {
+      team2: team2 || {
         fullName: "Team 2",
         logoUrl: "/teams_icons/default_team_icon.png",
       },
     });
+
     setShowGameDropdown(false);
+
+    // Pass teams directly to fetchWinLossHistory
+    fetchWinLossHistory(team1.fullName, team2.fullName);
   };
 
   const renderGameOptions = () => {
@@ -591,6 +796,11 @@ const ComparisonUserView = ({ league }) => {
                           )}
                         </tbody>
                       </table>
+                      {isWinLossLoading ? (
+                        <p>Loading win-loss history...</p>
+                      ) : (
+                        comparisonData && renderWinLossHistory()
+                      )}
                     </div>
                   ) : (
                     <div className={styles.comingSoon}>
