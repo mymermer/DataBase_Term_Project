@@ -190,6 +190,9 @@
   Play By Play Details
 */
 
+/*
+  Play-by-Play Details
+*/
 .playByPlayDetails {
     display: flex;
     flex-direction: column;
@@ -222,19 +225,12 @@
 }
 
 .playRow::before {
-    content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 4px;
-    background: linear-gradient(to bottom, #3498db, #2980b9);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.playRow:hover::before {
-    opacity: 1;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: #3498db;
 }
 
 .minuteDisplay {
@@ -247,14 +243,13 @@
 }
 
 .minuteDisplay::after {
-    content: '';
+    content: '🏀'; 
     position: absolute;
-    right: 0;
+    right: -24px;
     top: 50%;
     transform: translateY(-50%);
-    height: 16px;
-    width: 2px;
-    background: #e1e8ed;
+    font-size: 1.25rem;
+    color: #64748b;
 }
 
 .playInfo {
@@ -281,15 +276,10 @@
     font-size: 0.9375rem;
 }
 
-.playerInfo span {
-    display: flex;
-    align-items: center;
-}
-
 .playerInfo span::before {
-    content: '•';
+    content: '⭐'; 
     margin-right: 8px;
-    color: #3498db;
+    color: #f39c12;
     font-size: 1.25rem;
 }
 
@@ -326,15 +316,6 @@
     background-color: rgba(16, 185, 129, 0.1);
 }
 
-.leadingPoints::after {
-    content: '▲';
-    font-size: 0.75rem;
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    color: #10b981;
-}
-
 .statsSummary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -353,6 +334,15 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.statCard::before {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    color: rgba(0, 0, 0, 0.1);
 }
 
 .statLabel {

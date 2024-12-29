@@ -36,9 +36,9 @@
     text-align: center;
   }
 
-/******************************
+/*
   Selectors (Season / Game)
-*******************************/
+*/
 .selectors {
     display: flex;
     gap: 20px;
@@ -100,9 +100,9 @@
     color: #000080;
   }
 
-/******************************
+/*
   Game Dropdown
-*******************************/
+*/
 .customSelect {
     position: relative;
     width: 100%;
@@ -166,10 +166,10 @@
   .gameOptionContent {
     display: flex;
     align-items: center;
-    justify-content: center; /* Center the content */
+    justify-content: center; 
     white-space: nowrap;
-    width: 100%; /* Ensure full-width alignment */
-    text-align: center; /* Align text centrally */
+    width: 100%; 
+    text-align: center;
   }
 
   
@@ -186,18 +186,18 @@
 .vsText {
     margin: 0 auto;
     font-weight: bold;
-    font-size: 1.2rem; /* Maintained */
+    font-size: 1.2rem; 
 }
 
-/******************************
+/*
   Team Info / Logos
-*******************************/
+*/
 .teamInfo {
     display: flex;
     align-items: center;
     gap: 10px; 
     overflow: hidden;
-    max-width: 160px; /* Maintained */
+    max-width: 160px; 
 }
 
 .rightTeam {
@@ -220,7 +220,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 120px;
-    line-height: 30px; /* Match the height of the logo */
+    line-height: 30px; 
   }
 
   .scoreVs {
@@ -228,7 +228,7 @@
     align-items: center;
     margin: 0 10px;
     flex-shrink: 0;
-    line-height: 30px; /* Match the height of the logo */
+    line-height: 30px; 
   }
 
   .score {
@@ -245,18 +245,7 @@
     justify-content: flex-end;
     text-align: right;
   }
-  
-  .teamLogo {
-    object-fit: contain;
-    height: 30px;
-    width: 30px;
-    flex-shrink: 0;
-  }
-  
-  .teamLogo[src*="default_team_icon.png"] {
-    filter: grayscale(100%) brightness(1);
-  }
-  
+    
   
   .disabled {
     opacity: 0.7;
@@ -303,127 +292,151 @@
       transform: translateY(0);
     }
   }
-/******************************
+/*
   Box Score Details
-*******************************/
+*/
 .boxScoreDetails {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem; /* Maintained */
-    margin: 1.5rem auto 3rem; /* Maintained */
-    max-width: 1000px; /* Maintained */
-    width: 100%;
-    background-color: #fff;
-    padding: 2rem; /* Maintained */
-    border-radius: 8px; /* Maintained */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem auto 3rem;
+  max-width: 1000px;
+  width: 100%;
+  background: linear-gradient(135deg, #f9fafe, #ffffff); 
+  padding: 2rem;
+  border-radius: 12px; 
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); 
+  border: 1px solid #e0e0f0; 
+  animation: fadeIn 0.5s ease-in; 
 }
 
+/* Each player's stats as a card */
 .playerStatsRow {
-    display: flex;
-    flex-direction: column;
-    background: #fdfdfd;
-    padding: 1rem 1.5rem; /* Maintained */
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-    animation: fadeIn 0.5s ease-in;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 1.5rem; 
+  border-radius: 10px; 
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: fadeIn 0.5s ease-in;
+  border: 1px solid #eaeaea; 
+  position: relative; 
+  overflow: hidden; 
 }
+
+.playerStatsRow::before {
+  content: "⛹️‍♂️"; 
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 1.5rem;
+  color: rgba(0, 0, 128, 0.15);
+}
+
 
 .playerStatsRow:hover {
-    background-color: #f1f9ff;
+  background: #f3f9ff;
+  transform: translateY(-3px); 
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); 
 }
 
 .playerName {
-    font-size: 1.4rem; /* Maintained */
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.5rem;
+  font-size: 1.6rem; 
+  font-weight: 700; 
+  color: #333;
+  margin-bottom: 1rem; 
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; 
 }
 
-.playerName span {
-    font-size: 1rem; /* Maintained */
-    font-weight: normal;
-    color: #555;
-    margin-left: 0.5rem;
+.playerName span.badge {
+  background-color: #e6f7ff; 
+  color: #0074cc;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-left: 0.8rem; 
+}
+
+/* Team section styling */
+.playerTeam {
+  margin-top: 0.5rem; 
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+  line-height: 1.5rem;
 }
 
 .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Maintained */
-    gap: 0.5rem 1.5rem; 
-    font-size: 1rem; 
-    color: #444;
-    margin-top: 0.5rem; 
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+  gap: 1rem 2rem; 
+  font-size: 1rem;
+  color: #444;
 }
 
 .statItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee; 
-    position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0; 
+  border-bottom: 1px solid #f0f0f0; 
+  position: relative; 
 }
 
 .statItem:last-child {
-    border-bottom: none; 
-}
-
-.statLabel {
-    font-weight: 500;
-    color: #555;
-    display: flex;
-    align-items: center;
-}
-
-.statValue {
-    font-weight: 600;
-    color: #333;
-    background-color: #e6f2ff; 
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.statValue:hover {
-    background-color: #d0e7ff; 
+  border-bottom: none;
 }
 
 .statLabel::before {
-    content: ''; 
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    background-size: contain;
-    background-repeat: no-repeat;
+  content: '●'; 
+  color: #0074cc; 
+  font-size: 0.8rem;
+  margin-right: 8px;
 }
 
-/* Example Icons )
-.statItem.points .statLabel::before {
-    background-image: url('icons/points.svg');
+.statLabel {
+  font-weight: 500;
+  color: #555;
+  display: flex;
+  align-items: center;
 }
 
-.statItem.rebounds .statLabel::before {
-    background-image: url('icons/rebounds.svg');
+.statValue {
+  font-weight: 700; 
+  color: #228b22; 
+  background-color: rgba(34, 139, 34, 0.1); 
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
-.statItem.assists .statLabel::before {
-    background-image: url('icons/assists.svg');
+.statValue:hover {
+  background-color: rgba(34, 139, 34, 0.2); 
 }
 
-.statItem.steals .statLabel::before {
-    background-image: url('icons/steals.svg');
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.statItem.blocks .statLabel::before {
-    background-image: url('icons/blocks.svg');
-}
-*/
 
-/******************************
+/*
   Pagination Controls
-*******************************/
+*/
 .paginationControls {
     display: flex;
     justify-content: space-between;
@@ -461,9 +474,9 @@
     font-size: 1rem; 
 }
 
-/******************************
+/*
   Utility / Animations
-*******************************/
+*/
 .fadeIn {
     animation: fadeIn 0.5s ease-in;
 }
@@ -492,9 +505,9 @@
     color: #999;
   }
   
-/******************************
+/*
   Responsive Adjustments
-*******************************/
+*/
 @media (max-width: 1024px) {
     .container {
         padding: 1.5rem;
@@ -603,7 +616,6 @@
     }
 }
 
-/* Additional Class */
 .playerTeam {
     font-size: 0.9em;
     color: #555;
