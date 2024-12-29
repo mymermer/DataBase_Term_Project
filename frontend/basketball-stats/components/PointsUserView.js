@@ -21,6 +21,7 @@ const PointsUserView = ({ league }) => {
   const [error, setError] = useState(null);
   const [lastFetchedGame, setLastFetchedGame] = useState('');
   const [hasNextPage, setHasNextPage] = useState(true);
+  const [showPaginationControls, setShowPaginationControls] = useState(false);
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
   const tournament = league === "euroleague" ? "lig" : "cup";
@@ -30,6 +31,7 @@ const PointsUserView = ({ league }) => {
       fetchGames();
       setSelectedGame('');
       setCurrentGameTeams({ team1: null, team2: null });
+      setShowPaginationControls(false);
     }
   }, [selectedSeason]);
 
@@ -39,6 +41,7 @@ const PointsUserView = ({ league }) => {
       setRowsPerPage(25);
       fetchScoreAttempts();
       updateCurrentGameTeams();
+      setShowPaginationControls(true);
     }
   }, [selectedGame]);
 
@@ -190,6 +193,31 @@ const PointsUserView = ({ league }) => {
     });
   };
 
+  const renderShotLine = (coordX, coordY, isSuccessful) => {
+    // Adjust the coordinate system
+    const startX = ((coordY+4100) / 20000) * 100; // Normalize to 0-100 range
+    const startY = ((coordX + 750) / 1500) * 100; // Normalize to 0-100 range, invert Y-axis
+    const endX = 0;
+    const endY = 50; // Middle of the left side
+
+    const lineColor = isSuccessful ? "rgb(20, 221, 20)" : "#FF5252";
+
+    return (
+      <svg className={styles.shotLine} viewBox="0 0 100 100" preserveAspectRatio="none">
+        <line
+          x1={`${startX}%`}
+          y1={`${startY}%`}
+          x2={`${endX}%`}
+          y2={`${endY}%`}
+          stroke={lineColor}
+          strokeWidth="1"
+          strokeDasharray="5,5"
+          className={styles.animatedDash}
+        />
+      </svg>
+    );
+  };
+
   return (
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
@@ -258,12 +286,13 @@ const PointsUserView = ({ league }) => {
               {scoreAttempts.map((attempt, index) => (
                 <div key={attempt.game_point_id} className={`${styles.attemptBlock} ${styles.fadeIn}`}>
                   <div className={styles.courtWrapper}>
-                    <Image src="/basketball-court.png" alt="Basketball Court" width={300} height={150} />
+                    <Image src="/basketball-court.png" alt="Basketball Court" layout="fill" objectFit="contain" />
+                    {renderShotLine(attempt.coord_x, attempt.coord_y, attempt.points > 0)}
                     <div 
-                      className={styles.shotMarker} 
+                      className={`${styles.shotMarker} ${attempt.points > 0 ? styles.successfulShot : styles.unsuccessfulShot}`}
                       style={{ 
-                        left: `${(1500 + attempt.coord_y) / 7000  * 300}px`, 
-                        top: `${(950 + attempt.coord_x) / 1900 * 150}px` 
+                        left: `${((attempt.coord_y+3750) / 18000) * 100}%`, 
+                        top: `${((attempt.coord_x + 750) / 1500) * 100}%` 
                       }}
                     />
                     <div className={styles.minuteDisplay}>{attempt.minute}'</div>
@@ -295,18 +324,20 @@ const PointsUserView = ({ league }) => {
                 </div>
               ))}
             </div>
-            <div className={styles.paginationControls}>
-              <button onClick={handlePrevious} disabled={offset === 0}>Previous</button>
-              <select 
-                value={rowsPerPage} 
-                onChange={(e) => setRowsPerPage(Number(e.target.value))}
-              >
-                <option value={25}>25 rows</option>
-                <option value={50}>50 rows</option>
-                <option value={100}>100 rows</option>
-              </select>
-              <button onClick={handleNext} disabled={!hasNextPage}>Next</button>
-            </div>
+            {showPaginationControls && (
+              <div className={styles.paginationControls}>
+                <button onClick={handlePrevious} disabled={offset === 0}>Previous</button>
+                <select 
+                  value={rowsPerPage} 
+                  onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                >
+                  <option value={25}>25 rows</option>
+                  <option value={50}>50 rows</option>
+                  <option value={100}>100 rows</option>
+                </select>
+                <button onClick={handleNext} disabled={!hasNextPage}>Next</button>
+              </div>
+            )}
           </>
         )}
       </div>
