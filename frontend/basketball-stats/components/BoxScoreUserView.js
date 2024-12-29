@@ -63,11 +63,18 @@ const BoxScoreUserView = ({ league }) => {
       if (!resp.ok) {
         throw new Error(`HTTP error! status: ${resp.status}`);
       }
-      const data = await resp.json(); 
-      setGames(data);
-
-      const allTeams = new Set(data.flatMap((g) => g.split("-")));
+      const data = await resp.json() || [];
+      // Filter out null or undefined items
+      const filteredData = data.filter((g) => typeof g === "string");
+      
+      setGames(filteredData);
+      
+      // Then do the set of teams from only valid strings
+      const allTeams = new Set(
+        filteredData.flatMap((g) => g.split("-"))
+      );
       await fetchTeamInfo(Array.from(allTeams));
+      
     } catch (err) {
       console.error("Error fetching games:", err);
       setError("Unable to fetch game list for box scores. Please try again.");
@@ -79,10 +86,10 @@ const BoxScoreUserView = ({ league }) => {
   const fetchBoxScores = async () => {
     setLoading(true);
     setError(null);
-
+  
     const yearPrefix = tournament === "cup" ? "U" : "E";
     const year = `${yearPrefix}${selectedSeason}`;
-
+  
     const columnsParam = [
       "game_player_id",
       "game",
@@ -108,23 +115,31 @@ const BoxScoreUserView = ({ league }) => {
       "fouls_received",
       "valuation",
     ].join(",");
-
+  
     const url = 
       `http://127.0.0.1:5000/api/v1/${tournament}_box_score/with_year_like` +
       `?likePattern=${year}` +
-      `&offset=${offset}` +
-      `&limit=${rowsPerPage}` +
       `&columns=${columnsParam}` +
       `&filters=game:${selectedGame}` +
-      `&sortBy=player&order=asc`;
-
+      `&sortBy=player&order=asc`; 
+  
     try {
       const resp = await fetch(url);
       if (!resp.ok) {
         throw new Error(`HTTP error! status: ${resp.status}`);
       }
       const data = await resp.json();
-      setBoxScores(data); 
+  
+      // Deduplicate data
+      const uniqueBoxScores = data.filter(
+        (player, index, self) =>
+          index ===
+          self.findIndex(
+            (p) => p.game_player_id === player.game_player_id
+          )
+      );
+  
+      setBoxScores(uniqueBoxScores); // Save all deduplicated scores
     } catch (err) {
       console.error("Error fetching box scores:", err);
       setError("Unable to fetch box score data. Please try again.");
@@ -233,28 +248,53 @@ const BoxScoreUserView = ({ league }) => {
     if (!boxScores.length) {
       return <p>No box score data for this game.</p>;
     }
-
-    return boxScores.map((playerStats) => (
-      <div key={playerStats.game_player_id} className={styles.playerStatsRow}>
+  
+    const validBoxScores = boxScores.filter((playerStats) => {
+      const t = playerStats.player_team?.trim();
+      return t && t !== "N/A";
+    });
+  
+    if (!validBoxScores.length) {
+      return <p>No box score data for players with valid teams.</p>;
+    }
+  
+    return validBoxScores.map((playerStats, index) => (
+      <div
+        key={`${playerStats.game_player_id || "unknown"}-${index}`} 
+        className={styles.playerStatsRow}
+      >
         <div className={styles.playerName}>
           <strong>{playerStats.player}</strong>
           {playerStats.is_starter ? <span> (Starter)</span> : ""}
+          <p className={styles.playerTeam}>
+            Team: {playerStats.player_team}
+          </p>
         </div>
         <div className={styles.stats}>
           <p>Points: {playerStats.points}</p>
-          <p>2PT: {playerStats.two_points_made}/{playerStats.two_points_attempted}</p>
-          <p>3PT: {playerStats.three_points_made}/{playerStats.three_points_attempted}</p>
-          <p>FT: {playerStats.free_throws_made}/{playerStats.free_throws_attempted}</p>
           <p>
-            Rebounds: {playerStats.total_rebounds} 
-            (Off {playerStats.offensive_rebounds}/Def {playerStats.defensive_rebounds})
+            2PT: {playerStats.two_points_made}/{playerStats.two_points_attempted}
+          </p>
+          <p>
+            3PT: {playerStats.three_points_made}/{playerStats.three_points_attempted}
+          </p>
+          <p>
+            FT: {playerStats.free_throws_made}/{playerStats.free_throws_attempted}
+          </p>
+          <p>
+            Rebounds: {playerStats.total_rebounds} (Off{" "}
+            {playerStats.offensive_rebounds}/Def {playerStats.defensive_rebounds})
           </p>
           <p>Assists: {playerStats.assists}</p>
           <p>Steals: {playerStats.steals}</p>
           <p>Turnovers: {playerStats.turnovers}</p>
-          <p>Blocks For/Against: {playerStats.blocks_favour}/{playerStats.blocks_against}</p>
           <p>
-            Fouls (Committed/Received): {playerStats.fouls_committed}/{playerStats.fouls_received}
+            Blocks For/Against: {playerStats.blocks_favour}/
+            {playerStats.blocks_against}
+          </p>
+          <p>
+            Fouls (Committed/Received): {playerStats.fouls_committed}/
+            {playerStats.fouls_received}
           </p>
           <p>Valuation: {playerStats.valuation}</p>
         </div>
@@ -262,133 +302,115 @@ const BoxScoreUserView = ({ league }) => {
     ));
   };
 
-  // Pagination event handlers
-  const handlePrevious = () => {
-    if (offset >= rowsPerPage) {
-      setOffset(offset - rowsPerPage);
-    }
-  };
+const handlePrevious = () => {
+  if (offset >= rowsPerPage) {
+    setOffset(offset - rowsPerPage);
+  }
+};
 
-  const handleNext = () => {
+const handleNext = () => {
+  if (offset + rowsPerPage < boxScores.length) {
     setOffset(offset + rowsPerPage);
-  };
+  }
+};
 
-  return (
-    <div className={styles.containerWrapper}>
-      <div className={styles.container}>
-        {/* Season & Game Selectors */}
-        <div className={styles.initialView}>
-          {!selectedGame && (
-            <h2>Select a game to view the box score of players</h2>
-          )}
-          <div className={styles.selectors}>
-            {/* Season dropdown */}
-            <div className={styles.selectWrapper}>
-              <select
-                value={selectedSeason}
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className={selectedSeason ? styles.filled : ""}
-              >
-                <option value="">Season</option>
-                {seasons.map((season) => (
-                  <option key={season} value={season}>
-                    {season}-{season + 1}
-                  </option>
-                ))}
-              </select>
-              <span className={styles.selectLabel}>Season</span>
-            </div>
-            {/* Game dropdown */}
-            <div className={styles.customSelect}>
-              <div
-                className={`${styles.selectedGame} ${
-                  selectedGame ? styles.filled : ""
-                } ${!selectedSeason ? styles.disabledGame : ""}`}
-                onClick={() => selectedSeason && setShowGameDropdown(!showGameDropdown)}
-              >
-                {selectedGame ? (
-                  <>
-                    <div className={styles.teamInfo}>
-                      <Image
-                        src={
-                          currentGameTeams.team1?.logoUrl ||
-                          "/teams_icons/default_team_icon.png"
-                        }
-                        alt={`${currentGameTeams.team1?.fullName} logo`}
-                        width={30}
-                        height={30}
-                        className={styles.teamLogo}
-                      />
-                      <span className={styles.teamName}>
-                        {currentGameTeams.team1?.fullName}
-                      </span>
-                    </div>
-                    <span className={styles.vsText}>vs</span>
-                    <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
-                      <span className={styles.teamName}>
-                        {currentGameTeams.team2?.fullName}
-                      </span>
-                      <Image
-                        src={
-                          currentGameTeams.team2?.logoUrl ||
-                          "/teams_icons/default_team_icon.png"
-                        }
-                        alt={`${currentGameTeams.team2?.fullName} logo`}
-                        width={30}
-                        height={30}
-                        className={styles.teamLogo}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <span>Select a game</span>
-                )}
-              </div>
-              <span className={styles.selectLabel}>Game</span>
-              {showGameDropdown && (
-                <div className={styles.gameDropdown}>{renderGameOptions()}</div>
+return (
+  <div className={styles.containerWrapper}>
+    <div className={styles.container}>
+      {/* Season & Game Selectors */}
+      <div className={styles.initialView}>
+        {!selectedGame && (
+          <h2>Select a game to view the box score of players</h2>
+        )}
+        <div className={styles.selectors}>
+          {/* Season dropdown */}
+          <div className={styles.selectWrapper}>
+            <select
+              value={selectedSeason}
+              onChange={(e) => setSelectedSeason(e.target.value)}
+              className={selectedSeason ? styles.filled : ""}
+            >
+              <option value="">Season</option>
+              {seasons.map((season) => (
+                <option key={season} value={season}>
+                  {season}-{season + 1}
+                </option>
+              ))}
+            </select>
+            <span className={styles.selectLabel}>Season</span>
+          </div>
+          {/* Game dropdown */}
+          <div className={styles.customSelect}>
+            <div
+              className={`${styles.selectedGame} ${
+                selectedGame ? styles.filled : ""
+              } ${!selectedSeason ? styles.disabledGame : ""}`}
+              onClick={() => selectedSeason && setShowGameDropdown(!showGameDropdown)}
+            >
+              {selectedGame ? (
+                <>
+                  <div className={styles.teamInfo}>
+                    <Image
+                      src={
+                        currentGameTeams.team1?.logoUrl ||
+                        "/teams_icons/default_team_icon.png"
+                      }
+                      alt={`${currentGameTeams.team1?.fullName} logo`}
+                      width={30}
+                      height={30}
+                      className={styles.teamLogo}
+                    />
+                    <span className={styles.teamName}>
+                      {currentGameTeams.team1?.fullName}
+                    </span>
+                  </div>
+                  <span className={styles.vsText}>vs</span>
+                  <div className={`${styles.teamInfo} ${styles.rightTeam}`}>
+                    <span className={styles.teamName}>
+                      {currentGameTeams.team2?.fullName}
+                    </span>
+                    <Image
+                      src={
+                        currentGameTeams.team2?.logoUrl ||
+                        "/teams_icons/default_team_icon.png"
+                      }
+                      alt={`${currentGameTeams.team2?.fullName} logo`}
+                      width={30}
+                      height={30}
+                      className={styles.teamLogo}
+                    />
+                  </div>
+                </>
+              ) : (
+                <span>Select a game</span>
               )}
             </div>
+            <span className={styles.selectLabel}>Game</span>
+            {showGameDropdown && (
+              <div className={styles.gameDropdown}>{renderGameOptions()}</div>
+            )}
           </div>
         </div>
-
-        {/* Error Display */}
-        {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
-
-        {/* Loading or the final box score output */}
-        {selectedGame && (
-          <>
-            {loading ? (
-              <LoadingSkeleton rows={5} columns={4} />
-            ) : (
-              <div className={styles.boxScoreDetails}>
-                {renderBoxScores()}
-              </div>
-            )}
-
-            {/* Pagination controls for Next/Prev & rows-per-page */}
-            <div className={styles.paginationControls}>
-              <button onClick={handlePrevious} disabled={offset === 0}>
-                Previous
-              </button>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setOffset(0); // reset to page 1
-                }}
-              >
-                <option value={25}>25 rows</option>
-                <option value={50}>50 rows</option>
-                <option value={100}>100 rows</option>
-              </select>
-              <button onClick={handleNext}>Next</button>
-            </div>
-          </>
-        )}
       </div>
+
+      {/* Error Display */}
+      {error && <ErrorDisplay message={error} onRetry={fetchGames} />}
+
+      {/* Loading or the final box score output */}
+      {selectedGame && (
+        <>
+          {loading ? (
+            <LoadingSkeleton rows={5} columns={4} />
+          ) : (
+            <div className={styles.boxScoreDetails}>
+              {renderBoxScores()}
+            </div>
+          )}
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default BoxScoreUserView;

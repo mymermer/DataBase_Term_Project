@@ -24,6 +24,8 @@ def get_paginated_plays():
         limit = int(request.args.get('limit', 25))  # Default to 25 if not provided
         columns = request.args.get('columns', None)  # Optional column list
         filters_raw = request.args.get('filters', None)  # Optional filters
+        sort_by = request.args.get('sortBy', None)
+        order = request.args.get('order', 'asc')
         
         # Parse columns if provided
         if columns:
@@ -34,7 +36,7 @@ def get_paginated_plays():
         if filters_raw:
             filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
-        cup_play_by_play = CupPlayByPlayDAO.get_paginated_plays(db, offset=offset, limit=limit, columns=columns, filters=filters)
+        cup_play_by_play = CupPlayByPlayDAO.get_paginated_plays(db, offset=offset, limit=limit, columns=columns, filters=filters, sort_by=sort_by,order=order)
         if cup_play_by_play is None:
             return jsonify([]), 200
         return jsonify(cup_play_by_play), 200  # Already a list of dicts if columns are specified
@@ -168,3 +170,5 @@ def get_distinct_games_with_like():
         return jsonify({'error': 'Invalid columns or likePattern'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500    
+    
+    

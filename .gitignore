@@ -3,6 +3,6 @@
 *.venv
 __pycache__
 backend/dataset
-.gitigonre
-*.sql
+*.DS_Store
 backend/app/config.py
+*.sql

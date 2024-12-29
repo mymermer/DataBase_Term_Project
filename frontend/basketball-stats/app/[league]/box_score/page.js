@@ -7,14 +7,14 @@ import styles from "../../../styles/Page.module.css";
 import BoxScoreUserView from "../../../components/BoxScoreUserView";
 
 const allColumns = [
-  'game_player_id', 'game_id', 'game', 'round_of_game', 'phase', 'season_player_id', 'season_team_id',
-  'is_starter', 'is_playing', 'dorsal', 'player', 'points',
-  'two_points_made', 'two_points_attempted',
-  'three_points_made', 'three_points_attempted',
-  'free_throws_made', 'free_throws_attempted',
-  'offensive_rebounds', 'defensive_rebounds', 'total_rebounds',
-  'assists', 'steals', 'turnovers', 'blocks_favour', 'blocks_against',
-  'fouls_committed', 'fouls_received', 'valuation'
+  "game_player_id", "game_id", "game", "round_of_game", "phase", "season_player_id", "season_team_id",
+  "is_starter", "is_playing", "dorsal", "player", "points",
+  "two_points_made", "two_points_attempted",
+  "three_points_made", "three_points_attempted",
+  "free_throws_made", "free_throws_attempted",
+  "offensive_rebounds", "defensive_rebounds", "total_rebounds",
+  "assists", "steals", "turnovers", "blocks_favour", "blocks_against",
+  "fouls_committed", "fouls_received", "valuation"
 ];
 
 const foreignKeyColumns = [
@@ -25,6 +25,7 @@ const foreignKeyColumns = [
 
 const primaryKey = "game_player_id";
 const columnTypes = {
+
   game_player_id: 'game_player_id',
   game_id: 'game_id',
   game: 'game',
@@ -56,7 +57,6 @@ const columnTypes = {
   valuation: 'integer'
 };
 
-
 export default function BoxScorePage({ params }) {
   const { league } = React.use(params);
 
@@ -77,15 +77,7 @@ export default function BoxScorePage({ params }) {
 
   useEffect(() => {
     fetchData();
-  }, [
-    currentPage,
-    rowsPerPage,
-    tournament,
-    selectedColumns,
-    filters,
-    sortBy,
-    sortOrder,
-  ]);
+  }, [currentPage, rowsPerPage, tournament, selectedColumns, filters, sortBy, sortOrder]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -95,6 +87,7 @@ export default function BoxScorePage({ params }) {
     if (sortBy) {
       dataUrl += `&sortBy=${sortBy}&order=${sortOrder}`;
     }
+
     let countUrl = `http://127.0.0.1:5000/api/v1/${tournament}_box_score/count`;
 
     // Add filters to the URL
@@ -149,7 +142,7 @@ export default function BoxScorePage({ params }) {
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(0); // Reset to first page when filters change
+    setCurrentPage(0);
   };
 
   const handleSort = (column) => {
@@ -259,6 +252,7 @@ export default function BoxScorePage({ params }) {
             onAdd={handleAdd}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
+            league={league}
             onFetchData={fetchData}
             foreignKeyColumns={foreignKeyColumns}
             primaryKey={primaryKey}
@@ -268,5 +262,4 @@ export default function BoxScorePage({ params }) {
       </div>
     </StatPageTemplate>
   );
-
 }

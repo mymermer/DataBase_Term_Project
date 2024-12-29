@@ -87,7 +87,6 @@ class LigBoxScoreDAO:
             cursor.close()
             connection.close()
             
-
     @staticmethod
     def get_all_lig_box_scores(db: db) -> list:
         try:
@@ -107,7 +106,6 @@ class LigBoxScoreDAO:
         finally:
             cursor.close()
             connection.close()
-
 
     @staticmethod
     def update_lig_box_score(db: db, boxscore: LigBoxScore) -> None:
@@ -175,7 +173,6 @@ class LigBoxScoreDAO:
             if boxscore.valuation is not None:
                 fields_to_update['valuation'] = boxscore.valuation    
 
-            
             if not fields_to_update:
                 raise ValueError("No fields to update were provided.")
 
@@ -200,7 +197,6 @@ class LigBoxScoreDAO:
             cursor.close()
             connection.close()
 
-
     @staticmethod
     def delete_lig_box_score(db: db, game_player_id: str) -> None:
         try:
@@ -219,7 +215,6 @@ class LigBoxScoreDAO:
         finally:
             cursor.close()
             connection.close()
-
 
     @staticmethod
     def get_paginated_lig_box_scores(
@@ -246,10 +241,9 @@ class LigBoxScoreDAO:
                 SELECT {selected_columns}
                 FROM LIG_BOX_SCORE
                 {where_clause}
-                {order_clause}
-                LIMIT %s OFFSET %s
+                {order_clause} 
+                LIMIT %s OFFSET %s              
             """    
-
             params.extend([limit, offset])
             cursor = connection.cursor()
             cursor.execute(query, params)
@@ -319,75 +313,6 @@ class LigBoxScoreDAO:
                 connection.close()
                 
                 
-    @staticmethod
-    def get_paginated_lig_box_score_with_like(
-        db: db,
-        like_pattern: str,
-        offset: int = 0,
-        limit: int = 25,
-        columns: list = None,
-        filters: dict = None,
-        sort_by: str = None,
-        order: str = 'asc'
-    ) -> list:
-        
-        try:
-            connection = db.get_connection()
-
-            # Add `%` wildcard to the LIKE pattern
-            like_pattern = f"{like_pattern}%"
-
-            # Build the SELECT part of the query
-            selected_columns = ", ".join(columns) if columns else "*"
-
-            # Build the WHERE clause dynamically based on filters
-            where_clauses = [f"game_player_id LIKE %s"]
-            params = [like_pattern]
-
-            if filters:
-                for column, value in filters.items():
-                    where_clauses.append(f"{column} = %s")
-                    params.append(value)
-
-            where_clause = f"WHERE {' AND '.join(where_clauses)}"
-
-            # Add ORDER BY clause
-            order_clause = ""
-            if sort_by:
-                if order.lower() not in ['asc', 'desc']:
-                    order = 'asc'  # Default to ascending
-                order_clause = f"ORDER BY {sort_by} {order.upper()}"
-
-            # Final query with LIMIT and OFFSET
-            query = f"""
-                SELECT {selected_columns} FROM LIG_BOX_SCORE
-                {where_clause}
-                {order_clause}
-                LIMIT %s OFFSET %s
-            """
-            
-            # Append limit and offset to the params
-            params.extend([limit, offset])
-            
-            cursor = connection.cursor()
-            cursor.execute(query, params)
-            box_scores = cursor.fetchall()
-
-            if box_scores is None:
-                return None
-
-            if columns:
-                return [dict(zip(columns, box_score)) for box_score in box_scores]
-            else:
-                return [LigBoxScore(*box_score) for box_score in box_scores]
-
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            connection.rollback()
-            raise
-        finally:
-            cursor.close()
-            connection.close()
 
 
 
@@ -436,3 +361,74 @@ class LigBoxScoreDAO:
         finally:
             cursor.close()
             connection.close()                 
+
+
+    @staticmethod
+    def get_filtered_lig_box_score_with_like(
+        db: db,
+        like_pattern: str,
+        columns: list = None,
+        filters: dict = None,
+        sort_by: str = None,
+        order: str = 'asc'
+    ) -> list:
+    
+        try:
+            connection = db.get_connection()
+
+            # Add `%` wildcard to the LIKE pattern
+            like_pattern = f"{like_pattern}%"
+
+            # Build the SELECT part of the query
+            base_columns = ", ".join([f"bs.{col}" for col in columns]) if columns else "bs.*"
+            selected_columns = f"{base_columns}, pbp.team AS player_team"
+
+            # Build the WHERE clause dynamically based on filters
+            where_clauses = [f"bs.game_player_id LIKE %s"]
+            params = [like_pattern]
+
+            if filters:
+                for column, value in filters.items():
+                    where_clauses.append(f"bs.{column} = %s")
+                    params.append(value)
+
+            where_clause = f"WHERE {' AND '.join(where_clauses)}"
+
+            # Add ORDER BY clause
+            order_clause = ""
+            if sort_by:
+                if order.lower() not in ['asc', 'desc']:
+                    order = 'asc'  # Default to ascending
+                order_clause = f"ORDER BY {sort_by} {order.upper()}"
+
+            query = f"""
+            SELECT DISTINCT {selected_columns} 
+            FROM LIG_BOX_SCORE bs
+            LEFT JOIN LIG_PLAY_BY_PLAY pbp
+            ON bs.game_player_id = pbp.game_player_id
+            {where_clause}
+            {order_clause}
+            """
+        
+        
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            box_scores = cursor.fetchall()
+
+            if box_scores is None:
+                return None
+
+            # Include player_team in the response dictionary if columns are specified
+            if columns:
+                columns_with_team = columns + ["player_team"]
+                return [dict(zip(columns_with_team, box_score)) for box_score in box_scores]
+            else:
+                return [LigBoxScore(*box_score) for box_score in box_scores]
+
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            connection.rollback()
+            raise
+        finally:
+            cursor.close()
+            connection.close()
