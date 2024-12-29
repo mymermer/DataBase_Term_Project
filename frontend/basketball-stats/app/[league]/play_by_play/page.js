@@ -46,7 +46,7 @@ const columnTypes = {
   phase: "string",
   season_player_id: "season_player_id",
   season_team_id: "season_team_id",
-  quarter: "integer",
+  quarter: "string",
   play_type: "string",
   player: "string",
   team: "string",
