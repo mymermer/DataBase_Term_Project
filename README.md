@@ -41,19 +41,19 @@ Welcome to the KickStats Term Project! Follow the instructions below to set up a
     ```
 2. Change `app/config.py`according to your mysql username and password.    
 
-2. Install the required Python packages:
+3. Install the required Python packages:
 
     ```bash
     pip install -r requirements.txt
     ```
 
-3. Install the `waitress` server:
+4. Install the `waitress` server:
 
     ```bash
     pip install waitress
     ```
 
-4. Start the backend server:
+5. Start the backend server:
 
     ```bash
     waitress-serve --port=5000 run:app
