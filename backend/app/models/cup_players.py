@@ -54,52 +54,52 @@ from typing import Optional
 
 @dataclass
 class Cup_Player:
-    season_player_id: Optional[str]
-    season_team_id: Optional[str]
-    player: Optional[str]
-    games_played: Optional[int]
-    games_started: Optional[int]
-    minutes_played: Optional[float]
-    points: Optional[int]
-    two_points_made: Optional[int]
-    two_points_attempted: Optional[int]
-    three_points_made: Optional[int]
-    three_points_attempted: Optional[int]
-    free_throws_made: Optional[int]
-    free_throws_attempted: Optional[int]
-    offensive_rebounds: Optional[int]
-    defensive_rebounds: Optional[int]
-    total_rebounds: Optional[int]
-    assists: Optional[int]
-    steals: Optional[int]
-    turnovers: Optional[int]
-    blocks_favour: Optional[int]
-    blocks_against: Optional[int]
-    fouls_committed: Optional[int]
-    fouls_received: Optional[int]
-    valuation: Optional[int]
-    minutes_per_game: Optional[float]
-    points_per_game: Optional[float]
-    two_points_made_per_game: Optional[float]
-    two_points_attempted_per_game: Optional[float]
-    two_points_percentage: Optional[float]
-    three_points_made_per_game: Optional[float]
-    three_points_attempted_per_game: Optional[float]
-    three_points_percentage: Optional[float]
-    free_throws_made_per_game: Optional[float]
-    free_throws_attempted_per_game: Optional[float]
-    free_throws_percentage: Optional[float]
-    offensive_rebounds_per_game: Optional[float]
-    defensive_rebounds_per_game: Optional[float]
-    total_rebounds_per_game: Optional[float]
-    assists_per_game: Optional[float]
-    steals_per_game: Optional[float]
-    turnovers_per_game: Optional[float]
-    blocks_favour_per_game: Optional[float]
-    blocks_against_per_game: Optional[float]
-    fouls_committed_per_game: Optional[float]
-    fouls_received_per_game: Optional[float]
-    valuation_per_game: Optional[float]
+    season_player_id: Optional[str] #? why can the primary key be optional?
+    season_team_id: Optional[str] = None
+    player: Optional[str] = None
+    games_played: Optional[int] = None
+    games_started: Optional[int] = None
+    minutes_played: Optional[float] = None
+    points: Optional[int] = None
+    two_points_made: Optional[int] = None
+    two_points_attempted: Optional[int] = None
+    three_points_made: Optional[int] = None
+    three_points_attempted: Optional[int] = None
+    free_throws_made: Optional[int] = None
+    free_throws_attempted: Optional[int] = None
+    offensive_rebounds: Optional[int] = None
+    defensive_rebounds: Optional[int] = None
+    total_rebounds: Optional[int] = None
+    assists: Optional[int] = None
+    steals: Optional[int] = None
+    turnovers: Optional[int] = None
+    blocks_favour: Optional[int] = None
+    blocks_against: Optional[int] = None
+    fouls_committed: Optional[int] = None
+    fouls_received: Optional[int] = None
+    valuation: Optional[int] = None
+    minutes_per_game: Optional[float] = None
+    points_per_game: Optional[float] = None
+    two_points_made_per_game: Optional[float] = None
+    two_points_attempted_per_game: Optional[float] = None
+    two_points_percentage: Optional[float] = None
+    three_points_made_per_game: Optional[float] = None
+    three_points_attempted_per_game: Optional[float] = None
+    three_points_percentage: Optional[float] = None
+    free_throws_made_per_game: Optional[float] = None
+    free_throws_attempted_per_game: Optional[float] = None
+    free_throws_percentage: Optional[float] = None
+    offensive_rebounds_per_game: Optional[float] = None
+    defensive_rebounds_per_game: Optional[float] = None
+    total_rebounds_per_game: Optional[float] = None
+    assists_per_game: Optional[float] = None
+    steals_per_game: Optional[float] = None 
+    turnovers_per_game: Optional[float] = None
+    blocks_favour_per_game: Optional[float] = None
+    blocks_against_per_game: Optional[float] = None
+    fouls_committed_per_game: Optional[float] = None
+    fouls_received_per_game: Optional[float] = None
+    valuation_per_game: Optional[float] = None
 
 class Cup_PlayersDAO():
     @staticmethod
