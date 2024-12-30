@@ -24,7 +24,7 @@ const PointsUserView = ({ league }) => {
   const [loading, setLoading] = useState(false);
   const [teamInfo, setTeamInfo] = useState({});
   const [showGameDropdown, setShowGameDropdown] = useState(false);
-  const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null, team2: null });
+  const [currentGameTeams, setCurrentGameTeams] = useState({ team1: null});
   const [error, setError] = useState(null);
 
   const seasons = Array.from({ length: 2016 - 2007 + 1 }, (_, i) => 2007 + i);
@@ -181,20 +181,11 @@ const PointsUserView = ({ league }) => {
 
   const updateCurrentGameTeams = () => {
     if (selectedGame) {
-      const [team1, team2] = selectedGame.game.split('-'); 
+      const [team1] = selectedGame.game.split('-'); 
       setCurrentGameTeams({
         team1: teamInfo[team1] || { fullName: team1, logoUrl: '/teams_icons/default_team_icon.png' },
       });
     }
-  };
-
-  const getTeamCode = (seasonTeamId) => {
-    return seasonTeamId.split('_')[1];
-  };
-
-  const formatPlayerName = (playerName) => {
-    const [surname, name] = playerName.split(', ');
-    return `${name} ${surname}`;
   };
 
   const renderGameOptions = () => {
@@ -215,19 +206,17 @@ const PointsUserView = ({ league }) => {
           setShowGameDropdown(false);
         }}
       >
-        <div className={styles.gameOptionContent}>
-          <div className={styles.teamInfo}>
-            <Image
-              src={teamInfo[team]?.logoUrl || '/teams_icons/default_team_icon.png'}
-              alt={`${teamInfo[team]?.fullName || team} logo`}
-              width={30}
-              height={30}
-              className={styles.teamLogo}
-            />
-            <span className={styles.teamName}>
-              {teamInfo[team]?.fullName || team}
-            </span>
-          </div>
+        <div className={`${styles.teamInfo} ${styles.singleTeam}`}>
+          <Image 
+            src={teamInfo[team]?.logoUrl || '/teams_icons/default_team_icon.png'} 
+            alt={`${teamInfo[team]?.fullName || team} logo`} 
+            width={30} 
+            height={30} 
+            className={styles.teamLogo}
+          />
+          <span className={styles.teamName}>
+            {teamInfo[team]?.fullName || team}
+          </span>
         </div>
       </div>
     ));
