@@ -72,7 +72,7 @@ def get_paginated_header():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
 
         # Call the DAO method with the sort_by and order parameters
         lig_header = Lig_HeaderDAO.get_paginated_lig_header(
@@ -100,7 +100,7 @@ def get_total_header_count():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
             
         total_count = Lig_HeaderDAO.get_total_lig_header(db,filters=filters)
         return jsonify({'total': total_count}), 200

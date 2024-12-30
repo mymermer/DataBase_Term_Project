@@ -43,7 +43,7 @@ def get_paginated_teams():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
 
         # Call the DAO method with the sort_by and order parameters
         cup_teams = Cup_TeamsDAO.get_paginated_cup_teams(
@@ -74,7 +74,7 @@ def get_total_teams_count():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
             
 
 

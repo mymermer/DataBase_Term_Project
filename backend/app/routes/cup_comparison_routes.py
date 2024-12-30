@@ -69,7 +69,7 @@ def get_paginated_comparison():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
 
         # Call the DAO method with the sort_by and order parameters
         cup_comparison = Cup_ComparisonDAO.get_paginated_cup_comparison(
@@ -97,7 +97,7 @@ def get_total_comparison_count():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(","))
+            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
             
         total_count = Cup_ComparisonDAO.get_total_cup_comparison(db,filters=filters)
         return jsonify({'total': total_count}), 200
