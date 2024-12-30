@@ -25,10 +25,10 @@ Welcome to the KickStats Term Project! Follow the instructions below to set up a
 
 3. Run the SQL scripts in the following order:
 
-    - `table_initialization/create_tables.sql`
-    - `table_initialization/load_tables.sql`
-    - `table_initialization/prepare_for_foreign_keys.sql`
-    - `table_initialization/add_foreign_keys.sql`
+    - `backend/table_initialization/create_tables.sql`
+    - `backend/table_initialization/load_tables.sql`
+    - `backend/table_initialization/prepare_for_foreign_keys.sql`
+    - `backend/table_initialization/add_foreign_keys.sql`
 
 ---
 
