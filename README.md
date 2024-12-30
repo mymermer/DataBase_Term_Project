@@ -15,8 +15,8 @@ Welcome to the KickStats Term Project! Follow the instructions below to set up a
 
 ### 1. Database Setup
 
-1. You can download the required CSV files from the following link:  
-[Google Drive - CSV Files](https://drive.google.com/drive/folders/1bf3SSKFpJ-_Hd-Ut3kM-QVPX0uZqp-Az?usp=sharing). Put these CSV files in the folder specified in the `table_initialization/load_tables.sql` file. If you are using a different version of MySQL, update the file paths in the SQL file accordingly.
+1. You can download the required CSV files from the following link: [Google Drive - CSV Files](https://drive.google.com/drive/folders/1bf3SSKFpJ-_Hd-Ut3kM-QVPX0uZqp-Az?usp=sharing).
+Put these CSV files in the folder specified in the `table_initialization/load_tables.sql` file. If you are using a different version of MySQL, update the file paths in the SQL file accordingly.
 
 2. Create a database in MySQL with the following command:
 
