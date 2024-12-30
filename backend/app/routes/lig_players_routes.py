@@ -31,7 +31,7 @@ def get_paginated_players():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
         # Call the DAO method with the sort_by and order parameters
         lig_players = Lig_PlayersDAO.get_paginated_lig_player(
@@ -88,7 +88,7 @@ def get_total_cup_players():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
         total_count = Lig_PlayersDAO.get_total_lig_players(db,filters=filters)
         return jsonify({'total': total_count}), 200

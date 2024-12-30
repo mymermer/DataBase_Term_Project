@@ -42,7 +42,7 @@ def get_paginated_points():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
         # Call the DAO method with the sort_by and order parameters
         lig_points = Lig_PointsDAO.get_paginated_lig_points(
@@ -70,7 +70,7 @@ def get_total_points_count():
         # Parse filters if provided
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
             
 
 

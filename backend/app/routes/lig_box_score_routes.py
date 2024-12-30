@@ -32,7 +32,7 @@ def get_paginated_box_score():
         
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
 
         
         lig_box_score = LigBoxScoreDAO.get_paginated_lig_box_scores(
@@ -59,7 +59,7 @@ def get_total_box_score_count():
        
         filters = None
         if filters_raw:
-            filters = dict(filter.split(":") for filter in filters_raw.split(";"))
+            filters = dict(filter.split(":") for filter in filters_raw.split(","))
             
         total_count = LigBoxScoreDAO.get_total_lig_box_scores(db,filters=filters)
         return jsonify({'total': total_count}), 200
