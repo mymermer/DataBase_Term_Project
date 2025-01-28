@@ -1,13 +1,19 @@
-# KickStats Term Project
+# European Basketball Statistics
 
-Welcome to the KickStats Term Project! Follow the instructions below to set up and run the project on your local machine.
+<img src="logo.png" alt="Logo" width="100" />
 
----
+
+This project is built on a relational database schema, utilizing advanced SQL query techniques and extensive preprocessing to adapt tables for various use cases. The backend and frontend work seamlessly together to present statistics to users in a visually appealing and interactive manner.
+
+For more details about the project, including in-depth explanations and user interface designs, check out our [project report](./documentation/Report.pdf).
+
+If you want to run the project on your local machine, follow the instructions below.
 
 ## Prerequisites
 
-1. **MySQL**: Ensure MySQL is installed on your machine. If not, download and install it from the [official website](https://www.mysql.com/).
+1. **MySQL (9.1 recomended)**: Ensure MySQL is installed on your machine. If not, download and install it from the [official website](https://www.mysql.com/).
 2. **Node.js and npm**: Required for the frontend setup. Download and install them from the [official Node.js website](https://nodejs.org/).
+3. **Python (3.12 recomended)**: Required for the backend setup. Download and install it from the [official Python website](https://www.python.org/).
 
 ---
 
@@ -29,7 +35,7 @@ Put these CSV files in the folder specified in the `table_initialization/load_ta
     - `backend/table_initialization/create_tables.sql`
     - `backend/table_initialization/load_tables.sql`
     - `backend/table_initialization/prepare_for_foreign_keys.sql`
-    - `backend/table_initialization/add_foreign_keys.sql`
+    - `backend/table_initialization/foreign_keys.sql`
 
 ---
 
