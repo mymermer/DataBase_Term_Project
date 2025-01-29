@@ -53,14 +53,8 @@ Put these CSV files in the folder specified in the `table_initialization/load_ta
     ```bash
     pip install -r requirements.txt
     ```
-
-4. Install the `waitress` server:
-
-    ```bash
-    pip install waitress
-    ```
-
-5. Start the backend server:
+    
+4. Start the backend server:
 
     ```bash
     waitress-serve --port=5000 run:app
